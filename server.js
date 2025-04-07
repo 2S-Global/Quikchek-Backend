@@ -20,7 +20,7 @@ import pdfRouter from "./routes/pdfRoutes.js";
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Welcome to the back end of the E2 Score ");
+  res.send("Welcome to the back end of the Quikchek ");
 });
 app.use("/api/auth", AuthRouter);
 app.use("/api/verify", userVerificationRoutes);
