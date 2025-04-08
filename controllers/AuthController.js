@@ -129,47 +129,60 @@ export const listCompanies = async (req, res) => {
 };
 
 export const deleteCompany = async (req, res) => {
-    try {
-        const { companyId } = req.body;
+  try {
+    const { companyId } = req.body;
 
-        // Validate companyId format
-        if (!mongoose.Types.ObjectId.isValid(companyId)) {
-            return res.status(400).json({ success: false, message: "Invalid company ID" });
-        }
-
-        const objectId = new mongoose.Types.ObjectId(companyId);
-
-
-        const existingCompany = await User.findOne({ _id: objectId });
-        console.log("Existing company:", existingCompany);
-
- 
-        const deletedCompany = await User.findOneAndUpdate(
-            {
-                _id: objectId,
-                role: 2,
-                $or: [{ is_del: false }, { is_del: "false" }]
-            },
-            {
-                is_del: true,
-                updatedAt: new Date()
-            },
-            { new: true }
-        );
-
-        if (!deletedCompany) {
-            return res.status(404).json({ success: false, message: "Company not found or already deleted" });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "Company deleted successfully",
-            data: deletedCompany
-        });
-    } catch (error) {
-        console.error("Delete company error:", error);
-        res.status(500).json({ success: false, message: "Error deleting company", error: error.message });
+    // ✅ Step 1: Validate ID format
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(400).json({ success: false, message: "Invalid company ID" });
     }
+
+    const objectId = new mongoose.Types.ObjectId(companyId);
+
+    // ✅ Step 2: Log to verify document before update
+    const existingCompany = await User.findOne({ _id: objectId });
+    if (!existingCompany) {
+      return res.status(404).json({ success: false, message: "Company not found" });
+    }
+
+    console.log("Found company:", {
+      id: existingCompany._id,
+      is_del: existingCompany.is_del,
+      role: existingCompany.role,
+    });
+
+    // ✅ Step 3: Soft delete (with strict match)
+    const deletedCompany = await User.findOneAndUpdate(
+      {
+        _id: objectId,
+        role: 2,
+        is_del: false,
+      },
+      {
+        is_del: true,
+        updatedAt: new Date(),
+      },
+      { new: true }
+    );
+
+    if (!deletedCompany) {
+      return res.status(404).json({ success: false, message: "Company not found or already deleted" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Company deleted successfully",
+      data: deletedCompany,
+    });
+
+  } catch (error) {
+    console.error("Delete company error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting company",
+      error: error.message,
+    });
+  }
 };
 export const toggleCompanyStatus = async (req, res) => {
     try {
