@@ -175,7 +175,7 @@ export const toggleCompanyStatus = async (req, res) => {
         }
         const objectId = new mongoose.Types.ObjectId(companyId);
         const updatedCompany = await User.findOneAndUpdate(
-            { _id: objectId, role: 2, is_del: false },
+            { _id: objectId, role: 1, is_del: false },
             { is_active: status, updatedAt: new Date() },
             { new: true }
         );
