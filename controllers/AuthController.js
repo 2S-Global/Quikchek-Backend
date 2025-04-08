@@ -110,15 +110,9 @@ export const loginUser = async (req, res) => {
 
 export const listCompanies = async (req, res) => {
     try {
-/*         const user_id = req.userId;
-
-        // Validate user_id
-        if (!user_id) {
-            return res.status(400).json({ message: "User ID is required" });
-        } */
 
         // Fetch projects for the given user_id where is_del is false
-        const allcompanies = await User.find({ is_del: false, role: 1 });
+        const allcompanies = await User.find({ is_del: false, role: 1 }).select('-password');
 
         if (!allcompanies.length) {
             return res.status(404).json({ message: "No projects found for this user" });
@@ -131,5 +125,61 @@ export const listCompanies = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving projects", error: error.message });
+    }
+};
+
+export const deleteCompany = async (req, res) => {
+    try {
+        const { companyId } = req.body;
+
+        // Find and update the company
+        const deletedCompany = await User.findOneAndUpdate(
+            { _id: companyId, role: 2, is_del: false },
+            { is_del: true, updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!deletedCompany) {
+            return res.status(404).json({ success: false, message: "Company not found or already deleted" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Company deleted successfully",
+            data: deletedCompany
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error deleting company", error: error.message });
+    }
+};
+
+
+export const toggleCompanyStatus = async (req, res) => {
+    try {
+        const { status, companyId } = req.body; // true for activate, false for deactivate
+
+        console.log(companyId);
+
+        if (typeof status !== "boolean") {
+            return res.status(400).json({ success: false, message: "Invalid status value. It must be true or false." });
+        }
+
+        const updatedCompany = await User.findOneAndUpdate(
+            { _id: companyId, role: 2, is_del: false },
+            { is_active: status, updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!updatedCompany) {
+            return res.status(404).json({ success: false, message: "Company not found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Company has been ${status ? "activated" : "deactivated"} successfully`,
+            data: updatedCompany
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error updating company status", error: error.message });
     }
 };

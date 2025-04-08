@@ -7,6 +7,8 @@ import {
     loginUser,
     registerCompany,
     listCompanies,
+    deleteCompany,
+    toggleCompanyStatus,
 } from '../controllers/AuthController.js'; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -30,6 +32,7 @@ AuthRouter.post('/login', upload.none(), loginUser);
 // Register company
 AuthRouter.post('/company-register', upload.none(), registerCompany);
 AuthRouter.post('/list-companies', listCompanies);
-
+AuthRouter.post('/delete-companies', deleteCompany);
+AuthRouter.post('/togglestatus-companies', toggleCompanyStatus);
 
 export default AuthRouter;
