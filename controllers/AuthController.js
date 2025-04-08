@@ -6,10 +6,10 @@ import bcrypt from "bcrypt";
 // Register a new user
 export const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, transaction_fee, transaction_gst } = req.body;
         const role = 1;
         // Validate required fields
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !transaction_fee || !transaction_gst) {
             return res.status(400).json({ message: "Name, email, and password are required" });
         }
 
@@ -108,3 +108,28 @@ export const loginUser = async (req, res) => {
     }
 };
 
+export const listCompanies = async (req, res) => {
+    try {
+/*         const user_id = req.userId;
+
+        // Validate user_id
+        if (!user_id) {
+            return res.status(400).json({ message: "User ID is required" });
+        } */
+
+        // Fetch projects for the given user_id where is_del is false
+        const allcompanies = await User.find({ is_del: false, role: 1 });
+
+        if (!allcompanies.length) {
+            return res.status(404).json({ message: "No projects found for this user" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Projects retrieved successfully",
+            data: allcompanies,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving projects", error: error.message });
+    }
+};

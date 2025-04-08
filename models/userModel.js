@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    is_active: {
+        type: Boolean,
+        default: true,
+    },
     role: {
         /* 0 for admin ,1 for candidate ,2 for company  */
         type: Number,

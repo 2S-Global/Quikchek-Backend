@@ -6,6 +6,7 @@ import {
     registerUser,
     loginUser,
     registerCompany,
+    listCompanies,
 } from '../controllers/AuthController.js'; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -24,7 +25,11 @@ const upload = multer({ storage: storage });
 AuthRouter.post('/register', upload.none(), registerUser);
 // Login user
 AuthRouter.post('/login', upload.none(), loginUser);
+
+
 // Register company
 AuthRouter.post('/company-register', upload.none(), registerCompany);
+AuthRouter.post('/list-companies', listCompanies);
+
 
 export default AuthRouter;
