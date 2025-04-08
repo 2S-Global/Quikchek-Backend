@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
+import mongoose from "mongoose";
 
 // Register a new user
 export const registerUser = async (req, res) => {
