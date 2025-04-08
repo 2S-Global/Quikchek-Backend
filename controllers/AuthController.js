@@ -132,9 +132,16 @@ export const deleteCompany = async (req, res) => {
     try {
         const { companyId } = req.body;
 
+        // Validate and convert companyId to ObjectId
+        if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            return res.status(400).json({ success: false, message: "Invalid company ID" });
+        }
+
+        const objectId = new mongoose.Types.ObjectId(companyId);
+
         // Find and update the company
         const deletedCompany = await User.findOneAndUpdate(
-            { _id: companyId, role: 2, is_del: false },
+            { _id: objectId, role: 2, is_del: false },
             { is_del: true, updatedAt: new Date() },
             { new: true }
         );
@@ -152,7 +159,6 @@ export const deleteCompany = async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting company", error: error.message });
     }
 };
-
 
 export const toggleCompanyStatus = async (req, res) => {
     try {
