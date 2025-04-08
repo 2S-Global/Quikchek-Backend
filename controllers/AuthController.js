@@ -132,17 +132,28 @@ export const deleteCompany = async (req, res) => {
     try {
         const { companyId } = req.body;
 
-        // Validate and convert companyId to ObjectId
+        // Validate companyId format
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
             return res.status(400).json({ success: false, message: "Invalid company ID" });
         }
 
         const objectId = new mongoose.Types.ObjectId(companyId);
 
-        // Find and update the company
+
+        const existingCompany = await User.findOne({ _id: objectId });
+        console.log("Existing company:", existingCompany);
+
+ 
         const deletedCompany = await User.findOneAndUpdate(
-            { _id: objectId, role: 2, is_del: false },
-            { is_del: true, updatedAt: new Date() },
+            {
+                _id: objectId,
+                role: 2,
+                $or: [{ is_del: false }, { is_del: "false" }]
+            },
+            {
+                is_del: true,
+                updatedAt: new Date()
+            },
             { new: true }
         );
 
@@ -156,10 +167,10 @@ export const deleteCompany = async (req, res) => {
             data: deletedCompany
         });
     } catch (error) {
+        console.error("Delete company error:", error);
         res.status(500).json({ success: false, message: "Error deleting company", error: error.message });
     }
 };
-
 export const toggleCompanyStatus = async (req, res) => {
     try {
         const { status, companyId } = req.body; // true for activate, false for deactivate
