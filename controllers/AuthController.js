@@ -43,7 +43,7 @@ export const registerUser = async (req, res) => {
 export const registerCompany = async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const role = 2;
+        const role = 1;
         // Validate required fields
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Name, email, and password are required" });
