@@ -17,6 +17,7 @@ import AuthRouter from "./routes/AuthRoutes.js";
 import userVerificationRoutes from "./routes/userVerificationRoutes.js";
 import userVerificationCartRoutes from "./routes/userVerificationCartRoutes.js";
 import pdfRouter from "./routes/pdfRoutes.js";
+import fieldsRouts from "./routes/additionalFieldsRoutes.js";
 
 // Routes
 app.get("/", (req, res) => {
@@ -26,6 +27,7 @@ app.use("/api/auth", AuthRouter);
 app.use("/api/verify", userVerificationRoutes);
 app.use("/api/usercart", userVerificationCartRoutes);
 app.use("/api/pdf", pdfRouter);
+app.use("/api/fields", fieldsRouts);
 // Start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
