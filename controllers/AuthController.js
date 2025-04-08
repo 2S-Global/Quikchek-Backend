@@ -165,14 +165,17 @@ export const toggleCompanyStatus = async (req, res) => {
     try {
         const { status, companyId } = req.body; // true for activate, false for deactivate
 
-        console.log(companyId);
+          if (!mongoose.Types.ObjectId.isValid(companyId)) {
+            return res.status(400).json({ success: false, message: "Invalid company ID" });
+        }
+
 
         if (typeof status !== "boolean") {
             return res.status(400).json({ success: false, message: "Invalid status value. It must be true or false." });
         }
-
+        const objectId = new mongoose.Types.ObjectId(companyId);
         const updatedCompany = await User.findOneAndUpdate(
-            { _id: companyId, role: 2, is_del: false },
+            { _id: objectId, role: 2, is_del: false },
             { is_active: status, updatedAt: new Date() },
             { new: true }
         );
