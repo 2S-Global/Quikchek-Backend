@@ -13,7 +13,8 @@ import {
 //import userAuth from '../middleware/authMiddleware.js';
 //import Companymid from '../middleware/companyMiddleware.js';
 
-
+import userAuth from '../middleware/authMiddleware.js';
+import adminMiddleware from '../middleware/adminMiddleware.js';
 // Initialize dotenv to load environment variables
 dotenv.config();
 
@@ -32,8 +33,8 @@ const userRouter = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-userRouter.post('/add_fields', upload.none(), addField);
-userRouter.post('/list_fields', upload.none(), listFields);
-userRouter.post('/delete_fields',  upload.none(), deleteField);
+userRouter.post('/add_fields', upload.none(),userAuth,adminMiddleware, addField);
+userRouter.post('/list_fields', upload.none(),userAuth,adminMiddleware, listFields);
+userRouter.post('/delete_fields',  upload.none(),userAuth,adminMiddleware, deleteField);
 
 export default userRouter;
