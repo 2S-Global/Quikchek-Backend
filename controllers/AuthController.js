@@ -128,36 +128,39 @@ export const listCompanies = async (req, res) => {
     }
 };
 
-export const deleteCandidate = async (req, res) => {
+export const deleteCompany = async (req, res) => {
     try {
         const { companyId } = req.body;
 
+        // Validate and convert companyId to ObjectId
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
-            return res.status(400).json({ success: false, message: "Invalid ID" });
+            return res.status(400).json({ success: false, message: "Invalid company ID" });
         }
 
         const objectId = new mongoose.Types.ObjectId(companyId);
 
-        const deletedCandidate = await User.findOneAndUpdate(
+        // Find and update the company
+        const deletedCompany = await User.findOneAndUpdate(
             { _id: objectId, role: 1, is_del: false },
             { is_del: true, updatedAt: new Date() },
             { new: true }
         );
 
-        if (!deletedCandidate) {
-            return res.status(404).json({ success: false, message: "Candidate not found or already deleted" });
+        if (!deletedCompany) {
+            return res.status(404).json({ success: false, message: "Company not found or already deleted" });
         }
 
         res.status(200).json({
             success: true,
-            message: "Candidate deleted successfully",
-            data: deletedCandidate
+            message: "Company deleted successfully",
+            data: deletedCompany
         });
-
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error deleting candidate", error: error.message });
+        res.status(500).json({ success: false, message: "Error deleting company", error: error.message });
     }
 };
+
+
 export const toggleCompanyStatus = async (req, res) => {
     try {
         const { status, companyId } = req.body; // true for activate, false for deactivate
