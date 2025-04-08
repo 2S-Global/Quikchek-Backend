@@ -27,13 +27,13 @@ const AuthRouter = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 // Register user candidate
-AuthRouter.post('/register', upload.none(), registerUser);
+AuthRouter.post('/register',userAuth,adminMiddleware, upload.none(), registerUser);
 // Login user
 AuthRouter.post('/login', upload.none(), loginUser);
 
 
 // Register company
-AuthRouter.post('/company-register', upload.none(), registerCompany);
+AuthRouter.post('/company-register', upload.none(),userAuth,adminMiddleware, registerCompany);
 AuthRouter.post('/list-companies',userAuth,adminMiddleware, listCompanies);
 AuthRouter.post('/delete-companies',userAuth,adminMiddleware, deleteCompany);
 AuthRouter.post('/togglestatus-companies',userAuth,adminMiddleware, toggleCompanyStatus);
