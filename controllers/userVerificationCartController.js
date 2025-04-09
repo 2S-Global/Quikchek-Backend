@@ -159,7 +159,7 @@ export const getUserVerificationCartByEmployerAll_OLD = async (req, res) => {
             //    total_verifications: totalVerifications,
                 subtotal: subtotal.toFixed(2),
                 gst: gst.toFixed(2),
-                total: total.toFixed(2)
+                total: total.toFixed(2) 
             }
         });
     } catch (error) {
