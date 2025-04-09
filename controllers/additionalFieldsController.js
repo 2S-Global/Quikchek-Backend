@@ -30,7 +30,53 @@ export const addField = async (req, res) => {
     }
 };
 
+export const editField = async (req, res) => {
+    const { id, name, field_type, field_values} = req.body;
+
+    try {
+        // Find the field by ID and update it
+        const updatedField = await Fields.findByIdAndUpdate(id,
+            {
+                name,
+                field_type,
+                field_values,
+                updatedAt: Date.now(),
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedField) {
+            return res.status(404).json({ message: "Field not found" });
+        }
+
+        res.status(200).json({
+            message: "Field updated successfully",
+            data: updatedField,
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error updating field", error: error.message });
+    }
+};
+
+
 export const listFields = async (req, res) => {
+    try {
+        const { company_id } = req.body;
+
+        const fields = await Fields.find({ company_id, is_del: false });
+
+        res.status(200).json({
+            success: true,
+            message: "Fields fetched successfully",
+            data: fields
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
+    }
+};
+
+export const listFieldsByCompany = async (req, res) => {
     try {
         const { company_id } = req.body;
 
