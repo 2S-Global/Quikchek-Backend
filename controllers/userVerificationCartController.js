@@ -1,5 +1,6 @@
 import UserCartVerification from "../models/userVerificationCartModel.js";
 import UserVerification from "../models/userVerificationModel.js";
+import User from "../models/userModel.js";
 import mongoose from "mongoose";
 // Register a new user
 
