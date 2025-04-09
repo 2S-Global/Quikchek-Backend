@@ -187,7 +187,16 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
         const gstPercent = parseFloat(employer.transaction_gst || 0)/100;
 
         const userCarts = await UserCartVerification.find({ employer_id, is_del: false,is_paid:0 });
+if (!userCarts || userCarts.length === 0) {
+    return res.status(200).json({
+        success: true,
+        data: [],
 
+        message: "No unpaid verification cart items found."
+    });
+}
+
+        
         let overallTotalVerifications = 0;
         let overallSubtotal = 0;
 
