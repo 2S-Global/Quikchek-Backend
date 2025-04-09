@@ -77,8 +77,7 @@ export const listFields = async (req, res) => {
 };
 export const listFieldsByCompany = async (req, res) => {
     try {
-        const { company_id } = req.body;
-
+        const company_id = req.userId;
         // Get company details once
         const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications");
 
