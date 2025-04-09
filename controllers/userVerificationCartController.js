@@ -192,11 +192,15 @@ if (!userCarts || userCarts.length === 0) {
     return res.status(200).json({
         success: true,
         data: [],
-
+        overall_billing: {
+            total_verifications: 0,
+            subtotal: "0.00",
+            gst: "0.00",
+            total: "0.00"
+        },
         message: "No unpaid verification cart items found."
     });
 }
-
         
         let overallTotalVerifications = 0;
         let overallSubtotal = 0;
