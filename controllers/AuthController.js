@@ -2,11 +2,10 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-
 // Register a new user
 export const registerUser = async (req, res) => {
     try {
-        const { name, email, password, transaction_fee, transaction_gst } = req.body;
+        const { name, email, password, transaction_fee, transaction_gst, allowed_verifications } = req.body;
         const role = 1;
         // Validate required fields
         if (!name || !email || !password || !transaction_fee || !transaction_gst) {
@@ -24,7 +23,7 @@ export const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create a new user with hashed password
-        const newUser = new User({ name, email, password: hashedPassword, role, transaction_fee, transaction_gst });
+        const newUser = new User({ name, email, password: hashedPassword, role, transaction_fee, transaction_gst, allowed_verifications });
         await newUser.save();
         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
@@ -37,6 +36,41 @@ export const registerUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Error creating user", error: error.message });
     }
+};
+
+export const editUser = async (req, res) => {
+    const {
+        name, allowed_verifications, transaction_fee, transaction_gst, id } = req.body;
+
+        try {
+            const updatedFields = {};
+    
+            if (name !== undefined) updatedFields.name = name;
+            if (allowed_verifications !== undefined) updatedFields.allowed_verifications = allowed_verifications;
+            if (transaction_fee !== undefined) updatedFields.transaction_fee = transaction_fee;
+            if (transaction_gst !== undefined) updatedFields.transaction_gst = transaction_gst;
+    
+            updatedFields.updatedAt = Date.now(); // ensure updatedAt is modified
+    
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                { $set: updatedFields },
+                { new: true, runValidators: true }
+            );
+    
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            res.status(200).json({
+                success: true,
+                message: "User updated successfully",
+                user: updatedUser,
+            });
+    
+        } catch (error) {
+            res.status(500).json({ message: "Error updating user", error: error.message });
+        }
 };
 
 // Register a new company
