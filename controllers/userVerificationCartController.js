@@ -283,7 +283,13 @@ export const deleteUser = async (req, res) => {
 
         // Fetch updated user cart after deletion
         const employer_id = req.userId;
-        const verificationCharge = 50;
+
+          const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
+          if (!employer) {
+            return res.status(404).json({ success: false, message: "Employer not found" });
+        }
+     const verificationCharge = parseFloat(employer.transaction_fee || 0);
+        const gstPercent = parseFloat(employer.transaction_gst || 0)/100;
 
         const userCarts = await UserCartVerification.find({ employer_id });
 
@@ -315,7 +321,7 @@ export const deleteUser = async (req, res) => {
             };
         });
 
-        const overallGst = overallSubtotal * 0.18;
+        const overallGst = overallSubtotal * gstPercent;
         const overallTotal = overallSubtotal + overallGst;
 
         return res.status(200).json({
