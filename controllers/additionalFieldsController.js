@@ -75,7 +75,34 @@ export const listFields = async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
     }
 };
+export const listFieldsByCompany = async (req, res) => {
+    try {
+        const { company_id } = req.body;
 
+        // Get company details once
+        const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications");
+
+        if (!company) {
+            return res.status(404).json({ success: false, message: "Company not found" });
+        }
+
+        // Get fields without repeating company
+        const fields = await Fields.find({ company_id, is_del: false }).select("-company_id");
+
+        res.status(200).json({
+            success: true,
+            message: "Fields fetched successfully",
+            company,
+            data: fields,
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
+    }
+};
+
+
+/*
 export const listFieldsByCompany = async (req, res) => {
     try {
         const { company_id } = req.body;
@@ -91,7 +118,7 @@ export const listFieldsByCompany = async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
     }
 };
-
+*/
 export const deleteField = async (req, res) => {
     try {
         const { fieldId } = req.body;
