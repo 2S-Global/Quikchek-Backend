@@ -1,5 +1,5 @@
 import Fields from "../models/additionalFieldsModels.js";
-
+import User from "../models/userModel.js";
 
 
 // Register a new user
