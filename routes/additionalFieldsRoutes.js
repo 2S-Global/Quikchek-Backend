@@ -38,7 +38,7 @@ const upload = multer({ storage: storage });
 userRouter.post('/add_fields', upload.none(),userAuth,adminMiddleware, addField);
 userRouter.post('/edit_fields', upload.none(),userAuth,adminMiddleware, editField);
 userRouter.post('/list_fields', upload.none(),userAuth,adminMiddleware, listFields);
-userRouter.post('/list_fields_by_company', upload.none(),userAuth,adminMiddleware, listFieldsByCompany);
+userRouter.post('/list_fields_by_company', upload.none(),userAuth, listFieldsByCompany);
 userRouter.post('/delete_fields',  upload.none(),userAuth,adminMiddleware, deleteField);
 
 export default userRouter;
