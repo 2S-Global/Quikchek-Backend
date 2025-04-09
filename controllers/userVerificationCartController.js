@@ -75,10 +75,17 @@ export const addUserToCart = async (req, res) => {
 export const getUserVerificationCartByEmployerAll = async (req, res) => {
     try {
         const employer_id = req.userId;
+         const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
+          if (!employer) {
+            return res.status(404).json({ success: false, message: "Employer not found" });
+        }
         const userCarts = await UserCartVerification.find({ employer_id, is_del: false });
 
+         const verificationCharge = parseFloat(employer.transaction_fee || 0);
+        const gstPercent = parseFloat(employer.transaction_gst || 0)/100;
+        
         let totalVerifications = 0;
-        const verificationCharge = 50;
+        // const verificationCharge = 50;
 
         // Process each user's cart
         const userData = userCarts.map(cart => {
@@ -112,7 +119,7 @@ export const getUserVerificationCartByEmployerAll = async (req, res) => {
         });
 
         const subtotal = totalVerifications * verificationCharge;
-        const gst = subtotal * 0.18;
+        const gst = subtotal * gstPercent;
         const total = subtotal + gst;
 
         res.status(200).json({ 
