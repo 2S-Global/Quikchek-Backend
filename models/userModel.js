@@ -5,6 +5,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    allowed_verifications :{
+    type: String,
+    },
+    
+    
     password: {
         type: String,
         required: true,
