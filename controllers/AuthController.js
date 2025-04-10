@@ -223,6 +223,42 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+export const getUserDetailsById = async (req, res) => {
+  try {
+      const { company_id } = req.body; // Or use req.params if it's from URL
+
+      if (!company_id) {
+          return res.status(400).json({ success: false, message: "User ID is required" });
+      }
+
+      const user = await User.findById(company_id).select(
+          "name email phone_number address"
+      );
+
+      if (!user) {
+          return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      // Transform allowed_verifications to boolean object
+
+      const result = {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone_number: user.phone_number,
+          address: user.address
+      };
+
+      res.status(200).json({
+          success: true,
+          message: "User details fetched successfully",
+          data: result
+      });
+
+  } catch (error) {
+      res.status(500).json({ success: false, message: "Error fetching user", error: error.message });
+  }
+};
 
 
 // Register a new company
