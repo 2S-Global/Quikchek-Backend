@@ -159,6 +159,72 @@ export const editUser = async (req, res) => {
   }
 };
 
+
+export const forgotPassword = async (req, res) => {
+  try {
+      const { email } = req.body;
+
+      // Check if user exists
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).json({ message: "User not found with this email" });
+      }
+
+      // Generate a new arbitrary password (e.g. 8 characters)
+      const generatePassword = () => {
+          const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
+          let password = "";
+          for (let i = 0; i < 10; i++) {
+              password += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return password;
+      };
+
+      const newPassword = generatePassword();
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update user's password in DB
+      await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+      // Send email with new password
+      const transporter = nodemailer.createTransport({
+          host: "smtp.hostinger.com",
+          port: 465,
+          secure: true,
+          auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+          },
+      });
+
+      const mailOptions = {
+          from: `"Support Team" <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: "Your Password Has Been Reset",
+          html: `
+              <h3>Hello, ${user.name}</h3>
+              <p>Your password has been reset. Here is your new login password:</p>
+              <p><strong>New Password:</strong> ${newPassword}</p>
+              <p>We recommend logging in and changing this password immediately.</p>
+              <br/>
+              <p>Regards,<br/>Support Team</p>
+          `,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(200).json({ message: "New password sent to your email" });
+
+  } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Error resetting password", error: error.message });
+  }
+};
+
+
+
 // Register a new company
 export const registerCompany = async (req, res) => {
   try {
