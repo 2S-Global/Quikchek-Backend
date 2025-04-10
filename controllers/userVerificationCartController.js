@@ -36,6 +36,7 @@ export const addUserToCart = async (req, res) => {
             votername,
             voternumber,
             voterdoc,
+            additionalfields,
             uannumber
         } = req.body;
 
@@ -62,6 +63,7 @@ export const addUserToCart = async (req, res) => {
             epic_name : votername,
             epic_number : voternumber,
             epic_image : voterdoc,
+            additionalfields : additionalfields,
             uan_number:uannumber
         });
 
