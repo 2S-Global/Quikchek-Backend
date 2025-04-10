@@ -5,11 +5,11 @@ import mongoose from "mongoose";
 // Register a new user
 export const registerUser = async (req, res) => {
     try {
-        const { name, email, password, transaction_fee, transaction_gst, allowed_verifications } = req.body;
+        const { name, email, password, transaction_fee, transaction_gst, allowed_verifications, phone_number, address, gst_no, package_id, discount_percent } = req.body;
         const role = 1;
         // Validate required fields
-        if (!name || !email || !password || !transaction_fee || !transaction_gst) {
-            return res.status(400).json({ message: "Name, email, and password are required" });
+        if (!name || !email || !password || !transaction_fee || !transaction_gst || !package_id) {
+            return res.status(400).json({ message: "Name, email, password, package_id are required" });
         }
 
         // Check if user already exists
@@ -23,7 +23,7 @@ export const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create a new user with hashed password
-        const newUser = new User({ name, email, password: hashedPassword, role, transaction_fee, transaction_gst, allowed_verifications });
+        const newUser = new User({ name, email, password: hashedPassword, role, transaction_fee, transaction_gst, allowed_verifications, phone_number, address, gst_no, package_id, discount_percent });
         await newUser.save();
         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
@@ -39,8 +39,7 @@ export const registerUser = async (req, res) => {
 };
 
 export const editUser = async (req, res) => {
-    const {
-        name, allowed_verifications, transaction_fee, transaction_gst, id } = req.body;
+    const {name, allowed_verifications, transaction_fee, transaction_gst, id, phone_number, address, gst_no, package_id, discount_percent } = req.body;
 
         try {
             const updatedFields = {};
@@ -49,7 +48,13 @@ export const editUser = async (req, res) => {
             if (allowed_verifications !== undefined) updatedFields.allowed_verifications = allowed_verifications;
             if (transaction_fee !== undefined) updatedFields.transaction_fee = transaction_fee;
             if (transaction_gst !== undefined) updatedFields.transaction_gst = transaction_gst;
-    
+
+            updatedFields.phone_number = phone_number;
+            updatedFields.address = address;
+            updatedFields.gst_no = gst_no;
+            updatedFields.package_id = package_id;
+            updatedFields.discount_percent = discount_percent;
+
             updatedFields.updatedAt = Date.now(); // ensure updatedAt is modified
     
             const updatedUser = await User.findByIdAndUpdate(
