@@ -106,7 +106,9 @@ const userVerificationCartSchema = new mongoose.Schema(
         epfo_response :{
         type: Object
         },
-                    
+        additionalfields :{
+            type: Object
+            },                  
         updatedAt: {
             type: Date,
             default: Date.now,
