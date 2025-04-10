@@ -2,6 +2,8 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+
+
 // Register a new user
 export const registerUser = async (req, res) => {
     try {
@@ -27,6 +29,37 @@ export const registerUser = async (req, res) => {
         await newUser.save();
         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
+
+         // Send email with login credentials
+         const transporter = nodemailer.createTransport({
+            host: "smtp.hostinger.com", // fixed typo
+            port: 465,
+            secure: true, // true for port 465
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: `"Support Team" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Your Account Has Been Created",
+            html: `
+                <h3>Welcome, ${name}!</h3>
+                <p>Your account has been successfully created.</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p>You can now log in and start using our services.</p>
+                <br/>
+                <p>Regards,<br/>The Team</p>
+            `,
+        };
+
+        await transporter.sendMail(mailOptions);
+
+
+
         res.status(201).json({
             success: true,
             message: "User registered and logged in successfully!",
@@ -37,6 +70,7 @@ export const registerUser = async (req, res) => {
         res.status(500).json({ message: "Error creating user", error: error.message });
     }
 };
+
 
 export const editUser = async (req, res) => {
     const {name, allowed_verifications, transaction_fee, transaction_gst, id, phone_number, address, gst_no, package_id, discount_percent } = req.body;
