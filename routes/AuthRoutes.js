@@ -12,6 +12,7 @@ import {
     editUser,
     forgotPassword,
     listFieldsByCompany,
+    getUserDetailsById,
 } from '../controllers/AuthController.js'; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -33,6 +34,7 @@ const upload = multer({ storage: storage });
 AuthRouter.post('/register',userAuth,adminMiddleware, upload.none(), registerUser);
 AuthRouter.post('/edit_user',userAuth,adminMiddleware, upload.none(), editUser);
 AuthRouter.post('/list_fields_by_company',userAuth,adminMiddleware, upload.none(), listFieldsByCompany);
+AuthRouter.post('/get_company_details', upload.none(), getUserDetailsById);
 
 // Login user
 AuthRouter.post('/login', upload.none(), loginUser);
