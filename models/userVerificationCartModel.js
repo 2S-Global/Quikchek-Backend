@@ -107,7 +107,7 @@ const userVerificationCartSchema = new mongoose.Schema(
         type: Object
         },
         additionalfields :{
-            type: Object
+            type: String
             },                  
         updatedAt: {
             type: Date,
