@@ -75,7 +75,7 @@ export const listFields = async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
     }
 };
-export const listFieldsByCompany = async (req, res) => {
+export const listFieldsByCompany_OLD = async (req, res) => {
     try {
         const company_id = req.userId;
         // Get company details once
@@ -92,6 +92,46 @@ export const listFieldsByCompany = async (req, res) => {
             success: true,
             message: "Fields fetched successfully",
             company,
+            data: fields,
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
+    }
+};
+
+export const listFieldsByCompany = async (req, res) => {
+    try {
+        const { company_id } = req.body;
+
+        const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications package_id gst_no discount_percent");
+
+        if (!company) {
+            return res.status(404).json({ success: false, message: "Company not found" });
+        }
+
+        // Convert allowed_verifications to object
+        const allTypes = ["PAN", "Aadhaar", "DL", "EPIC", "Passport"];
+        const allowedTypes = (company.allowed_verifications || "").split(",").map(v => v.trim().toUpperCase());
+
+        const allowedVerificationsObj = {};
+        allTypes.forEach(type => {
+            allowedVerificationsObj[type] = allowedTypes.includes(type);
+        });
+
+        // Overwrite original string field with the object
+        const companyData = {
+            ...company._doc,
+            ...allowedVerificationsObj
+        };
+
+        // Get fields
+        const fields = await Fields.find({ company_id, is_del: false }).select("-company_id");
+
+        res.status(200).json({
+            success: true,
+            message: "Fields fetched successfully",
+            company: companyData,
             data: fields,
         });
 
