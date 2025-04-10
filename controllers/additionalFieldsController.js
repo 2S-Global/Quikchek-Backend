@@ -102,7 +102,7 @@ export const listFieldsByCompany_OLD = async (req, res) => {
 
 export const listFieldsByCompany = async (req, res) => {
     try {
-        const { company_id } = req.body;
+        const company_id = req.userId;
 
         const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications package_id gst_no discount_percent");
 
