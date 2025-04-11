@@ -60,6 +60,9 @@ is_active: {
 type: Boolean,
 default: true,
 },
+wallet_amount: {
+type: Number,
+},
 role: {
 /* 0 for admin ,1 for candidate ,2 for company  */
 type: Number,
