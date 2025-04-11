@@ -407,22 +407,47 @@ export const deleteUser = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Fetch updated user cart after deletion
-        const employer_id = req.userId;
+       const employer_id = req.userId;
 
-          const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
-          if (!employer) {
+        // Ensure employer is valid
+        const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
+
+        if (!employer) {
             return res.status(404).json({ success: false, message: "Employer not found" });
         }
-     const verificationCharge = parseFloat(employer.transaction_fee || 0);
-        const gstPercent = parseFloat(employer.transaction_gst || 0)/100;
 
-        const userCarts = await UserCartVerification.find({ employer_id });
+        const verificationCharge = parseFloat(employer.transaction_fee || 0);
+        const gstPercent = parseFloat(employer.transaction_gst || 0) / 100;
+        const discountPercent = parseFloat(employer.discount_percent || 0) / 100;
+        const wallet_amount = parseFloat(employer.wallet_amount || 0);
+        const packageId = employer.package_id;
+
+        const userCarts = await UserCartVerification.find({ employer_id, is_del: false, is_paid: 0 });
+
+        if (!userCarts || userCarts.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: [],
+                overall_billing: {
+                    total_verifications: 0,
+                    wallet_amount: wallet_amount.toFixed(2),
+                    fund_status: "0",
+                    subtotal: "0.00",
+                    discount: "0.00",
+                    discount_percent: "0.00",
+                    cgst: "0.00",
+                    cgst_percent: "0.00",
+                    sgst: "0.00",
+                    sgst_percent: "0.00",
+                    total: "0.00"
+                },
+                message: "No unpaid verification cart items found."
+            });
+        }
 
         let overallTotalVerifications = 0;
         let overallSubtotal = 0;
 
-        // Prepare formatted response
         const formattedData = userCarts.map((cart) => {
             const payForArray = [];
 
@@ -433,7 +458,11 @@ export const deleteUser = async (req, res) => {
             if (cart.epic_number) payForArray.push("Voter ID (EPIC)");
 
             const totalVerifications = payForArray.length;
-            const subtotal = totalVerifications * verificationCharge;
+
+            // Updated logic: if package_id is "1", charge once per row
+            const subtotal = packageId === "1"
+                ? (totalVerifications > 0 ? verificationCharge : 0)
+                : totalVerifications * verificationCharge;
 
             overallTotalVerifications += totalVerifications;
             overallSubtotal += subtotal;
@@ -447,20 +476,32 @@ export const deleteUser = async (req, res) => {
             };
         });
 
-        const overallGst = overallSubtotal * gstPercent;
-        const overallTotal = overallSubtotal + overallGst;
+        const discountAmount = overallSubtotal * discountPercent;
+        const discountedSubtotal = overallSubtotal - discountAmount;
 
-        return res.status(200).json({
-            message: "User deleted successfully",
-            updatedCart: {
-                success: true,
-                data: formattedData,
-                overall_billing: {
-                    total_verifications: overallTotalVerifications,
-                    subtotal: overallSubtotal.toFixed(2),
-                    gst: overallGst.toFixed(2),
-                    total: overallTotal.toFixed(2)
-                }
+        const gstAmount = discountedSubtotal * gstPercent;
+        const cgst = gstAmount / 2;
+        const sgst = gstAmount / 2;
+
+        const total = discountedSubtotal + gstAmount;
+
+        const fundStatus = wallet_amount >= total ? "1" : "0";
+
+        res.status(200).json({
+            success: true,
+            data: formattedData,
+            overall_billing: {
+                total_verifications: overallTotalVerifications,
+                wallet_amount: wallet_amount.toFixed(2),
+                fund_status: fundStatus,
+                subtotal: overallSubtotal.toFixed(2),
+                discount: discountAmount.toFixed(2),
+                discount_percent: (discountPercent * 100).toFixed(2),
+                cgst: cgst.toFixed(2),
+                cgst_percent: (gstPercent * 50).toFixed(2),
+                sgst: sgst.toFixed(2),
+                sgst_percent: (gstPercent * 50).toFixed(2),
+                total: total.toFixed(2)
             }
         });
 
@@ -471,7 +512,6 @@ export const deleteUser = async (req, res) => {
         });
     }
 };
-
 
 
 
