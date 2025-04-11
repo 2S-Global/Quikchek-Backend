@@ -20,6 +20,16 @@ const transactionSchema = new mongoose.Schema({
     paymentids: {
         type: String,
     },
+        payment_method:{
+        type:String,
+        enum:["Live","Wallet"]
+
+    },
+    payment_type: {
+        type: String,
+        enum: ["credit", "debit"],
+      
+      },
     createdAt: {
         type: Date,
         default: Date.now,
