@@ -494,6 +494,7 @@ export const deleteUser = async (req, res) => {
 
         res.status(200).json({
             success: true,
+            message: "User deleted successfully.",
             data: formattedData,
             overall_billing: {
                 total_verifications: overallTotalVerifications,
