@@ -93,7 +93,7 @@ export const walletBalance = async (req, res) => {
     const user = await User.findById(employer_id); // ✅ Use findById instead of find
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "User not found"
       });
@@ -102,7 +102,7 @@ export const walletBalance = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        walletBalance: user.walletBalance // or whatever field you're using
+        wallet_amount: user.wallet_amount // or whatever field you're using
       }
     });
   } catch (error) {
