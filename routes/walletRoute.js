@@ -31,8 +31,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 userRouter.post('/addTransaction', upload.none(), userAuth, Companymid, addTransaction);
-userRouter.get('/getUserTransactions',userAuth,Companymid,getUserTransactions);
-userRouter.get('/walletBalance',userAuth,Companymid,walletBalance);
+userRouter.get('/getUserTransactions',upload.none(),userAuth,Companymid,getUserTransactions);
+userRouter.get('/walletBalance',upload.none(),Companymid,walletBalance);
 
 
 export default userRouter;
