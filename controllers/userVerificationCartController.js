@@ -362,31 +362,34 @@ if (!userCarts || userCarts.length === 0) {
 };
 
 export const getPaidUserVerificationCartByEmployer = async (req, res) => {
-    try {
-        // Assuming the userId is available from authentication middleware (e.g., JWT)
-        const employer_id = req.userId;
+  try {
+    const employer_id = req.userId;
 
-        // Check if employer_id is a valid ObjectId (Optional, but recommended)
-        if (!mongoose.Types.ObjectId.isValid(employer_id)) {
-            return res.status(400).json({ message: "Invalid employer ID" });
-        }
+    if (!mongoose.Types.ObjectId.isValid(employer_id)) {
+      return res.status(400).json({ message: "Invalid employer ID", data: [] });
+    }
 
-        // Fetch users with paid verification and sort by createdAt in descending order
-        const paidUsers = await UserVerification.find({ employer_id })
-            .sort({ createdAt: -1 });
- if (!paidUsers.length) {
+    const paidUsers = await UserVerification.find({ employer_id }).sort({ createdAt: -1 });
+
+    if (!paidUsers.length) {
       return res.status(200).json({
         message: "No paid users found for this employer",
         data: [],
       });
     }
 
-        // Return the fetched users
-        res.status(200).json(paidUsers);
-    } catch (error) {
-        console.error("Error fetching paid users:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
+    return res.status(200).json({
+      message: "Paid users fetched successfully",
+      data: paidUsers,
+    });
+  } catch (error) {
+    console.error("Error fetching paid users:", error);
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+      data: [],
+    });
+  }
 };
 
 export const deleteUser = async (req, res) => {
