@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 import axios from "axios";
 
 import Transaction from "../models/transactionModel.js";
+import User from "../models/userModel.js";
+
+
 // Register a new user
 export const listUserVerifiedList = async (req, res) => {
   try {
@@ -433,7 +436,7 @@ export const verifiedDetails = async (req, res) => {
 };
 
 
-export const paynow = async (req, res) => {
+export const paynow_OLDFUNC = async (req, res) => {
   try {
     const employer_id = req.userId;
 
@@ -499,6 +502,98 @@ console.log("Transaction saved:", transaction);
     });
   }
 };
+
+
+
+export const paynow = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+
+    if (!amount || !payment_method) {
+      return res.status(400).json({ error: "Payment details are incomplete." });
+    }
+
+    const user = await User.findById(employer_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Check wallet balance if payment_method is Wallet
+    if (payment_method === "Wallet") {
+      if (!user.wallet_amount || user.wallet_amount < amount) {
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+
+      // Deduct wallet amount
+      user.wallet_amount -= amount;
+      await user.save();
+    } else if (payment_method === "Live") {
+      if (!razorpay_response?.razorpay_payment_id) {
+        return res.status(400).json({ error: "Razorpay payment ID is missing." });
+      }
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+    // Step 1: Update the 'is_paid' field to 1 for all records of this employer
+    const updatedUsers = await UserCartVerification.updateMany(
+      { employer_id: employer_id },
+      { $set: { is_paid: 1, createdAt: new Date() } }
+    );
+
+    if (updatedUsers.modifiedCount === 0) {
+      return res.status(404).json({ message: "No users found for this employer" });
+    }
+
+    // Step 2: Insert the updated records into the archived collection
+    const usersToArchive = await UserCartVerification.find({ employer_id: employer_id, is_paid: 1 });
+
+    if (usersToArchive.length === 0) {
+      return res.status(404).json({ message: "No updated users to archive" });
+    }
+
+    await UserVerification.insertMany(usersToArchive);
+
+    const userIds = usersToArchive.map(user => user._id);
+
+    // Step 3: Delete original records
+    await UserCartVerification.deleteMany({ employer_id: employer_id, is_paid: 1 });
+
+    // Step 4: Save transaction
+    const transaction = new Transaction({
+      employer_id: employer_id,
+      transactionId: payment_method === "Live" ? razorpay_response.razorpay_payment_id : `wallet_${Date.now()}`,
+      amount: amount,
+      paymentids: paymentIds || null,
+      order_ids: userIds.join(','),
+      payment_method: payment_method,
+      payment_type: "debit",
+    });
+
+    await transaction.save();
+
+    return res.status(200).json({
+      message: "Payment processed, verifications archived, and transaction recorded",
+      archivedUsersCount: usersToArchive.length,
+      remainingWalletBalance: user.wallet_amount,
+    });
+
+  } catch (error) {
+    console.error("Payment Error:", error);
+    return res.status(500).json({
+      message: "Error processing payment2",
+      error: error.message,
+    });
+  }
+};
+
+
 
 
 function convertDateFormat(dateString) {
