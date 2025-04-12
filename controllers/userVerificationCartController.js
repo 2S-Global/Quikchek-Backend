@@ -376,7 +376,7 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
             .sort({ createdAt: -1 });
 
         if (!paidUsers.length) {
-            return res.status(404).json({ message: "No paid users found for this employer" });
+            return res.status(200).json({ message: "No paid users found for this employer" });
         }
 
         // Return the fetched users
