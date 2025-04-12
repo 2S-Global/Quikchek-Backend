@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
 import {
-    addTransaction
+    addTransaction,getUserTransactions
 } from '../controllers/walletController.js'; // Adjust the path according to your project structure
 
 //Middleware
@@ -31,7 +31,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 userRouter.post('/addTransaction', upload.none(), userAuth, Companymid, addTransaction);
-// userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
+userRouter.get('/getUserTransactions ', upload.none(),getUserTransactions );
 
 
 export default userRouter;
