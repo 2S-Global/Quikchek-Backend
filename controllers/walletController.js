@@ -84,5 +84,30 @@ export const addTransaction = async (req, res) => {
       });
     }
   };
+
+
+ export const walletBalance = async (req, res) => {
+    try {
+      const employer_id = req.userId;
+
+  
+      const walletBalance = await User.find({ 
+        employer_id,
+       });
+  
+
+  
+      res.status(200).json({ 
+        success: true, 
+        data: walletBalance 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to fetch transactions", 
+        error: error.message 
+      });
+    }
+  };
   
   
