@@ -89,15 +89,11 @@ export const addTransaction = async (req, res) => {
  export const walletBalance = async (req, res) => {
     try {
       const employer_id = req.userId;
-
-  
-      const walletBalance = await User.find({ 
+    const walletBalance = await User.find({ 
         employer_id,
        });
   
-
-  
-      res.status(200).json({ 
+ res.status(200).json({ 
         success: true, 
         data: walletBalance 
       });
