@@ -86,24 +86,33 @@ export const addTransaction = async (req, res) => {
   };
 
 
- export const walletBalance = async (req, res) => {
-    try {
-      const employer_id = req.userId;
-    const walletBalance = await User.find({ 
-        employer_id,
-       });
-  
- res.status(200).json({ 
-        success: true, 
-        data: walletBalance 
-      });
-    } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to fetch transactions", 
-        error: error.message 
+export const walletBalance = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    const user = await User.findById(employer_id); // ✅ Use findById instead of find
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
       });
     }
-  };
+
+    res.status(200).json({
+      success: true,
+      data: {
+        walletBalance: user.walletBalance // or whatever field you're using
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch wallet balance",
+      error: error.message
+    });
+  }
+};
+
   
   
