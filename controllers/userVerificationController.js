@@ -525,7 +525,7 @@ export const paynow = async (req, res) => {
     }
 
     // Check wallet balance if payment_method is Wallet
-    if (payment_method === "wallet") {
+    if (payment_method === "Wallet") {
       if (!user.wallet_amount || user.wallet_amount < amount) {
         return res.status(400).json({ error: "Insufficient wallet balance." });
       }
