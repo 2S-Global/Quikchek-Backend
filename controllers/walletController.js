@@ -57,11 +57,11 @@ export const addTransaction = async (req, res) => {
   export const getUserTransactions = async (req, res) => {
     try {
       const employer_id = req.userId;
-      const payment_method = "Wallet";
+
   
       const transactions = await Transaction.find({ 
         employer_id,
-        payment_method
+   
       }).sort({ created_at: -1 });
   
       if (!transactions || transactions.length === 0) {
