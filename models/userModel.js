@@ -62,6 +62,7 @@ default: true,
 },
 wallet_amount: {
 type: Number,
+default: 0,
 },
 role: {
 /* 0 for admin ,1 for candidate ,2 for company  */
