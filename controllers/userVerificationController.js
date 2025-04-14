@@ -21,14 +21,10 @@ export const listUserVerifiedList = async (req, res) => {
       }
 
       // Fetch all records for the employer_id and sort by createdAt (newest first)
-      const users = await UserVerification.find({ employer_id, all_verified: 1 })
-          .sort({ createdAt: -1 });  // -1 for descending order (newest first)
+const users = await UserVerification.find({ employer_id, all_verified: 1 })
+  .sort({ createdAt: -1 });
 
-      if (!users.length) {
-          return res.status(200).json({ message: "No verified users found" });
-      }
-
-      res.status(200).json(users);
+res.status(200).json(users);
   } catch (error) {
       console.error("Error fetching verified users:", error);
       res.status(500).json({ message: error.message });
