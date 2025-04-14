@@ -7,6 +7,9 @@ const userVerificationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    order_id:{
+      type: String,
+    },
     pdf_url: {
       type: String,
     },
