@@ -644,7 +644,7 @@ export const paynow = async (req, res) => {
     }
 
     // ✅ Generate and assign order_id to each record
-    const orderPrefix = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const orderPrefix = `ORD-${Date.now()}`;
     const usersWithOrderId = usersToArchive.map((user, index) => {
       const obj = user.toObject();
       obj.order_id = `${orderPrefix}-${index + 1}`;
@@ -660,7 +660,7 @@ export const paynow = async (req, res) => {
 
     const transaction = new Transaction({
       employer_id: employer_id,
-      transactionId: payment_method === "Live"
+      transactionId: payment_method === "online"
         ? razorpay_response.razorpay_payment_id
         : `wallet_${Date.now()}`,
       amount: amount,
