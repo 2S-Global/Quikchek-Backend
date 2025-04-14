@@ -501,7 +501,7 @@ console.log("Transaction saved:", transaction);
 
 
 
-export const paynow = async (req, res) => {
+export const paynow_TODAY_14 = async (req, res) => {
   try {
     const employer_id = req.userId;
 
@@ -584,6 +584,104 @@ export const paynow = async (req, res) => {
     console.error("Payment Error:", error);
     return res.status(500).json({
       message: "Error processing payment2",
+      error: error.message,
+    });
+  }
+};
+
+
+
+export const paynow = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+
+    if (!amount || !payment_method) {
+      return res.status(400).json({ error: "Payment details are incomplete." });
+    }
+
+    const user = await User.findById(employer_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (payment_method === "Wallet") {
+      if (!user.wallet_amount || user.wallet_amount < amount) {
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+      user.wallet_amount -= amount;
+      await user.save();
+    } else if (payment_method === "online") {
+      if (!razorpay_response?.razorpay_payment_id) {
+        return res.status(400).json({ error: "Razorpay payment ID is missing." });
+      }
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+    // Update is_paid field
+    const updatedUsers = await UserCartVerification.updateMany(
+      { employer_id: employer_id },
+      { $set: { is_paid: 1, createdAt: new Date() } }
+    );
+
+    if (updatedUsers.modifiedCount === 0) {
+      return res.status(404).json({ message: "No users found for this employer" });
+    }
+
+    const usersToArchive = await UserCartVerification.find({
+      employer_id: employer_id,
+      is_paid: 1,
+    });
+
+    if (usersToArchive.length === 0) {
+      return res.status(404).json({ message: "No updated users to archive" });
+    }
+
+    // ✅ Generate and assign order_id to each record
+    const orderPrefix = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const usersWithOrderId = usersToArchive.map((user, index) => {
+      const obj = user.toObject();
+      obj.order_id = `${orderPrefix}-${index + 1}`;
+      delete obj._id; // Remove _id so MongoDB can generate a new one
+      return obj;
+    });
+
+    await UserVerification.insertMany(usersWithOrderId);
+
+    const userIds = usersToArchive.map(user => user._id);
+
+    await UserCartVerification.deleteMany({ employer_id: employer_id, is_paid: 1 });
+
+    const transaction = new Transaction({
+      employer_id: employer_id,
+      transactionId: payment_method === "Live"
+        ? razorpay_response.razorpay_payment_id
+        : `wallet_${Date.now()}`,
+      amount: amount,
+      paymentids: paymentIds || null,
+      order_ids: userIds.join(','),
+      payment_method: payment_method,
+      payment_type: "debit",
+    });
+
+    await transaction.save();
+
+    return res.status(200).json({
+      message: "Payment processed, verifications archived, and transaction recorded",
+      archivedUsersCount: usersWithOrderId.length,
+      remainingWalletBalance: user.wallet_amount,
+    });
+
+  } catch (error) {
+    console.error("Payment Error:", error);
+    return res.status(500).json({
+      message: "Error processing payment",
       error: error.message,
     });
   }
