@@ -529,7 +529,7 @@ export const paynow = async (req, res) => {
       // Deduct wallet amount
       user.wallet_amount -= amount;
       await user.save();
-    } else if (payment_method === "Live") {
+    } else if (payment_method === "online") {
       if (!razorpay_response?.razorpay_payment_id) {
         return res.status(400).json({ error: "Razorpay payment ID is missing." });
       }
