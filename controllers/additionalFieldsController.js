@@ -111,7 +111,7 @@ export const listFieldsByCompany = async (req, res) => {
         }
 
         // Convert allowed_verifications to object
-        const allTypes = ["PAN", "Aadhaar", "DL", "EPIC", "Passport"];
+        const allTypes = ["PAN", "AADHAAR", "DL", "EPIC", "PASSPORT"];
         const allowedTypes = (company.allowed_verifications || "").split(",").map(v => v.trim().toUpperCase());
 
         const allowedVerificationsObj = {};
