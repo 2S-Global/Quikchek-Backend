@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
-    order_ids: {
+    order_id: {
         type: String,
     },
     transactionId: {
