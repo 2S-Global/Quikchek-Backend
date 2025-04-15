@@ -1,7 +1,6 @@
 import Package from "../models/packageModel.js"; 
 
 
-import Package from "../models/packageModel.js";
 
 export const addPackage = async (req, res) => {
   try {
