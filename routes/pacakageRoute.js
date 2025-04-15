@@ -3,7 +3,7 @@ import multer from "multer";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 
-import { addPackage } from "../controllers/pacakageController.js";
+import { addPackage,getAllPackages } from "../controllers/pacakageController.js";
 
 //Middleware
 import userAuth from "../middleware/authMiddleware.js";
@@ -29,5 +29,6 @@ const upload = multer({ storage: storage });
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
 userRouter.post("/addPackage", upload.none(), addPackage);
+userRouter.get("/getAllPackages", upload.none(), getAllPackages);
 
 export default userRouter;
