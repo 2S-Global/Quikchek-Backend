@@ -32,6 +32,6 @@ const upload = multer({ storage: storage });
 
 userRouter.post("/addPackage", upload.none(),userAuth,adminMiddleware, addPackage);
 userRouter.get("/getAllPackages", upload.none(),userAuth,adminMiddleware, getAllPackages);
-userRouter.get("/deletePackage", upload.none(),userAuth,adminMiddleware, deletePackage);
+userRouter.post("/deletePackage", upload.none(),userAuth,adminMiddleware, deletePackage);
 
 export default userRouter;
