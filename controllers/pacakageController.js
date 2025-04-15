@@ -83,5 +83,49 @@ export const deletePackage = async (req, res) => {
   }
 };
 
+export const updatePackage = async (req, res) => {
+  try {
+    const {
+      id,
+      name,
+      transaction_fee,
+      description,
+      transaction_gst,
+      allowed_verifications,
+      expiryDate,
+    } = req.body;
+
+    const parsedVerifications =
+      typeof allowed_verifications === "string"
+        ? allowed_verifications.split(",").map((item) => item.trim())
+        : Array.isArray(allowed_verifications)
+        ? allowed_verifications
+        : [];
+
+    const updated = await Package.findByIdAndUpdate(
+      id,
+      {
+        name,
+        transaction_fee,
+        description,
+        transaction_gst: transaction_gst || 18,
+        allowed_verifications: parsedVerifications,
+        expiryDate,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Package not found" });
+    }
+
+    res.status(200).json({ message: "Package updated successfully", data: updated });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating package", error: error.message });
+  }
+};
+
 
 
