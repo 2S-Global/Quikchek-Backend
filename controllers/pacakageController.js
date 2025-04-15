@@ -10,9 +10,12 @@ export const addPackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
-    const parsedVerifications = typeof allowed_verifications === 'string'
-      ? allowed_verifications.split(',').map(item => item.trim()) // 🪄 convert "PAN,AADHAAR" → ["PAN", "AADHAAR"]
-      : [];
+    const parsedVerifications =
+      typeof allowed_verifications === "string"
+        ? allowed_verifications.split(",").map((item) => item.trim()) // convert "PAN,AADHAAR" → ["PAN", "AADHAAR"]
+        : Array.isArray(allowed_verifications)
+        ? allowed_verifications
+        : [];
 
     const newPackage = new Package({
       name,
@@ -24,8 +27,13 @@ export const addPackage = async (req, res) => {
     });
 
     const savedPackage = await newPackage.save();
-    res.status(201).json({ message: 'Package added successfully', data: savedPackage });
+    res
+      .status(201)
+      .json({ message: "Package added successfully", data: savedPackage });
   } catch (error) {
-    res.status(500).json({ message: 'Error adding package', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error adding package", error: error.message });
   }
 };
+
