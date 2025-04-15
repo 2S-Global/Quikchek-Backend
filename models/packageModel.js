@@ -8,7 +8,7 @@ const packageSchema = new mongoose.Schema({
 allowed_verifications: {
   type: [String],
   default: [],
-}
+},
 
   expiryDate: { type: Date },
   is_del: { type: Boolean, default: false },
