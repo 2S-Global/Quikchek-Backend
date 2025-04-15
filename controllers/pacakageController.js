@@ -63,5 +63,25 @@ export const getAllPackages = async (req, res) => {
   }
 };
 
+export const deletePackage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Package.findByIdAndUpdate(
+      id,
+      { is_del: true },
+      { new: true }
+    );
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Package not found" });
+    }
+
+    res.status(200).json({ message: "Package deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting package", error: error.message });
+  }
+};
+
 
 
