@@ -10,7 +10,7 @@ allowed_verifications: {
   default: [],
 },
 
-  expiryDate: { type: Date },
+   expiryDate: { type: String },
   is_del: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
