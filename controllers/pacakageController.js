@@ -13,18 +13,7 @@ export const addPackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
-     if (
 
-      !name ||
-      transaction_fee == null ||
-      transaction_gst == null ||
-      !allowed_verifications ||
-
-    ) {
-      return res.status(200).json({
-        message: "All fields are required:  name, transaction_fee, transaction_gst, allowed_verifications",
-      });
-    }
 
     const parsedVerifications =
       typeof allowed_verifications === "string"
