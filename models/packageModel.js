@@ -6,8 +6,8 @@ const packageSchema = new mongoose.Schema({
   description: { type: String },
   transaction_gst: { type: Number, default: 18 },
 allowed_verifications: {
-  type: String,
-
+  type: [String],
+  default: [],
 },
 
   expiryDate: { type: Date },
