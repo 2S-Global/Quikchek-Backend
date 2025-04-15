@@ -39,13 +39,29 @@ export const addPackage = async (req, res) => {
 };
 
 
+import Package from "../models/packageModel.js";
+
 export const getAllPackages = async (req, res) => {
   try {
     const packages = await Package.find({ is_del: false });
-    res.status(200).json({ message: "Packages fetched successfully", data: packages });
+
+    const transformedPackages = packages.map(pkg => {
+      const pkgObj = pkg.toObject();
+      pkgObj.allowed_verifications = pkg.allowed_verifications.join(", ");
+      return pkgObj;
+    });
+
+    res.status(200).json({
+      message: "Packages fetched successfully",
+      data: transformedPackages,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching packages", error: error.message });
+    res.status(500).json({
+      message: "Error fetching packages",
+      error: error.message,
+    });
   }
 };
+
 
 
