@@ -5,9 +5,11 @@ import { v2 as cloudinary } from "cloudinary";
 
 import { addPackage,getAllPackages } from "../controllers/pacakageController.js";
 
+
 //Middleware
 import userAuth from "../middleware/authMiddleware.js";
 import Companymid from "../middleware/companyMiddleware.js";
+import adminMiddleware from '../middleware/adminMiddleware.js';
 
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -28,7 +30,7 @@ const upload = multer({ storage: storage });
 
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
-userRouter.post("/addPackage", upload.none(),userAuth,Companymid, addPackage);
-userRouter.get("/getAllPackages", upload.none(),userAuth,Companymid, getAllPackages);
+userRouter.post("/addPackage", upload.none(),userAuth,adminMiddleware, addPackage);
+userRouter.get("/getAllPackages", upload.none(),userAuth,adminMiddleware, getAllPackages);
 
 export default userRouter;
