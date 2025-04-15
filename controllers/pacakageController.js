@@ -1,5 +1,4 @@
-import userPackage from "../models/packageModel.js";
-
+import Package from "../models/packageModel.js"; 
 export const addPackage = async (req, res) => {
     try {
       const {
@@ -11,7 +10,7 @@ export const addPackage = async (req, res) => {
         expiryDate,
       } = req.body;
   
-      const newPackage = new userPackage({
+      const newPackage = new Package({
         name,
         transaction_fee,
         description,
