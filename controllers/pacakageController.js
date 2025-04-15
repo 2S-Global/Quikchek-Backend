@@ -10,19 +10,22 @@ export const addPackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
+    // Check if allowed_verifications is a string and split it into an array
     const parsedVerifications =
       typeof allowed_verifications === "string"
-        ? allowed_verifications.split(",").map((item) => item.trim()) // convert "PAN,AADHAAR" → ["PAN", "AADHAAR"]
+        ? allowed_verifications.split(",").map((item) => item.trim()) // Split string into array
         : Array.isArray(allowed_verifications)
         ? allowed_verifications
         : [];
+
+    console.log("Parsed verifications:", parsedVerifications); // This will now log the array
 
     const newPackage = new Package({
       name,
       transaction_fee,
       description,
       transaction_gst: transaction_gst || 18,
-      allowed_verifications: parsedVerifications,
+      allowed_verifications: parsedVerifications, // Store as an array of strings
       expiryDate,
     });
 
