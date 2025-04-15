@@ -1,4 +1,6 @@
 import Package from "../models/packageModel.js"; 
+import Package from "../models/packageModel.js"; 
+
 export const addPackage = async (req, res) => {
   try {
     const {
@@ -10,6 +12,9 @@ export const addPackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
+    // Log the incoming request body to check the data
+    console.log("Request Body:", req.body);
+
     // Check if allowed_verifications is a string and split it into an array
     const parsedVerifications =
       typeof allowed_verifications === "string"
@@ -18,8 +23,10 @@ export const addPackage = async (req, res) => {
         ? allowed_verifications
         : [];
 
-    console.log("Parsed verifications:", parsedVerifications); // This will now log the array
+    // Log the parsed allowed_verifications before saving
+    console.log("Parsed verifications:", parsedVerifications);
 
+    // Create a new package
     const newPackage = new Package({
       name,
       transaction_fee,
@@ -29,14 +36,12 @@ export const addPackage = async (req, res) => {
       expiryDate,
     });
 
+    // Save to the database
     const savedPackage = await newPackage.save();
-    res
-      .status(201)
-      .json({ message: "Package added successfully", data: savedPackage });
+    res.status(201).json({ message: "Package added successfully", data: savedPackage });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error adding package", error: error.message });
+    res.status(500).json({ message: "Error adding package", error: error.message });
   }
 };
+
 
