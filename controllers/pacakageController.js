@@ -98,6 +98,22 @@ export const updatePackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
+    // ✅ Validate required fields
+    if (
+      !id ||
+      !name ||
+      transaction_fee == null ||
+      transaction_gst == null ||
+      !allowed_verifications ||
+
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "All fields are required: id, name, transaction_fee, transaction_gst, allowed_verifications",
+      });
+    }
+
     const parsedVerifications =
       typeof allowed_verifications === "string"
         ? allowed_verifications.split(",").map((item) => item.trim())
@@ -105,30 +121,45 @@ export const updatePackage = async (req, res) => {
         ? allowed_verifications
         : [];
 
+    // ✅ Fetch current package
+    const existingPackage = await Package.findById(id);
+    if (!existingPackage) {
+      return res.status(404).json({ success: false, message: "Package not found" });
+    }
+
+    // ✅ Merge existing + new verifications (avoid duplicates)
+    const mergedVerifications = Array.from(
+      new Set([...existingPackage.allowed_verifications, ...parsedVerifications])
+    );
+
+    // ✅ Update the document
     const updated = await Package.findByIdAndUpdate(
       id,
       {
         name,
         transaction_fee,
         description,
-        transaction_gst: transaction_gst || 18,
-        allowed_verifications: parsedVerifications,
+        transaction_gst,
+        allowed_verifications: mergedVerifications,
         expiryDate,
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Package not found" });
-    }
-
-    res.status(200).json({success: true, message: "Package updated successfully", data: updated });
+    res.status(200).json({
+      success: true,
+      message: "Package updated successfully",
+      data: updated,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating package", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error updating package",
+      error: error.message,
+    });
   }
 };
+
 
 
 
