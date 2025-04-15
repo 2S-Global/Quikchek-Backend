@@ -104,7 +104,7 @@ export const updatePackage = async (req, res) => {
       !name ||
       transaction_fee == null ||
       transaction_gst == null ||
-      !allowed_verifications ||
+      !allowed_verifications
 
     ) {
       return res.status(400).json({
