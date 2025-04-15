@@ -13,14 +13,7 @@ export const addPackage = async (req, res) => {
       expiryDate,
     } = req.body;
 
-    // Manually parse expiryDate and set time to 00:00:00.000Z
-    const parsedExpiryDate = new Date(expiryDate);
-    parsedExpiryDate.setHours(0, 0, 0, 0); // Set time to midnight UTC
-
-    // If it's not a valid date, return an error
-    if (isNaN(parsedExpiryDate)) {
-      return res.status(400).json({ message: "Invalid expiry date format." });
-    }
+ 
 
     const parsedVerifications =
       typeof allowed_verifications === "string"
@@ -35,7 +28,7 @@ export const addPackage = async (req, res) => {
       description,
       transaction_gst: transaction_gst || 18,
       allowed_verifications: parsedVerifications,
-      expiryDate: parsedExpiryDate, // Save date as midnight
+      expiryDate: expiryDate, 
     });
 
     const savedPackage = await newPackage.save();
