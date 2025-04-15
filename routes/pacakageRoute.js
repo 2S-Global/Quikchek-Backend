@@ -28,7 +28,7 @@ const upload = multer({ storage: storage });
 
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
-userRouter.post("/addPackage", upload.none(),userAuth,Companymid addPackage);
+userRouter.post("/addPackage", upload.none(),userAuth,Companymid, addPackage);
 userRouter.get("/getAllPackages", upload.none(),userAuth,Companymid, getAllPackages);
 
 export default userRouter;
