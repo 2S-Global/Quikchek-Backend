@@ -39,7 +39,7 @@ export const addPackage = async (req, res) => {
 };
 
 
-import Package from "../models/packageModel.js";
+
 
 export const getAllPackages = async (req, res) => {
   try {
