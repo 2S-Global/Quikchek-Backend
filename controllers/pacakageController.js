@@ -122,7 +122,7 @@ export const updatePackage = async (req, res) => {
       return res.status(404).json({ message: "Package not found" });
     }
 
-    res.status(200).json({ message: "Package updated successfully", data: updated });
+    res.status(200).json({success: true, message: "Package updated successfully", data: updated });
   } catch (error) {
     res
       .status(500)
