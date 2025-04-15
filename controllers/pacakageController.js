@@ -65,7 +65,7 @@ export const getAllPackages = async (req, res) => {
 
 export const deletePackage = async (req, res) => {
   try {
-    const { id } = req.params;
+  const { id } = req.body; 
 
     const deleted = await Package.findByIdAndUpdate(
       id,
