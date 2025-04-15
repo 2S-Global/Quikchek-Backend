@@ -1,23 +1,22 @@
-import express from 'express';
-import multer from 'multer';
-import dotenv from 'dotenv';
-import { v2 as cloudinary } from 'cloudinary';
+import express from "express";
+import multer from "multer";
+import dotenv from "dotenv";
+import { v2 as cloudinary } from "cloudinary";
 
-import { addPackage } from '../controllers/packageController.js';
+import { addPackage } from "../controllers/pacakageController.js";
 
 //Middleware
-import userAuth from '../middleware/authMiddleware.js';
-import Companymid from '../middleware/companyMiddleware.js';
-
+import userAuth from "../middleware/authMiddleware.js";
+import Companymid from "../middleware/companyMiddleware.js";
 
 // Initialize dotenv to load environment variables
 dotenv.config();
 
 // Configure Cloudinary
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Initialize router
@@ -29,8 +28,6 @@ const upload = multer({ storage: storage });
 
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
-
-userRouter.post("/addPackage",upload.none(), addPackage);
-
+userRouter.post("/addPackage", upload.none(), addPackage);
 
 export default userRouter;
