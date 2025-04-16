@@ -58,7 +58,7 @@ export const addPackage = async (req, res) => {
 
 export const getAllPackages = async (req, res) => {
   try {
-    const packages = await Package.find({ is_del: false });
+    const packages = await Package.find({ is_del: false ,is_active:true});
 
     const transformedPackages = packages.map(pkg => {
       const pkgObj = pkg.toObject();
