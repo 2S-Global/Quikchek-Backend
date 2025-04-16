@@ -61,7 +61,7 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
 
     const data = await CompanyPackage.findOne({ companyId })
       .populate("companyId", "name email") // populate user details
-      .populate("selected_plan", "name transaction_fee description"); // populate plans if needed
+     
 
     if (!data) {
       return res.status(200).json({
