@@ -42,7 +42,7 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
 
     const data = await CompanyPackage.find({ companyId })
       .populate("companyId", "name email") // optional: user info
-      .populate("planId", "name transaction_fee description transaction_gst "); // optional: plan info
+      .populate("selected_plan", "name transaction_fee description transaction_gst "); // optional: plan info
 
     if (data.length === 0) {
       return res.status(200).json({ success: false, message: "No packages found for this company" });
