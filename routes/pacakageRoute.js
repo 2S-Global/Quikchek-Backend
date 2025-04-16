@@ -34,5 +34,6 @@ userRouter.post("/addPackage", upload.none(),userAuth,adminMiddleware, addPackag
 userRouter.get("/getAllPackages", upload.none(),userAuth,adminMiddleware, getAllPackages);
 userRouter.post("/updatePackage", upload.none(),userAuth,adminMiddleware, updatePackage);
 userRouter.post("/deletePackage", upload.none(),userAuth,adminMiddleware, deletePackage);
+userRouter.post("/toggleStatusPackage ",toggleStatusPackage );
 
 export default userRouter;
