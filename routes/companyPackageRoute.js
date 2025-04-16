@@ -3,12 +3,12 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import { createCompanyPackage ,getCompanyPackagesByCompanyId } from '../controllers/companyPackageController.js';
+import { createCompanyPackage ,getCompanyPackagesByCompanyId,getPackageByCompany } from '../controllers/companyPackageController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
 import adminMiddleware from '../middleware/adminMiddleware.js';
-
+import Companymid from "../middleware/companyMiddleware.js";
 
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -30,8 +30,9 @@ const upload = multer({ storage: storage });
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
 
-userRouter.post("/createCompanyPackage",upload.none(), createCompanyPackage);
-userRouter.post("/getCompanyPackagesByCompanyId", getCompanyPackagesByCompanyId );
+userRouter.post("/createCompanyPackage",upload.none(),userAuth,adminMiddleware, createCompanyPackage);
+userRouter.post("/getCompanyPackagesByCompanyId",userAuth,adminMiddleware,getCompanyPackagesByCompanyId );
+userRouter.post("/getPackageByCompany",userAuth,Companymid, getPackageByCompany );
 
 
 export default userRouter;
