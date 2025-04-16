@@ -3,7 +3,7 @@ import multer from "multer";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 
-import { addPackage,getAllPackages,deletePackage,updatePackage,toggleStatusPackage } from "../controllers/pacakageController.js";
+import { addPackage,getAllPackages,deletePackage,updatePackage,toggleStatusPackage} from "../controllers/pacakageController.js";
 
 
 //Middleware
@@ -34,6 +34,6 @@ userRouter.post("/addPackage", upload.none(),userAuth,adminMiddleware, addPackag
 userRouter.get("/getAllPackages", upload.none(),userAuth,adminMiddleware, getAllPackages);
 userRouter.post("/updatePackage", upload.none(),userAuth,adminMiddleware, updatePackage);
 userRouter.post("/deletePackage", upload.none(),userAuth,adminMiddleware, deletePackage);
-userRouter.post("/toggleStatusPackage ",toggleStatusPackage );
+userRouter.post("/toggleStatusPackage",toggleStatusPackage );
 
 export default userRouter;
