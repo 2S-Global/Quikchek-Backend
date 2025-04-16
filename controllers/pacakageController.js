@@ -12,7 +12,7 @@ export const addPackage = async (req, res) => {
       allowed_verifications,
       expiryDate,
     } = req.body;
-
+ 
 
    if (
        !name ||
