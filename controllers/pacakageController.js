@@ -211,7 +211,7 @@ export const toggleStatusPackage = async (req, res) => {
 
 export const getPackages = async (req, res) => {
   try {
-    const packages = await Package.find({ is_del: false, is_active:true });
+    const packages = await Package.find({ is_del: false,is_active:true });
 
     const transformedPackages = packages.map(pkg => {
       const pkgObj = pkg.toObject();
@@ -227,6 +227,9 @@ export const getPackages = async (req, res) => {
     res.status(500).json({
       message: "Error fetching packages",
       error: error.message,
+    });
+  }
+};
   
 
 
