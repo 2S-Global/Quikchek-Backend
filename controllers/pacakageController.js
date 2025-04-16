@@ -209,6 +209,24 @@ export const toggleStatusPackage = async (req, res) => {
   }
 };
 
+export const getPackages = async (req, res) => {
+  try {
+    const packages = await Package.find({ is_del: false, is_active:true });
 
+    const transformedPackages = packages.map(pkg => {
+      const pkgObj = pkg.toObject();
+      pkgObj.allowed_verifications = pkg.allowed_verifications.join(", ");
+      return pkgObj;
+    });
+
+    res.status(200).json({
+      message: "Packages fetched successfully",
+      data: transformedPackages,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching packages",
+      error: error.message,
+  
 
 
