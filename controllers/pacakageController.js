@@ -173,6 +173,40 @@ export const updatePackage = async (req, res) => {
   }
 };
 
+export const toggleStatusPackage = async (req, res) => {
+  try {
+    const { pack_id } = req.body;
+
+    // Find the package first
+    const packageData = await Package.findById(pack_id);
+    if (!packageData) {
+      return res.status(404).json({
+        success: false,
+        message: "Package not found",
+      });
+    }
+
+    // Toggle the is_active status
+    const updated = await Package.findByIdAndUpdate(
+      pack_id,
+      {
+        is_active: !packageData.is_active,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: updated,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating package",
+      error: error.message,
+    });
+  }
+};
 
 
 
