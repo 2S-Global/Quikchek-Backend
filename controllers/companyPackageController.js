@@ -31,3 +31,26 @@ export const createCompanyPackage = async (req, res) => {
   }
 };
 
+
+export const getCompanyPackagesByCompanyId = async (req, res) => {
+  try {
+    const { companyId } = req.body;
+
+    if (!companyId) {
+      return res.status(400).json({ success: false, message: "companyId is required in body" });
+    }
+
+    const data = await CompanyPackage.find({ companyId })
+      .populate("companyId", "name email") // optional: user info
+      .populate("planId", "name transaction_fee description transaction_gst "); // optional: plan info
+
+    if (data.length === 0) {
+      return res.status(200).json({ success: false, message: "No packages found for this company" });
+    }
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
