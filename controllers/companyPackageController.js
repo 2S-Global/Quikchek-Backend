@@ -17,15 +17,31 @@ export const createCompanyPackage = async (req, res) => {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    const planIds = parsePlanIds(selected_plan);
+    const planIds = typeof selected_plan === "string"
+      ? selected_plan.split(",").map((id) => id.trim())
+      : Array.isArray(selected_plan)
+      ? selected_plan
+      : [];
 
-    const newPackage = await CompanyPackage.create({
-    companyId,
-    selected_plan: planIds,
-    discount_percent,
+    const updatedOrCreated = await CompanyPackage.findOneAndUpdate(
+      { companyId }, // match by companyId
+      {
+        companyId,
+        selected_plan: planIds,
+        discount_percent,
+      },
+      {
+        new: true,       // return the updated document
+        upsert: true,    // create if not exists
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Package created or updated successfully",
+      data: updatedOrCreated,
     });
-
-    res.status(200).json({ success: true, data: newPackage });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
