@@ -9,8 +9,10 @@ allowed_verifications: {
   type: [String],
   default: [],
 },
+  
 
    expiryDate: { type: String },
+   is_status: { type: Boolean, default: false },
   is_del: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
