@@ -28,7 +28,7 @@ export const addPackage = async (req, res) => {
       description,
       transaction_gst: transaction_gst || 18,
       allowed_verifications: parsedVerifications,
-      expiryDate: expiryDate, 
+      expiryDate: expiryDate,  
     });
 
     const savedPackage = await newPackage.save();
