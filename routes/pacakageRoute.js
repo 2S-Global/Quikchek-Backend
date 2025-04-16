@@ -3,7 +3,7 @@ import multer from "multer";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 
-import { addPackage,getAllPackages,deletePackage,updatePackage} from "../controllers/pacakageController.js";
+import { addPackage,getAllPackages,deletePackage,updatePackage,toggleStatusPackage } from "../controllers/pacakageController.js";
 
 
 //Middleware
