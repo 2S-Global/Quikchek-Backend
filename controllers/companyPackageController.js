@@ -71,7 +71,7 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
     }
 
     res.status(200).json({ success: true, data }); // ✅ data is a single object now
-  } catch (error) {
+  } catch (error) { 
     res.status(500).json({
       success: false,
       message: error.message,
