@@ -7,7 +7,7 @@ import { createCompanyPackage } from '../controllers/companyPackageController.js
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
-import Companymid from '../middleware/companyMiddleware.js';
+import adminMiddleware from '../middleware/adminMiddleware.js';
 
 
 // Initialize dotenv to load environment variables
@@ -31,6 +31,7 @@ const upload = multer({ storage: storage });
 
 
 userRouter.post("/createCompanyPackage",upload.none(), createCompanyPackage);
+userRouter.post("/getCompanyPackagesByCompanyId ", getCompanyPackagesByCompanyId );
 
 
 export default userRouter;
