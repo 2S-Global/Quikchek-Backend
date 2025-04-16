@@ -31,7 +31,7 @@ const upload = multer({ storage: storage });
 
 
 userRouter.post("/createCompanyPackage",upload.none(), createCompanyPackage);
-userRouter.post("/getCompanyPackagesByCompanyId ", getCompanyPackagesByCompanyId );
+userRouter.post("/getCompanyPackagesByCompanyId", getCompanyPackagesByCompanyId );
 
 
 export default userRouter;
