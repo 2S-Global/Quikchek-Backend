@@ -79,4 +79,36 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
   }
 };
 
+export const getPackageByCompany = async (req, res) => {
+  try {
+    const { companyId } = req.userId;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "companyId is required in body",
+      });
+    }
+
+    const data = await CompanyPackage.findOne({ companyId })
+      .populate("companyId", "name email") // populate user details
+     
+
+    if (!data) {
+      return res.status(200).json({
+        success: false,
+        message: "No packages found for this company",
+      });
+    }
+
+    res.status(200).json({ success: true, data }); // ✅ data is a single object now
+  } catch (error) { 
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 
