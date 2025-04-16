@@ -105,15 +105,15 @@ export const updatePackage = async (req, res) => {
       transaction_fee == null ||
       transaction_gst == null ||
       !allowed_verifications
-
     ) {
       return res.status(400).json({
         success: false,
         message:
-          "All fields are required:name, transaction_fee, transaction_gst, allowed_verifications",
+          "All fields are required: id, name, transaction_fee, transaction_gst, allowed_verifications",
       });
     }
 
+    // ✅ Normalize `allowed_verifications` to an array
     const parsedVerifications =
       typeof allowed_verifications === "string"
         ? allowed_verifications.split(",").map((item) => item.trim())
@@ -121,18 +121,16 @@ export const updatePackage = async (req, res) => {
         ? allowed_verifications
         : [];
 
-    // ✅ Fetch current package
+    // ✅ Fetch the existing package
     const existingPackage = await Package.findById(id);
     if (!existingPackage) {
-      return res.status(404).json({ success: false, message: "Package not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Package not found",
+      });
     }
 
-    // ✅ Merge existing + new verifications (avoid duplicates)
-    const mergedVerifications = Array.from(
-      new Set([...existingPackage.allowed_verifications, ...parsedVerifications])
-    );
-
-    // ✅ Update the document
+    // ✅ Update the package with the new data (replace verifications)
     const updated = await Package.findByIdAndUpdate(
       id,
       {
@@ -140,7 +138,7 @@ export const updatePackage = async (req, res) => {
         transaction_fee,
         description,
         transaction_gst,
-        allowed_verifications: mergedVerifications,
+        allowed_verifications: parsedVerifications, // 🔥 Replace with new list
         expiryDate,
       },
       { new: true }
@@ -159,6 +157,7 @@ export const updatePackage = async (req, res) => {
     });
   }
 };
+
 
 
 
