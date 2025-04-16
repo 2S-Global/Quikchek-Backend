@@ -110,7 +110,7 @@ export const updatePackage = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "All fields are required: id, name, transaction_fee, transaction_gst, allowed_verifications",
+          "All fields are required:name, transaction_fee, transaction_gst, allowed_verifications",
       });
     }
 
