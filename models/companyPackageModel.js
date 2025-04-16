@@ -16,6 +16,7 @@ const companyPackageSchema = new mongoose.Schema(
     discount_percent: {
       type: Number,
     },
+    is_del: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
