@@ -198,6 +198,7 @@ export const toggleStatusPackage = async (req, res) => {
     res.status(200).json({
       success: true,
       data: updated,
+       message: `Package Status Changed Successfully.`,
     });
   } catch (error) {
     res.status(500).json({
