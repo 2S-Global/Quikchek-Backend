@@ -2,18 +2,18 @@ import mongoose from "mongoose";
 
 const companyPackageSchema = new mongoose.Schema(
   {
-    company_id: {
+    companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", 
         },
-    plan_id: [
+    selected_plan: [
         {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Package",
          
         },
       ],
-    discount_percentage: {
+    discount_percent: {
       type: Number,
     },
   },
