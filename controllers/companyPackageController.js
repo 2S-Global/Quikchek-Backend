@@ -81,18 +81,18 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
 
 export const getPackageByCompany = async (req, res) => {
   try {
-    const { companyId } = req.userId;
+    const companyId = req.userId;
 
     if (!companyId) {
       return res.status(400).json({
         success: false,
-        message: "companyId is required in body",
+        message: "User ID is missing",
       });
     }
 
-    const data = await CompanyPackage.findOne({ companyId })
-      .populate("companyId", "name email") // populate user details
-     
+    const data = await CompanyPackage.findOne({ company_id: companyId })
+      .populate("company_id", "name email") // populate user info
+      .populate("plan_id"); // populate plan info (optional)
 
     if (!data) {
       return res.status(200).json({
@@ -101,14 +101,15 @@ export const getPackageByCompany = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true, data }); // ✅ data is a single object now
-  } catch (error) { 
+    res.status(200).json({ success: true, data });
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
+
 
 
 
