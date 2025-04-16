@@ -3,7 +3,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import { createCompanyPackage } from '../controllers/companyPackageController.js';
+import { createCompanyPackage ,getCompanyPackagesByCompanyId } from '../controllers/companyPackageController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
