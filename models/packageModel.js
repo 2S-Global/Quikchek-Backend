@@ -12,7 +12,7 @@ allowed_verifications: {
   
 
    expiryDate: { type: String },
-   is_active: { type: Boolean, default: false },
+   is_active: { type: Boolean, default: true },
   is_del: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
