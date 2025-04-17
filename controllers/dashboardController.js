@@ -47,10 +47,15 @@ export const getTotal = async (req, res) => {
 
 export const getMonthlyUserVerifications = async (req, res) => {
   try {
+    // Get date 6 months ago
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5); // Include current month
+
     const monthlyData = await UserVerification.aggregate([
       {
         $match: {
-          all_verified: 1 // Only verified users
+          all_verified: 1,
+          createdAt: { $gte: sixMonthsAgo }
         }
       },
       {
@@ -78,7 +83,6 @@ export const getMonthlyUserVerifications = async (req, res) => {
       }
     ]);
 
-    // Add month names
     const monthNames = [
       "", "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
