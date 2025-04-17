@@ -7,6 +7,7 @@ import {
     addField,
     listFields,
     listFieldsByCompany,
+    getAllFields,
     deleteField,
     editField
 } from '../controllers/additionalFieldsController.js'; // Adjust the path according to your project structure
