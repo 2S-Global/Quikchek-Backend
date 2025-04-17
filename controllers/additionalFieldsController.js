@@ -1,5 +1,6 @@
 import Fields from "../models/additionalFieldsModels.js";
 import User from "../models/userModel.js";
+import Package from "../models/packageModel.js";
 
 
 // Register a new user
@@ -104,24 +105,35 @@ export const listFieldsByCompany = async (req, res) => {
     try {
         const company_id = req.userId;
 
-        const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications package_id gst_no discount_percent");
+        const plan_id=req.body.plan_id;
 
+        const company = await User.findById(company_id).select("gst_no");
         if (!company) {
             return res.status(404).json({ success: false, message: "Company not found" });
         }
+        console.log(plan_id);
+        const packagedetails = await Package.findById(plan_id).select("transaction_fee transaction_gst allowed_verifications");
 
-        // Convert allowed_verifications to object
+        if (!packagedetails) {
+            return res.status(404).json({ success: false, message: "Package not found" });
+        }
+
+        console.log(packagedetails.allowed_verifications);
+
+        const allowedTypes = (packagedetails.allowed_verifications || []).map(v => v.trim().toUpperCase());
+        
         const allTypes = ["PAN", "AADHAAR", "DL", "EPIC", "PASSPORT"];
-        const allowedTypes = (company.allowed_verifications || "").split(",").map(v => v.trim().toUpperCase());
-
         const allowedVerificationsObj = {};
         allTypes.forEach(type => {
-            allowedVerificationsObj[type] = allowedTypes.includes(type);
+          allowedVerificationsObj[type] = allowedTypes.includes(type);
         });
 
         // Overwrite original string field with the object
         const companyData = {
             ...company._doc,
+            transaction_fee: packagedetails.transaction_fee,
+            transaction_gst: packagedetails.transaction_gst,
+            allowed_verifications: packagedetails.allowed_verifications,
             ...allowedVerificationsObj
         };
 
