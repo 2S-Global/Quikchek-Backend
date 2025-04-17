@@ -37,6 +37,7 @@ app.use("/api/pacakageRoute", pacakageRoute);
 app.use("/api/companyPackageRoute", companyPackageRoute);
 app.use("/api/terms", termsRoute);
 app.use("/api/privacyRoute", privacyRoute);
+app.use("/api/dashboard", dashboardRoute);
 
 // Start server
 const PORT = process.env.PORT || 8080;
