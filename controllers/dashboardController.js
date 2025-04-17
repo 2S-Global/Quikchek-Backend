@@ -47,9 +47,9 @@ export const getTotal = async (req, res) => {
 
 export const getMonthlyUserVerifications = async (req, res) => {
   try {
-    // Get date 6 months ago
+    const now = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5); // Include current month
+    sixMonthsAgo.setMonth(now.getMonth() - 5); // Last 6 months incl. current
 
     const monthlyData = await UserVerification.aggregate([
       {
@@ -68,12 +68,6 @@ export const getMonthlyUserVerifications = async (req, res) => {
         }
       },
       {
-        $sort: {
-          "_id.year": 1,
-          "_id.month": 1
-        }
-      },
-      {
         $project: {
           _id: 0,
           year: "$_id.year",
@@ -83,19 +77,35 @@ export const getMonthlyUserVerifications = async (req, res) => {
       }
     ]);
 
+    // Generate last 6 months with default 0
+    const result = [];
     const monthNames = [
       "", "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
 
-    const formattedData = monthlyData.map(item => ({
-      ...item,
-      monthName: monthNames[item.month]
-    }));
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(now.getMonth() - i);
+
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+
+      const match = monthlyData.find(
+        (item) => item.year === year && item.month === month
+      );
+
+      result.push({
+        year,
+        month,
+        monthName: monthNames[month],
+        total: match ? match.total : 0
+      });
+    }
 
     res.status(200).json({
       success: true,
-      data: formattedData
+      data: result
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
