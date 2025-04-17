@@ -13,9 +13,10 @@ export const createCompanyPackage = async (req, res) => {
   try {
     const { companyId, selected_plan, discount_percent } = req.body;
 
-    if (!companyId || !selected_plan || discount_percent == null) {
+    if (!companyId || !selected_plan ) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
+    const finalDiscount = discount_percent != null ? discount_percent : 0;
 
     const planIds = typeof selected_plan === "string"
       ? selected_plan.split(",").map((id) => id.trim())
@@ -27,8 +28,8 @@ export const createCompanyPackage = async (req, res) => {
       { companyId }, // match by companyId
       {
         companyId,
-        selected_plan: planIds,
-        discount_percent,
+     selected_plan: planIds,
+        discount_percent: finalDiscount,
       },
       {
         new: true,       // return the updated document
