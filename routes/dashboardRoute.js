@@ -8,7 +8,7 @@ import { getTotal } from '../controllers/dashboardController.js';
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
 import Companymid from '../middleware/companyMiddleware.js';
-
+import adminMiddleware from '../middleware/adminMiddleware.js';
 
 // Initialize dotenv to load environment variables
 dotenv.config();
@@ -30,7 +30,7 @@ const upload = multer({ storage: storage });
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
 
-userRouter.get("/getTotal",getTotal);
+userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
 
 
 export default userRouter;
