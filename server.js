@@ -23,6 +23,7 @@ import pacakageRoute from "./routes/pacakageRoute.js";
 import companyPackageRoute from "./routes/companyPackageRoute.js";
 import termsRoute from "./routes/termsRoutes.js"; 
 import privacyRoute from "./routes/privacyPolicyRoute.js"; 
+import dashboardRoute from "./routes/dashboardRoute.js"; 
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
