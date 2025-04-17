@@ -43,3 +43,57 @@ export const getTotal = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
+export const getMonthlyUserVerifications = async (req, res) => {
+  try {
+    const monthlyData = await UserVerification.aggregate([
+      {
+        $match: {
+          all_verified: 1 // Only verified users
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          total: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          total: 1
+        }
+      }
+    ]);
+
+    // Add month names
+    const monthNames = [
+      "", "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    const formattedData = monthlyData.map(item => ({
+      ...item,
+      monthName: monthNames[item.month]
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedData
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
