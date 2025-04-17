@@ -76,7 +76,7 @@ export const listFields = async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
     }
 };
-export const listFieldsByCompany_OLD = async (req, res) => {
+export const getAllFields = async (req, res) => {
     try {
         const company_id = req.userId;
         // Get company details once
@@ -92,7 +92,7 @@ export const listFieldsByCompany_OLD = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Fields fetched successfully",
-            company,
+           // company,
             data: fields,
         });
 
