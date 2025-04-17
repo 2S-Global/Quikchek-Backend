@@ -30,7 +30,8 @@ const upload = multer({ storage: storage });
 // userRouter.post('/list_verified_users', upload.none(), userAuth, Companymid, listUserVerifiedList);
 
 
-userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
+// userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
+userRouter.get("/getTotal",getTotal);
 
 
 export default userRouter;
