@@ -21,6 +21,7 @@ import fieldsRouts from "./routes/additionalFieldsRoutes.js";
 import walletRoute from "./routes/walletRoute.js";
 import pacakageRoute from "./routes/pacakageRoute.js";
 import companyPackageRoute from "./routes/companyPackageRoute.js";
+import termsRoute from "./routes/termsRoutes.js"; 
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
@@ -33,6 +34,7 @@ app.use("/api/fields", fieldsRouts);
 app.use("/api/wallet", walletRoute);
 app.use("/api/pacakageRoute", pacakageRoute);
 app.use("/api/companyPackageRoute", companyPackageRoute);
+app.use("/api/terms", termsRoute);
 // Start server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
