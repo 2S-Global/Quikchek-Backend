@@ -15,7 +15,7 @@ export const addUserToCart = async (req, res) => {
 
 
         const {
-            plan_id,
+            plan,
             name,
             email,
             phone,
@@ -43,7 +43,7 @@ export const addUserToCart = async (req, res) => {
 
         const newUserCart = new UserCartVerification({
             employer_id : user_id,
-            plan_id : plan_id,
+            plan : plan,
             candidate_name : name,
             candidate_email : email,
             candidate_mobile : phone,
