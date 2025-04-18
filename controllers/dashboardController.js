@@ -287,7 +287,7 @@ export const getTotalFrontend = async (req, res) => {
         },
         {
           $group: {
-      _id: null,
+      _id: 0,
       total: { $sum: "$amount" } // assuming amount is already stored as number
     }
         },
