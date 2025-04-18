@@ -34,7 +34,7 @@ userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
 userRouter.get("/getMonthlyUserVerifications",getMonthlyUserVerifications);
 userRouter.get("/getMonthlyUsers",getMonthlyUsers);
 userRouter.post("/getTotalFrontend",userAuth,Companymid,getTotalFrontend);
-userRouter.post("/getMonthlyUserVerificationsFrontend",userAuth,Companymid,getMonthlyUserVerificationsFrontend);
+userRouter.get("/getMonthlyUserVerificationsFrontend",userAuth,Companymid,getMonthlyUserVerificationsFrontend);
 // userRouter.get("/getTotal",getTotal);
 
 
