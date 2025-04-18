@@ -253,9 +253,9 @@ export const getMonthlyUsers = async (req, res) => {
 
 export const getTotalFrontend = async (req, res) => {
   try {
-    const user_id = req.userId; // Get employer ID from authenticated request
+    const user_id = req.userId;
 
-    // Fetch the employer's company package to count selected plans
+    // Get the company package for this employer
     const companyPackage = await CompanyPackage.findOne({
       companyId: user_id,
       is_del: false
@@ -268,40 +268,40 @@ export const getTotalFrontend = async (req, res) => {
       totalPendingVerifications,
       totalTransactionAmountAgg
     ] = await Promise.all([
-      // Count of users fully verified for this employer
+      // Fully verified users under this employer
       UserVerification.countDocuments({ all_verified: 1, employer_id: user_id }),
 
-      // Count of users with pending verification (0 or null)
+      // Pending verifications under this employer
       UserVerification.countDocuments({
         all_verified: { $in: [0, null] },
         employer_id: user_id
       }),
 
-      // Aggregate the total transaction amount for this employer
-     Transaction.aggregate([
-  {
-    $match: {
-      employer_id: user_id,
-      is_del: false
-    }
-  },
-  {
-    $group: {
-      _id: null,
-      total: { $sum: { $toDouble: "$amount" } } // Convert string to number
-    }
-  },
-  {
-    $project: {
-      _id: 0,
-      total: 1
-    }
-  }
-])
+      // Total transaction amount under this employer
+      Transaction.aggregate([
+        {
+          $match: {
+            employer_id: user_id,
+            is_del: false // Ensure only non-deleted transactions are considered
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: { $toDouble: "$amount" } } // Convert amount to number
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            total: 1
+          }
+        }
+      ])
+    ]);
 
     const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
 
-    // Send back the aggregated results
     res.status(200).json({
       success: true,
       totalSelectedPlans,
@@ -310,10 +310,6 @@ export const getTotalFrontend = async (req, res) => {
       totalTransactionAmount
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
