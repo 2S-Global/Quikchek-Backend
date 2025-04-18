@@ -1,5 +1,5 @@
 import CompanyPackage from "../models/companyPackageModel.js";
-
+import mongoose from "mongoose";
 // Utility to parse plan_id string/array
 const parsePlanIds = (selected_plan) => {
   if (typeof selected_plan === "string") {
