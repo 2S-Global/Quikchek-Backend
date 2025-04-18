@@ -1,6 +1,8 @@
 import UserCartVerification from "../models/userVerificationCartModel.js";
 import UserVerification from "../models/userVerificationModel.js";
 import User from "../models/userModel.js";
+import Package from "../models/packageModel.js";
+import CompanyPackage from "../models/companyPackageModel.js";
 import mongoose from "mongoose";
 // Register a new user
 
@@ -190,11 +192,7 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
             return res.status(404).json({ success: false, message: "Employer not found" });
         }
 
-        const verificationCharge = parseFloat(employer.transaction_fee || 0);
-        const gstPercent = parseFloat(employer.transaction_gst || 0) / 100;
-        const discountPercent = parseFloat(employer.discount_percent || 0) / 100;
-        const wallet_amount = parseFloat(employer.wallet_amount || 0);
-        const packageId = employer.package_id;
+
 
         const userCarts = await UserCartVerification.find({ employer_id, is_del: false, is_paid: 0 });
 
@@ -204,7 +202,7 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
                 data: [],
                 overall_billing: {
                     total_verifications: 0,
-                    wallet_amount: wallet_amount.toFixed(2),
+                    wallet_amount: "0.00",
                     fund_status: "0",
                     subtotal: "0.00",
                     discount: "0.00",
@@ -221,26 +219,48 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
 
         let overallTotalVerifications = 0;
         let overallSubtotal = 0;
+        let gstPercent = 18 / 100;
 
-        const formattedData = userCarts.map((cart) => {
+
+      
+        const discountPercentData = await CompanyPackage.findOne({ companyId: employer_id});
+         
+        if (!discountPercentData) {
+            return res.status(404).json({ success: false, message: "Discount Percent not found" });
+        }  
+        console.log('Discount ==>>',discountPercentData.discount_percent);
+        const discountPercent=parseFloat(discountPercentData.discount_percent || 0) / 100;
+
+        
+
+        const formattedData = await Promise.all(userCarts.map(async (cart) => {
+            console.log('Plan ID ==>>', cart.plan);
+        
+            const packagedetails = await Package.findById(cart.plan);
+        
+            if (!packagedetails) {
+                throw new Error("Package not found"); // or handle differently
+            }
+        
+            console.log('Plan Price ==>>', packagedetails.transaction_fee);
+        
+            const verificationCharge = parseFloat(packagedetails.transaction_fee || 0);
+            console.log(verificationCharge);
+        
             const payForArray = [];
-
             if (cart.pan_number) payForArray.push("PAN");
             if (cart.aadhar_number) payForArray.push("Aadhaar");
             if (cart.dl_number) payForArray.push("Driving Licence");
             if (cart.passport_file_number) payForArray.push("Passport");
             if (cart.epic_number) payForArray.push("Voter ID (EPIC)");
-
+        
             const totalVerifications = payForArray.length;
-
-            // Updated logic: if package_id is "1", charge once per row
-            const subtotal = packageId === "1"
-                ? (totalVerifications > 0 ? verificationCharge : 0)
-                : totalVerifications * verificationCharge;
-
+        
+            const subtotal = verificationCharge;
+        
             overallTotalVerifications += totalVerifications;
             overallSubtotal += subtotal;
-
+        
             return {
                 id: cart._id,
                 name: cart.candidate_name,
@@ -248,7 +268,7 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
                 payFor: payForArray.join(", "),
                 amount: subtotal
             };
-        });
+        }));
 
         const discountAmount = overallSubtotal * discountPercent;
         const discountedSubtotal = overallSubtotal - discountAmount;
@@ -259,15 +279,15 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
 
         const total = discountedSubtotal + gstAmount;
 
-        const fundStatus = wallet_amount >= total ? "1" : "0";
+      //  const fundStatus = wallet_amount >= total ? "1" : "0";
 
         res.status(200).json({
             success: true,
             data: formattedData,
             overall_billing: {
                 total_verifications: overallTotalVerifications,
-                wallet_amount: wallet_amount.toFixed(2),
-                fund_status: fundStatus,
+                wallet_amount: "0.00",
+                fund_status: "NA",
                 subtotal: overallSubtotal.toFixed(2),
                 discount: discountAmount.toFixed(2),
                 discount_percent: (discountPercent * 100).toFixed(2),
