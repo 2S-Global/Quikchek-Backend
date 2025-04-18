@@ -253,8 +253,8 @@ export const getMonthlyUsers = async (req, res) => {
 
 export const getTotalFrontend = async (req, res) => {
   try {
-    const user_id = req.userId;
-
+    // const user_id = req.userId;
+const user_id = new mongoose.Types.ObjectId(req.userId);
     // Get the company package for this employer
     const companyPackage = await CompanyPackage.findOne({
       companyId: user_id,
