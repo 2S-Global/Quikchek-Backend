@@ -11,7 +11,7 @@ export const getTotal = async (req, res) => {
       totalPendingVerifications,
       totalTransactionAmountAgg
     ] = await Promise.all([
-      User.countDocuments({ role_id: 1,is_del:false }), // Users with role_id = 1
+      User.countDocuments({ role: 1,is_del:false }), // Users with role_id = 1
       UserVerification.countDocuments({ all_verified: 1 }), // Fully verified users
    UserVerification.countDocuments({ all_verified: { $in: [1, null] } }), // Pending verification users
       Transaction.aggregate([ // Sum of all transaction amounts
