@@ -253,9 +253,9 @@ export const getMonthlyUsers = async (req, res) => {
 
 export const getTotalFrontend = async (req, res) => {
   try {
-    const user_id = req.userId;
+    const user_id = req.userId; // Get employer ID from authenticated request
 
-    // Get the company package for this employer
+    // Fetch the employer's company package to count selected plans
     const companyPackage = await CompanyPackage.findOne({
       companyId: user_id,
       is_del: false
@@ -268,16 +268,16 @@ export const getTotalFrontend = async (req, res) => {
       totalPendingVerifications,
       totalTransactionAmountAgg
     ] = await Promise.all([
-      // Fully verified users under this employer
+      // Count of users fully verified for this employer
       UserVerification.countDocuments({ all_verified: 1, employer_id: user_id }),
 
-      // Pending verifications under this employer
+      // Count of users with pending verification (0 or null)
       UserVerification.countDocuments({
         all_verified: { $in: [0, null] },
         employer_id: user_id
       }),
 
-      // Total transaction amount under this employer
+      // Aggregate the total transaction amount for this employer
       Transaction.aggregate([
         {
           $match: { employer_id: user_id }
@@ -299,6 +299,7 @@ export const getTotalFrontend = async (req, res) => {
 
     const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
 
+    // Send back the aggregated results
     res.status(200).json({
       success: true,
       totalSelectedPlans,
@@ -307,6 +308,10 @@ export const getTotalFrontend = async (req, res) => {
       totalTransactionAmount
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
   }
 };
