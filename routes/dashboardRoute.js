@@ -3,7 +3,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import { getTotal,getMonthlyUserVerifications,getMonthlyUsers,getTotalFrontend} from '../controllers/dashboardController.js';
+import { getTotal,getMonthlyUserVerifications,getMonthlyUsers,getTotalFrontend,getMonthlyUserVerificationsFrontend} from '../controllers/dashboardController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -34,6 +34,7 @@ userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
 userRouter.get("/getMonthlyUserVerifications",getMonthlyUserVerifications);
 userRouter.get("/getMonthlyUsers",getMonthlyUsers);
 userRouter.post("/getTotalFrontend",userAuth,Companymid,getTotalFrontend);
+userRouter.post("/getMonthlyUserVerificationsFrontend",userAuth,Companymid,getMonthlyUserVerificationsFrontend);
 // userRouter.get("/getTotal",getTotal);
 
 
