@@ -287,9 +287,9 @@ export const getTotalFrontend = async (req, res) => {
         },
         {
           $group: {
-            _id: null,
-            total: { $sum: { $toDouble: "$amount" } } // Convert amount string to number
-          }
+      _id: null,
+      total: { $sum: "$amount" } // assuming amount is already stored as number
+    }
         },
         {
           $project: {
