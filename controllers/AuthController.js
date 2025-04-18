@@ -110,11 +110,7 @@ export const registerUser = async (req, res) => {
     /* const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "30d",
     }); */
-    res.status(201).json({
-      success: true,
-      message: "User registered and logged in successfully!",
-      /* token, */
-    });
+    
     // Send email with login credentials
     const transporter = nodemailer.createTransport({
       host: "smtp.hostinger.com", // fixed typo
@@ -142,6 +138,12 @@ export const registerUser = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered and logged in successfully!",
+      /* token, */
+    });
   } catch (error) {
     res
       .status(500)
