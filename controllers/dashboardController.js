@@ -273,7 +273,7 @@ export const getTotalFrontend = async (req, res) => {
 
       // Pending verifications under this employer
       UserVerification.countDocuments({
-        all_verified: { $in: [1, null] },
+        all_verified: { $in: [0, null] },
         employer_id: user_id
       }),
 
