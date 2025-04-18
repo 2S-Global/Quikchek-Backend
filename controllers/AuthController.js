@@ -29,7 +29,7 @@ export const registerUser = async (req, res) => {
       !password ||
       !transaction_fee ||
       !transaction_gst ||
-      !package_id
+      
     ) {
       return res
         .status(400)
