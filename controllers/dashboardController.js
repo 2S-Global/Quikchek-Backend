@@ -314,7 +314,7 @@ const user_id = new mongoose.Types.ObjectId(req.userId);
   }
 };
 
-export const getMonthlyUserVerifications = async (req, res) => {
+export const getMonthlyUserVerificationsFrontend = async (req, res) => {
   try {
     const user_id = new mongoose.Types.ObjectId(req.userId); // Ensure it's an ObjectId
     const now = new Date();
