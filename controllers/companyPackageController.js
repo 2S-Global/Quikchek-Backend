@@ -82,7 +82,7 @@ export const getCompanyPackagesByCompanyId = async (req, res) => {
 
 export const getPackageByCompany = async (req, res) => {
   try {
-    const companyId = req.userId;
+ const companyId = new mongoose.Types.ObjectId(req.userId)
 
     if (!companyId) {
       return res.status(400).json({
