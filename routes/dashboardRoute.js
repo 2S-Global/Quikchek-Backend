@@ -3,7 +3,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import { getTotal,getMonthlyUserVerifications  } from '../controllers/dashboardController.js';
+import { getTotal,getMonthlyUserVerifications,getMonthlyUsers} from '../controllers/dashboardController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -32,6 +32,7 @@ const upload = multer({ storage: storage });
 
 userRouter.get("/getTotal",userAuth,adminMiddleware,getTotal);
 userRouter.get("/getMonthlyUserVerifications",getMonthlyUserVerifications);
+userRouter.get("/getMonthlyUsers",getMonthlyUsers);
 // userRouter.get("/getTotal",getTotal);
 
 
