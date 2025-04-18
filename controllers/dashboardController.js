@@ -2,6 +2,7 @@ import Transaction from "../models/transactionModel.js";
 import User from "../models/userModel.js";
 import UserVerification from "../models/userVerificationModel.js";
 import mongoose from "mongoose";
+import CompanyPackage from "../models/companyPackageModel.js";
 
 export const getTotal = async (req, res) => {
   try {
@@ -246,5 +247,66 @@ export const getMonthlyUsers = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+export const getTotalFrontend = async (req, res) => {
+  try {
+    const user_id = req.userId;
+
+    // Get the company package for this employer
+    const companyPackage = await CompanyPackage.findOne({
+      companyId: user_id,
+      is_del: false
+    });
+
+    const totalSelectedPlans = companyPackage?.selected_plan?.length || 0;
+
+    const [
+      totalActiveVerification,
+      totalPendingVerifications,
+      totalTransactionAmountAgg
+    ] = await Promise.all([
+      // Fully verified users under this employer
+      UserVerification.countDocuments({ all_verified: 1, employer_id: user_id }),
+
+      // Pending verifications under this employer
+      UserVerification.countDocuments({
+        all_verified: { $in: [1, null] },
+        employer_id: user_id
+      }),
+
+      // Total transaction amount under this employer
+      Transaction.aggregate([
+        {
+          $match: { employer_id: user_id }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$amount" }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            total: 1
+          }
+        }
+      ])
+    ]);
+
+    const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
+
+    res.status(200).json({
+      success: true,
+      totalSelectedPlans,
+      totalActiveVerification,
+      totalPendingVerifications,
+      totalTransactionAmount
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
