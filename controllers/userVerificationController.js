@@ -725,7 +725,7 @@ export const verifyDataBackground = async (req, res) => {
       };
 
       const response = await axios.post(
-        "https://test.zoop.one/api/v1/in/identity/pan/lite",
+        "https://live.zoop.one/api/v1/in/identity/pan/lite",
         panData,
         { headers: { "app-id": "67b8252871c07100283cedc6", "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", "Content-Type": "application/json" } }
       );
@@ -747,7 +747,7 @@ export const verifyDataBackground = async (req, res) => {
       };
 
       const response = await axios.post(
-        "https://test.zoop.one/api/v1/in/identity/aadhaar/verification",
+        "https://live.zoop.one/api/v1/in/identity/aadhaar/verification",
         aadhaarData,
         { headers: { "app-id": "67b8252871c07100283cedc6", "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", "Content-Type": "application/json" } }
       );
@@ -771,7 +771,7 @@ export const verifyDataBackground = async (req, res) => {
       };
 
       const response = await axios.post(
-        "https://test.zoop.one/api/v1/in/identity/dl/advance",
+        "https://live.zoop.one/api/v1/in/identity/dl/advance",
         dlData,
         { headers: { "app-id": "67b8252871c07100283cedc6", "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", "Content-Type": "application/json" } }
       );
@@ -797,7 +797,7 @@ export const verifyDataBackground = async (req, res) => {
   //console.log(passportData);
 
       const response = await axios.post(
-        "https://test.zoop.one/api/v1/in/identity/passport/advance",
+        "https://live.zoop.one/api/v1/in/identity/passport/advance",
         passportData,
         { headers: { "app-id": "67b8252871c07100283cedc6", "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", "Content-Type": "application/json" } }
       );
@@ -819,7 +819,7 @@ export const verifyDataBackground = async (req, res) => {
       };
 
       const response = await axios.post(
-        "https://test.zoop.one/api/v1/in/identity/voter/advance",
+        "https://live.zoop.one/api/v1/in/identity/voter/advance",
         epicData,
         { headers: { "app-id": "67b8252871c07100283cedc6", "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", "Content-Type": "application/json" } }
       );
@@ -842,7 +842,7 @@ export const verifyDataBackground = async (req, res) => {
     };
 
     const response = await axios.post(
-      'https://test.zoop.one/api/v1/in/identity/uan/advance',
+      'https://live.zoop.one/api/v1/in/identity/uan/advance',
       data,
       {
         headers: {
@@ -869,7 +869,7 @@ export const verifyDataBackground = async (req, res) => {
     };
 
     const response = await axios.post(
-      'https://test.zoop.one/api/v1/in/identity/epfo/pro',
+      'https://live.zoop.one/api/v1/in/identity/epfo/pro',
       data,
       {
         headers: {
@@ -908,7 +908,7 @@ export const verifyDataBackground = async (req, res) => {
     };
 
     const response = await axios.post(
-      'https://test.zoop.one/api/v1/in/identity/uan/advance',
+      'https://live.zoop.one/api/v1/in/identity/uan/advance',
       data,
       {
         headers: {
