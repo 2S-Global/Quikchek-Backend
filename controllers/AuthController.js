@@ -5,6 +5,52 @@ import mongoose from "mongoose";
 
 import nodemailer from "nodemailer";
 
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if (!user || user.is_del) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({
+          message: "Both old and new passwords are required",
+          success: false,
+        });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Invalid old password", success: false });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Password changed successfully", success: true });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res
+      .status(500)
+      .json({ message: "Error changing password", success: false });
+  }
+};
+
 // Register a new user
 export const registerUser = async (req, res) => {
   try {
@@ -23,20 +69,16 @@ export const registerUser = async (req, res) => {
     } = req.body;
     const role = 1;
     // Validate required fields
-    if (
-      !name ||
-      !email ||
-      !password
-
-      
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Name, email, password" });
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, password" });
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email, is_del: false, is_active: true });
+    const existingUser = await User.findOne({
+      email,
+      is_del: false,
+      is_active: true,
+    });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -158,51 +200,53 @@ export const editUser = async (req, res) => {
   }
 };
 
-
 export const forgotPassword = async (req, res) => {
   try {
-      const { email } = req.body;
+    const { email } = req.body;
 
-      // Check if user exists
-      const user = await User.findOne({ email });
-      if (!user) {
-          return res.status(404).json({ message: "User not found with this email" });
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found with this email" });
+    }
+
+    // Generate a new arbitrary password (e.g. 8 characters)
+    const generatePassword = () => {
+      const chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
+      let password = "";
+      for (let i = 0; i < 10; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
       }
+      return password;
+    };
 
-      // Generate a new arbitrary password (e.g. 8 characters)
-      const generatePassword = () => {
-          const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
-          let password = "";
-          for (let i = 0; i < 10; i++) {
-              password += chars.charAt(Math.floor(Math.random() * chars.length));
-          }
-          return password;
-      };
+    const newPassword = generatePassword();
 
-      const newPassword = generatePassword();
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      // Hash new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // Update user's password in DB
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
 
-      // Update user's password in DB
-      await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+    // Send email with new password
+    const transporter = nodemailer.createTransport({
+      host: "smtp.hostinger.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-      // Send email with new password
-      const transporter = nodemailer.createTransport({
-          host: "smtp.hostinger.com",
-          port: 465,
-          secure: true,
-          auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS,
-          },
-      });
-
-      const mailOptions = {
-          from: `"Support Team" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject: "Your Password Has Been Reset",
-          html: `
+    const mailOptions = {
+      from: `"Support Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your Password Has Been Reset",
+      html: `
               <h3>Hello, ${user.name}</h3>
               <p>Your password has been reset. Here is your new login password:</p>
               <p><strong>New Password:</strong> ${newPassword}</p>
@@ -210,55 +254,62 @@ export const forgotPassword = async (req, res) => {
               <br/>
               <p>Regards,<br/>Support Team</p>
           `,
-      };
+    };
 
-      await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
-      res.status(200).json({ message: "New password sent to your email" });
-
+    res.status(200).json({ message: "New password sent to your email" });
   } catch (error) {
-      console.error("Forgot password error:", error);
-      res.status(500).json({ message: "Error resetting password", error: error.message });
+    console.error("Forgot password error:", error);
+    res
+      .status(500)
+      .json({ message: "Error resetting password", error: error.message });
   }
 };
 
 export const getUserDetailsById = async (req, res) => {
   try {
-      const { company_id } = req.body; // Or use req.params if it's from URL
+    const { company_id } = req.body; // Or use req.params if it's from URL
 
-      if (!company_id) {
-          return res.status(400).json({ success: false, message: "User ID is required" });
-      }
+    if (!company_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User ID is required" });
+    }
 
-      const user = await User.findById(company_id).select(
-          "name email phone_number address"
-      );
+    const user = await User.findById(company_id).select(
+      "name email phone_number address"
+    );
 
-      if (!user) {
-          return res.status(404).json({ success: false, message: "User not found" });
-      }
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
 
-      // Transform allowed_verifications to boolean object
+    // Transform allowed_verifications to boolean object
 
-      const result = {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          phone_number: user.phone_number,
-          address: user.address
-      };
+    const result = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone_number: user.phone_number,
+      address: user.address,
+    };
 
-      res.status(200).json({
-          success: true,
-          message: "User details fetched successfully",
-          data: result
-      });
-
+    res.status(200).json({
+      success: true,
+      message: "User details fetched successfully",
+      data: result,
+    });
   } catch (error) {
-      res.status(500).json({ success: false, message: "Error fetching user", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user",
+      error: error.message,
+    });
   }
 };
-
 
 // Register a new company
 export const registerCompany = async (req, res) => {
@@ -364,45 +415,54 @@ export const listCompanies = async (req, res) => {
   }
 };
 
-
-
 export const listFieldsByCompany = async (req, res) => {
   try {
-      const { company_id } = req.body;
+    const { company_id } = req.body;
 
-      const company = await User.findById(company_id).select("transaction_fee transaction_gst allowed_verifications package_id gst_no discount_percent");
+    const company = await User.findById(company_id).select(
+      "transaction_fee transaction_gst allowed_verifications package_id gst_no discount_percent"
+    );
 
-      if (!company) {
-          return res.status(404).json({ success: false, message: "Company not found" });
-      }
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Company not found" });
+    }
 
-      // Convert allowed_verifications to object
-      const allTypes = ["PAN", "Aadhaar", "DL", "EPIC", "Passport"];
-      const allowedTypes = (company.allowed_verifications || "").split(",").map(v => v.trim().toUpperCase());
+    // Convert allowed_verifications to object
+    const allTypes = ["PAN", "Aadhaar", "DL", "EPIC", "Passport"];
+    const allowedTypes = (company.allowed_verifications || "")
+      .split(",")
+      .map((v) => v.trim().toUpperCase());
 
-      const allowedVerificationsObj = {};
-      allTypes.forEach(type => {
-          allowedVerificationsObj[type] = allowedTypes.includes(type);
-      });
+    const allowedVerificationsObj = {};
+    allTypes.forEach((type) => {
+      allowedVerificationsObj[type] = allowedTypes.includes(type);
+    });
 
-      // Overwrite original string field with the object
-      const companyData = {
-          ...company._doc,
-          ...allowedVerificationsObj
-      };
+    // Overwrite original string field with the object
+    const companyData = {
+      ...company._doc,
+      ...allowedVerificationsObj,
+    };
 
-      // Get fields
-      const fields = await Fields.find({ company_id, is_del: false }).select("-company_id");
+    // Get fields
+    const fields = await Fields.find({ company_id, is_del: false }).select(
+      "-company_id"
+    );
 
-      res.status(200).json({
-          success: true,
-          message: "Fields fetched successfully",
-          company: companyData,
-          data: fields,
-      });
-
+    res.status(200).json({
+      success: true,
+      message: "Fields fetched successfully",
+      company: companyData,
+      data: fields,
+    });
   } catch (error) {
-      res.status(500).json({ success: false, message: "Error fetching fields", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching fields",
+      error: error.message,
+    });
   }
 };
 
