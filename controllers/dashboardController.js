@@ -282,7 +282,7 @@ export const getTotalFrontend = async (req, res) => {
         {
           $match: {
             employer_id: user_id,
-            is_del: "false" // FIXED: match string, not boolean
+            is_del: false 
           }
         },
         {
