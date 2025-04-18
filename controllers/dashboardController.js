@@ -282,13 +282,13 @@ export const getTotalFrontend = async (req, res) => {
         {
           $match: {
             employer_id: user_id,
-            is_del: false // Ensure only non-deleted transactions are considered
+            is_del: "false" // FIXED: match string, not boolean
           }
         },
         {
           $group: {
             _id: null,
-            total: { $sum: { $toDouble: "$amount" } } // Convert amount to number
+            total: { $sum: { $toDouble: "$amount" } } // Convert amount string to number
           }
         },
         {
@@ -313,3 +313,4 @@ export const getTotalFrontend = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
