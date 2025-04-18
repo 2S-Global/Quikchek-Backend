@@ -278,24 +278,26 @@ export const getTotalFrontend = async (req, res) => {
       }),
 
       // Aggregate the total transaction amount for this employer
-      Transaction.aggregate([
-        {
-          $match: { employer_id: user_id }
-        },
-        {
-          $group: {
-            _id: null,
-            total: { $sum: "$amount" }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            total: 1
-          }
-        }
-      ])
-    ]);
+     Transaction.aggregate([
+  {
+    $match: {
+      employer_id: user_id,
+      is_del: false
+    }
+  },
+  {
+    $group: {
+      _id: null,
+      total: { $sum: { $toDouble: "$amount" } } // Convert string to number
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      total: 1
+    }
+  }
+])
 
     const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
 
