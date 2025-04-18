@@ -26,14 +26,13 @@ export const registerUser = async (req, res) => {
     if (
       !name ||
       !email ||
-      !password ||
-      !transaction_fee ||
-      !transaction_gst ||
+      !password
+
       
     ) {
       return res
         .status(400)
-        .json({ message: "Name, email, password, package_id are required" });
+        .json({ message: "Name, email, password" });
     }
 
     // Check if user already exists
