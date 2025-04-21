@@ -383,7 +383,47 @@ if (!userCarts || userCarts.length === 0) {
     }
 };
 
+
 export const getPaidUserVerificationCartByEmployer = async (req, res) => {
+    try {
+      const employer_id = req.userId;
+  
+      if (!mongoose.Types.ObjectId.isValid(employer_id)) {
+        return res.status(400).json({ message: "Invalid employer ID", data: [] });
+      }
+  
+      const paidUsers = await UserVerification.find({ employer_id }).sort({ createdAt: -1 });
+  
+      if (!paidUsers.length) {
+        return res.status(200).json({
+          message: "No paid users found for this employer",
+          data: [],
+        });
+      }
+  
+      // Add status field based on all_verified
+      const processedUsers = paidUsers.map(user => ({
+        ...user.toObject(), // convert Mongoose document to plain object
+        status: user.all_verified === 1 ? 'verified' : 'processing',
+      }));
+  
+      return res.status(200).json({
+        message: "Paid users fetched successfully",
+        data: processedUsers,
+      });
+    } catch (error) {
+      console.error("Error fetching paid users:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        data: [],
+      });
+    }
+  };
+
+  
+
+export const getPaidUserVerificationCartByEmployer_OLDONE = async (req, res) => {
   try {
     const employer_id = req.userId;
 
