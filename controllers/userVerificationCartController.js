@@ -391,7 +391,7 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
       return res.status(400).json({ message: "Invalid employer ID", data: [] });
     }
 
-    const paidUsers = await UserVerification.find({ employer_id,all_verified: 0, }).sort({ createdAt: -1 });
+    //const paidUsers = await UserVerification.find({ employer_id,all_verified: 0, }).sort({ createdAt: -1 });
 
     const paidUsers = await UserVerification.find({ employer_id }).sort({ createdAt: -1 });
 
