@@ -285,7 +285,7 @@ export const generatePDF = async (req, res) => {
           <div style="width: 100%; text-align: center; font-size: 12px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="flex: 2; text-align: center;">
-                <h2 style="margin: 0; color: #333;">E2 Score</h2>
+                <h2 style="margin: 0; color: #333;">QUIKCHEK</h2>
                 <p style="margin: 0; font-size: 10px;">1234 Elm Street, Springfield, IL 62704</p>
                 <p style="margin: 0; font-size: 10px;">abc@gmail.com | 1234567890</p>
               </div>
