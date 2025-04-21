@@ -383,7 +383,7 @@ export const getMonthlyUserVerificationsFrontend_SAYAN = async (req, res) => {
   }
 };
 
-export const getFinancialYearUserVerificationsFrontend = async (req, res) => {
+export const getMonthlyUserVerificationsFrontend = async (req, res) => {
   try {
     const user_id = new mongoose.Types.ObjectId(req.userId);
 
