@@ -319,7 +319,7 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
     const user_id = new mongoose.Types.ObjectId(req.userId); // Ensure it's an ObjectId
     const now = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 5); // Last 6 months including current
+    sixMonthsAgo.setMonth(now.getMonth() + 11); // Last 6 months including current
 
     const monthlyData = await UserVerification.aggregate([
       {
