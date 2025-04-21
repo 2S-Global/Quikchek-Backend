@@ -393,6 +393,8 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
 
     const paidUsers = await UserVerification.find({ employer_id,all_verified: 0, }).sort({ createdAt: -1 });
 
+    const paidUsers = await UserVerification.find({ employer_id }).sort({ createdAt: -1 });
+
     if (!paidUsers.length) {
       return res.status(200).json({
         message: "No paid users found for this employer",
