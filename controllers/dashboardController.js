@@ -534,7 +534,7 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
       result.push({
         year,
         month,
-        monthName: monthNames[month],
+        monthName: `${monthNames[month]} ${year}`,
         monthLabel: `${monthNames[month]} ${year}`, // Correct label
         total: match ? match.total : 0
       });
