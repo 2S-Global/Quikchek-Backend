@@ -29,7 +29,9 @@ export const inviteController = async (req, res) => {
       <li><strong>Increased Risk in Case of Emergencies:</strong> Difficulty in tracing the employee or their next of kin in genuine medical or other emergencies.</li>
     </ul>
     
-    <p>We understand that the primary deterrent to thorough KYC verification isn't necessarily the cost, but rather the complexity and hassle of dealing with multiple verification agencies and processes. Recognizing this critical need, <strong>Global Employability Information Services India Limited</strong> is proud to introduce <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a>, India's first comprehensive platform designed to streamline and simplify your KYC verification process.</p>
+    <p>We understand that the primary deterrent to thorough KYC verification isn't necessarily the cost,
+     but rather the complexity and hassle of dealing with multiple verification agencies and processes. 
+     Recognizing this critical need, <strong>Global Employability Information Services India Limited</strong> is proud to introduce <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a>, India's first comprehensive platform designed to streamline and simplify your KYC verification process.</p>
     
     <p><strong>Quikchek.in</strong> offers a single, unified platform to verify the authenticity of most standard KYC documents, including:</p>
     
@@ -58,7 +60,7 @@ export const inviteController = async (req, res) => {
     <p>We invite you to explore our platform at <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a> to understand how we can help you fortify your recruitment process and protect your organization. For further information or a personalized demonstration, please feel free to contact us.</p>
 
     <p>Sincerely,<br/>
-    The Team at Global Employability Information Services India Limited<br/>
+    The Team at <strong>Global Employability Information Services India Limited</strong><br/>
     info@geisil.com , 9831823898
 <br/>
     <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a></p>    
