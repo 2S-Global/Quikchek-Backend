@@ -61,10 +61,10 @@ export const inviteController = async (req, res) => {
 
     <p>Sincerely,<br/>
     The Team at <strong>Global Employability Information Services India Limited</strong><br/>
-   Email: info@geisil.com , <br/>
+   Email: hello@geisil.com , <br/>
    Mobile: +91 9831823898
 <br/>
-    <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a></p>    
+    <a href="https://geisil.com/" target="_blank">www.geisil.com</a></p>    
     `;
 
     const transporter = nodemailer.createTransport({
