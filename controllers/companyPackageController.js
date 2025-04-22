@@ -48,11 +48,20 @@ export const createCompanyPackage = async (req, res) => {
       });
     }
 
-    // Fetch plan names
-    const plans = await Package.find({ _id: { $in: planIds } }).select("name");
-    const planNames = plans.map((plan) => plan.name);
+    // Fetch plan names and details
+    const plans = await Package.find({ _id: { $in: planIds } }).select("name description");
+    const planDetailsHtml = plans
+      .map(
+        (plan) => `
+          <p>
+            <strong>• Package Name:</strong> <strong>${plan.name}</strong><br/>
+            <strong>• Package Details:</strong> <strong>${plan.description}</strong>
+          </p>
+        `
+      )
+      .join("");
 
-    // Setup email transporter
+    // Email transporter
     let transporter;
     try {
       transporter = nodemailer.createTransport({
@@ -68,46 +77,42 @@ export const createCompanyPackage = async (req, res) => {
       console.error("Failed to create transporter:", transportError.message);
     }
 
-    // Email HTML Content
+    // Email content
     const mailOptions = {
       from: `"Support Team" <${process.env.EMAIL_USER}>`,
-      // to: company.email,
-      to: "sayankolkata.1995@gmail.com",
-      subject: "Company Package Created/Updated",
+      to: company.email || "sayankolkata.1995@gmail.com",
+      subject: "QuikChek Account Activation and Package Details",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color: #4CAF50;">🎉 Company Package Update</h2>
-          <p>Dear ${company.name || "Company"},</p>
+          <p>Dear ${company.name || "Valued Partner"},</p>
 
-          <p>Your company package has been <strong>successfully created/updated</strong>. Here are the details:</p>
+          <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
 
-          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;"><strong>Company Name</strong></td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${
-                company.name
-              }</td>
-            </tr>
-            <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;"><strong>Selected Plans</strong></td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${planNames.join(
-                ", "
-              )}</td>
-            </tr>
-            <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;"><strong>Discount Percent</strong></td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${finalDiscount}%</td>
-            </tr>
-          </table>
+          <p>Following the successful creation of your <strong>QuikChek</strong> account, we are pleased to inform you that your selected service package has been activated.</p>
 
-          <p style="margin-top: 20px;">If you have any questions, feel free to contact our support team.</p>
+          <p>Based on your industry segment and requirements, the following package is now active for your account:</p>
 
-          <p style="margin-top: 30px;">Thanks & Regards,<br/><strong>Support Team</strong></p>
+          ${planDetailsHtml}
+
+          <p>With this activated package, you can now begin utilizing QuikChek's fast and accurate KYC verification services.</p>
+
+          <p>To access the platform and begin your verifications, please log in using your credentials at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
+
+          <p>We are committed to providing you with a seamless and efficient KYC verification experience. If you have any questions about your activated package or require any assistance, please feel free to contact our support team:</p>
+
+          <ul>
+            <li><strong>Email:</strong> support@quikchek.in</li>
+            <li><strong>Phone:</strong> +91-XXXXXXXXXX</li>
+          </ul>
+
+          <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+
+          <p>Sincerely,<br/>The Admin Team<br/><strong>Global Employability Information Services India Limited</strong></p>
         </div>
       `,
     };
 
-    // Send the email
+    // Send email
     if (transporter) {
       try {
         await transporter.sendMail(mailOptions);
@@ -127,6 +132,7 @@ export const createCompanyPackage = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 export const getCompanyPackagesByCompanyId = async (req, res) => {
   try {
