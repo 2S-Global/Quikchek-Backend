@@ -474,16 +474,14 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
 
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // 1-12
+    const currentMonth = now.getMonth() + 1;
 
     let startYear, endYear;
 
-    // If current month is Jan, Feb, Mar => financial year is last year - current year
     if (currentMonth < 4) {
       startYear = currentYear - 1;
       endYear = currentYear;
     } else {
-      // Else (Apr to Dec) => current year - next year
       startYear = currentYear;
       endYear = currentYear + 1;
     }
@@ -518,7 +516,6 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
       }
     ]);
 
-    // Build full April to March list
     const result = [];
     const monthNames = [
       "", "January", "February", "March", "April", "May", "June",
@@ -526,9 +523,7 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
     ];
 
     for (let i = 0; i < 12; i++) {
-      const date = new Date(startDate);
-      date.setMonth(3 + i); // April is month index 3
-
+      const date = new Date(startYear, 3 + i); // Start from April
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
 
@@ -540,7 +535,7 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
         year,
         month,
         monthName: monthNames[month],
-        monthLabel: `${monthNames[month]} ${year}`, // Added label with month and year
+        monthLabel: `${monthNames[month]} ${year}`, // Correct label
         total: match ? match.total : 0
       });
     }
@@ -553,3 +548,4 @@ export const getMonthlyUserVerificationsFrontend = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
