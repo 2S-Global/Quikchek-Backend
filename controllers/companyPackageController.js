@@ -79,7 +79,7 @@ export const createCompanyPackage = async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: `"Support Team" <${process.env.EMAIL_USER}>`,
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
       to: "sayankolkata.1995@gmail.com",
       subject: "QuikChek Account Activation and Package Details",
       html: `
