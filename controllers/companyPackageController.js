@@ -82,7 +82,11 @@ export const createCompanyPackage = async (req, res) => {
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
       to: company.email,
       subject: "QuikChek Account Activation and Package Details",
-      html: `
+      html: `  
+      <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745302610/QuikChek%20images/QuikChek%20images/yhxmwblp2gopjqxzuxap.jpg" alt="Banner" style="width: 100%; height: auto;" />
+      </div>
+      
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <p>Dear ${company.name || "Valued Partner"},</p>
 
