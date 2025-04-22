@@ -21,9 +21,10 @@ import fieldsRouts from "./routes/additionalFieldsRoutes.js";
 import walletRoute from "./routes/walletRoute.js";
 import pacakageRoute from "./routes/pacakageRoute.js";
 import companyPackageRoute from "./routes/companyPackageRoute.js";
-import termsRoute from "./routes/termsRoutes.js"; 
-import privacyRoute from "./routes/privacyPolicyRoute.js"; 
-import dashboardRoute from "./routes/dashboardRoute.js"; 
+import termsRoute from "./routes/termsRoutes.js";
+import privacyRoute from "./routes/privacyPolicyRoute.js";
+import dashboardRoute from "./routes/dashboardRoute.js";
+import InviteRouter from "./routes/inviteRoute.js";
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
@@ -39,6 +40,7 @@ app.use("/api/companyPackageRoute", companyPackageRoute);
 app.use("/api/terms", termsRoute);
 app.use("/api/privacyRoute", privacyRoute);
 app.use("/api/dashboard", dashboardRoute);
+app.use("/api/invite", InviteRouter);
 
 // Start server
 const PORT = process.env.PORT || 8080;
