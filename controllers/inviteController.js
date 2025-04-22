@@ -61,7 +61,8 @@ export const inviteController = async (req, res) => {
 
     <p>Sincerely,<br/>
     The Team at <strong>Global Employability Information Services India Limited</strong><br/>
-    info@geisil.com , 9831823898
+   Email: info@geisil.com , <br/>
+   Mobile: +91 9831823898
 <br/>
     <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a></p>    
     `;
