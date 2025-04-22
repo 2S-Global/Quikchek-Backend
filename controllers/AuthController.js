@@ -123,13 +123,13 @@ export const registerUser = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Support Team" <${process.env.EMAIL_USER}>`,
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
       html: `
       <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/f_auto,q_auto/v1/QuikChek%20images/yhxmwblp2gopjqxzuxap" alt="Banner" style="max-width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/f_auto,q_auto/v1/QuikChek%20images/yhxmwblp2gopjqxzuxap" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
         <p>Greetings from Global Employability Information Services India Limited.</p>
@@ -297,16 +297,23 @@ export const forgotPassword = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Support Team" <${process.env.EMAIL_USER}>`,
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Your Password Has Been Reset",
-      html: `
-              <h3>Hello, ${user.name}</h3>
-              <p>Your password has been reset. Here is your new login password:</p>
+      subject: "Password Reset Successful - Action Required",
+      html: `<div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745302610/QuikChek%20images/QuikChek%20images/yhxmwblp2gopjqxzuxap.jpg" alt="Banner" style="width: 100%; height: auto;" />
+  </div>
+              <h3>Dear, ${user.name}</h3>
+              <p>Your password has been successfully reset as per your request. Please find your new login credentials below::</p>
               <p><strong>New Password:</strong> ${newPassword}</p>
-              <p>We recommend logging in and changing this password immediately.</p>
+              <p>For your security, we strongly recommend that you log in immediately and change this password to something more personal and secure.</p>
+              <p>
+              If you did not request this password reset or have any concerns, please contact our support team right away.
+              
+              
+              </p>
               <br/>
-              <p>Regards,<br/>Support Team</p>
+              <p>Stay secure,<br/>Geisil Team</p>
           `,
     };
 
