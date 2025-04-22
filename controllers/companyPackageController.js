@@ -71,7 +71,8 @@ export const createCompanyPackage = async (req, res) => {
     // Email HTML Content
     const mailOptions = {
       from: `"Support Team" <${process.env.EMAIL_USER}>`,
-      to: company.email,
+      // to: company.email,
+      to: "sayankolkata.1995@gmail.com",
       subject: "Company Package Created/Updated",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
