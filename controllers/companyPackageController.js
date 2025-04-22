@@ -97,7 +97,7 @@ export const createCompanyPackage = async (req, res) => {
           <p>Based on your industry segment and requirements, the following package is now active for your account:</p>
 
           ${planDetailsHtml}
-        <p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>
+        ${finalDiscount > 0 ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>` : ""}
           <p>With this activated package, you can now begin utilizing QuikChek's fast and accurate KYC verification services.</p>
 
           <p>To access the platform and begin your verifications, please log in using your credentials at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
