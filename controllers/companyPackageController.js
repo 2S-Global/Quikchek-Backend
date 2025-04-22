@@ -101,8 +101,8 @@ export const createCompanyPackage = async (req, res) => {
           <p>We are committed to providing you with a seamless and efficient KYC verification experience. If you have any questions about your activated package or require any assistance, please feel free to contact our support team:</p>
 
           <ul>
-            <li><strong>Email:</strong> support@quikchek.in</li>
-            <li><strong>Phone:</strong> +91-XXXXXXXXXX</li>
+            <li><strong>Email:</strong> hello@geisil.com</li>
+            <li><strong>Phone:</strong>9831823898</li>
           </ul>
 
           <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
