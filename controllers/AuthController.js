@@ -129,7 +129,7 @@ export const registerUser = async (req, res) => {
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
       html: `
       <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745314518/QuikChek%20images/nubuhmj2qznzgj9ocw0q.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
         <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
