@@ -132,7 +132,7 @@ export const registerUser = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745314518/QuikChek%20images/nubuhmj2qznzgj9ocw0q.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Greetings from Global Employability Information Services India Limited.</p>
+        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -175,13 +175,13 @@ export const registerUser = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing Global Employability Information Services India Limited.</p>
+        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        Global Employability Information Services India Limited</p>
+        <strong>Global Employability Information Services India Limited</strong></p>
       `,
     };
 
