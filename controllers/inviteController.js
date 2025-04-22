@@ -16,7 +16,12 @@ export const inviteController = async (req, res) => {
   }
 
   try {
-    const emailContent = `<p>Dear <strong>${name}</strong>,</p>
+    const emailContent = `
+     <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
+  </div>
+    
+    <p>Dear <strong>${name}</strong>,</p>
     <p>In today's dynamic recruitment landscape, ensuring the authenticity of candidate KYC documents is paramount. As a standard practice, your organization likely collects PAN, Aadhaar/EPIC/Passport, and UAN details, primarily to establish employee identity and for emergency contact purposes. However, recent surveys indicate a concerning statistic: approximately <strong>7.6%</strong> of KYC documents submitted today are potentially fake. This alarming figure exposes your organization to significant risks throughout the employee lifecycle.</p>
 
     <p>The current recruitment process, while seemingly straightforward, carries inherent dangers when the authenticity of these crucial documents remains unverified. The implications of onboarding an employee with fraudulent credentials can be far-reaching, potentially leading to:</p>

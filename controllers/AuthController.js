@@ -301,7 +301,7 @@ export const forgotPassword = async (req, res) => {
       to: email,
       subject: "Password Reset Successful - Action Required",
       html: `<div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745304868/QuikChek%20images/ppj8quuizchhfvnimr8q.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
               <h3>Dear ${user.name},</h3>
               <p>Your password has been successfully reset as per your request. Please find your new login credentials below:</p>
