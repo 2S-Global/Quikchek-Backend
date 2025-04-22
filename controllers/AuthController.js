@@ -171,8 +171,8 @@ export const registerUser = async (req, res) => {
           For any assistance with the platform, including login issues or technical support, please contact our support team at:
         </p>
         <ul>
-          <li><strong>Email:</strong> <a href="mailto:hello@geisil.com">hello@geisil.com</a></li>
-          <li><strong>Phone:</strong> [Support Phone Number]</li>
+          <li><strong>Email:</strong> <a href="mailto:info@geisil.com">info@geisil.com</a></li>
+          <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
         <p>Thank you for choosing Global Employability Information Services India Limited.</p>
