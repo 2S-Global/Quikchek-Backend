@@ -649,7 +649,7 @@ export const listSelfRegisteredCompanies = async (req, res) => {
     const companies = await User.find({ is_del: false, role: 1, self_registered: 1 }).select("-password");
 
     if (!companies.length) {
-      return res.status(404).json({ message: "No companies found" });
+      return res.status(200).json({ message: "No companies found" });
     }
 
     // Get order counts grouped by employer_id
