@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import UserVerification from "../models/userVerificationModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -451,7 +452,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const listCompanies = async (req, res) => {
+export const listCompanies_23042025 = async (req, res) => {
   try {
     // Fetch projects for the given user_id where is_del is false
     const allcompanies = await User.find({ is_del: false, role: 1 }).select(
@@ -473,6 +474,50 @@ export const listCompanies = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error retrieving projects", error: error.message });
+  }
+};
+
+
+export const listCompanies = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find({ is_del: false, role: 1 }).select("-password");
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No companies found" });
+    }
+
+    // Get order counts grouped by employer_id
+    const orderCounts = await UserVerification.aggregate([
+      { $match: { is_del: false } },
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } }
+    ]);
+
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      orderMap[_id.toString()] = orderCount;
+    });
+
+    // Attach order count to each company
+    const companiesWithOrderCount = companies.map((company) => {
+      const companyId = company._id.toString();
+      return {
+        ...company.toObject(),
+        orderCount: orderMap[companyId] || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Companies retrieved successfully",
+      data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
   }
 };
 
