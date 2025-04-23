@@ -421,6 +421,72 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
     }
   };
 
+  export const getAllVerifiedCandidateAdmin = async (req, res) => {
+    try {
+  
+      const paidUsers = await UserVerification.find({ role: 1, is_del: false, all_verified: 1 }).sort({ createdAt: -1 });
+  
+      if (!paidUsers.length) {
+        return res.status(200).json({
+          message: "No paid users found for this employer",
+          data: [],
+        });
+      }
+  
+      // Add status field based on all_verified
+      const processedUsers = paidUsers.map(user => ({
+        ...user.toObject(), // convert Mongoose document to plain object
+        status: user.all_verified === 1 ? 'verified' : 'processing',
+      }));
+  
+      return res.status(200).json({
+        message: "Paid users fetched successfully",
+        data: processedUsers,
+      });
+    } catch (error) {
+      console.error("Error fetching paid users:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        data: [],
+      });
+    }
+  };
+
+  export const getAllVerifiedCandidateByCompanyForAdmin = async (req, res) => {
+    try {
+  
+    const { company_id } = req.body;
+
+      const paidUsers = await UserVerification.find({ role: 1, is_del: false, all_verified: 1, employer_id: company_id }).sort({ createdAt: -1 });
+  
+      if (!paidUsers.length) {
+        return res.status(200).json({
+          message: "No paid users found for this employer",
+          data: [],
+        });
+      }
+  
+      // Add status field based on all_verified
+      const processedUsers = paidUsers.map(user => ({
+        ...user.toObject(), // convert Mongoose document to plain object
+        status: user.all_verified === 1 ? 'verified' : 'processing',
+      }));
+  
+      return res.status(200).json({
+        message: "Paid users fetched successfully",
+        data: processedUsers,
+      });
+    } catch (error) {
+      console.error("Error fetching paid users:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        data: [],
+      });
+    }
+  };
+
   
 
 export const getPaidUserVerificationCartByEmployer_OLDONE = async (req, res) => {

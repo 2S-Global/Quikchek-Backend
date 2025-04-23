@@ -6,12 +6,15 @@ import { v2 as cloudinary } from 'cloudinary';
 import {
     addUserToCart,
     getUserVerificationCartByEmployer,
-    getUserVerificationCartByEmployerAll,getPaidUserVerificationCartByEmployer,deleteUser 
+    getUserVerificationCartByEmployerAll,getPaidUserVerificationCartByEmployer,deleteUser,
+    getAllVerifiedCandidateAdmin,
+    getAllVerifiedCandidateByCompanyForAdmin
 } from '../controllers/userVerificationCartController.js'; // Adjust the path according to your project structure
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
 import Companymid from '../middleware/companyMiddleware.js';
+import Adminmid from '../middleware/adminMiddleware.js';
 
 
 // Initialize dotenv to load environment variables
@@ -36,6 +39,8 @@ userRouter.post('/add_user_cart', upload.none(), userAuth, Companymid, addUserTo
 userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
 userRouter.get('/list_user_cart_all', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployerAll);
 userRouter.post('/getPaidUserVerificationCartByEmployer', upload.none(), userAuth, Companymid, getPaidUserVerificationCartByEmployer);
+userRouter.post('/getAllVerifiedCandidateAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateAdmin);
+userRouter.post('/getAllVerifiedCandidateByCompanyForAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateByCompanyForAdmin);
 userRouter.post('/deleteUser', upload.none(), userAuth, Companymid, deleteUser);
 
 export default userRouter;
