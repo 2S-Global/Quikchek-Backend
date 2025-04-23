@@ -14,11 +14,14 @@ import {
   forgotPassword,
   listFieldsByCompany,
   getUserDetailsById,
+  RegisterFrontEnd,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
 import userAuth from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
+ // Adjust path if needed
+
 dotenv.config();
 // Configure Cloudinary
 cloudinary.config({
@@ -35,27 +38,12 @@ const upload = multer({ storage: storage });
 AuthRouter.post("/change-password", upload.none(), userAuth, changePassword);
 
 // Register user candidate
-AuthRouter.post(
-  "/register",
-  userAuth,
-  adminMiddleware,
-  upload.none(),
-  registerUser
-);
-AuthRouter.post(
-  "/edit_user",
-  userAuth,
-  adminMiddleware,
-  upload.none(),
-  editUser
-);
-AuthRouter.post(
-  "/list_fields_by_company",
-  userAuth,
-  adminMiddleware,
-  upload.none(),
-  listFieldsByCompany
-);
+AuthRouter.post( "/register-frontend", upload.none(), RegisterFrontEnd);
+
+// Register user candidate
+AuthRouter.post("/register", userAuth, adminMiddleware, upload.none(), registerUser);
+AuthRouter.post("/edit_user", userAuth, adminMiddleware, upload.none(), editUser);
+AuthRouter.post("/list_fields_by_company", userAuth, adminMiddleware, upload.none(), listFieldsByCompany);
 AuthRouter.post("/get_company_details", upload.none(), getUserDetailsById);
 
 // Login user

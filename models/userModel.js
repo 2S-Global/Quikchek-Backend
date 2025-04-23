@@ -13,6 +13,14 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
     },
+    user_type: {
+      type: String,
+      default: 'company',
+    },
+    required_services: {
+      type: String,
+    //  default: 'company',
+    },
     email: {
       type: String,
       required: true,
