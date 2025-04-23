@@ -73,6 +73,7 @@ export const registerUser = async (req, res) => {
       discount_percent,
     } = req.body;
     const role = 1;
+    const self_registered=0;
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, password" });
@@ -106,6 +107,7 @@ export const registerUser = async (req, res) => {
       gst_no,
       package_id,
       discount_percent,
+      self_registered,
     });
     await newUser.save();
     /* const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
@@ -216,6 +218,7 @@ export const RegisterFrontEnd = async (req, res) => {
       required_services
     } = req.body;
     const role = 1;
+    const self_registered=1;
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, password" });
@@ -246,6 +249,7 @@ export const RegisterFrontEnd = async (req, res) => {
       address,
       gst_no,
       required_services,
+      self_registered,
     });
     await newUser.save();
     /* const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
@@ -637,6 +641,51 @@ export const listCompanies = async (req, res) => {
     });
   }
 };
+
+
+export const listSelfRegisteredCompanies = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find({ is_del: false, role: 1, self_registered: 1 }).select("-password");
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No companies found" });
+    }
+
+    // Get order counts grouped by employer_id
+    const orderCounts = await UserVerification.aggregate([
+      { $match: { is_del: false } },
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } }
+    ]);
+
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      orderMap[_id.toString()] = orderCount;
+    });
+
+    // Attach order count to each company
+    const companiesWithOrderCount = companies.map((company) => {
+      const companyId = company._id.toString();
+      return {
+        ...company.toObject(),
+        orderCount: orderMap[companyId] || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Companies retrieved successfully",
+      data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
 
 export const listFieldsByCompany = async (req, res) => {
   try {

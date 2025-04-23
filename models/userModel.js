@@ -73,6 +73,12 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    self_registered : {
+      /* 0 for admin ,1 for By own  */
+      type: Number,
+      required: true,
+      default: 0,
+    },    
     role: {
       /* 0 for admin ,1 for candidate ,2 for company  */
       type: Number,

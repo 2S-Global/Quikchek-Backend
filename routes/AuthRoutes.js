@@ -15,6 +15,7 @@ import {
   listFieldsByCompany,
   getUserDetailsById,
   RegisterFrontEnd,
+  listSelfRegisteredCompanies,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -40,6 +41,7 @@ AuthRouter.post("/change-password", upload.none(), userAuth, changePassword);
 // Register user candidate
 AuthRouter.post( "/register-frontend", upload.none(), RegisterFrontEnd);
 
+
 // Register user candidate
 AuthRouter.post("/register", userAuth, adminMiddleware, upload.none(), registerUser);
 AuthRouter.post("/edit_user", userAuth, adminMiddleware, upload.none(), editUser);
@@ -59,6 +61,7 @@ AuthRouter.post(
   registerCompany
 );
 AuthRouter.post("/list-companies", userAuth, adminMiddleware, listCompanies);
+AuthRouter.post("/list-companies-self", userAuth, adminMiddleware, listSelfRegisteredCompanies);
 AuthRouter.post("/delete-companies", userAuth, adminMiddleware, deleteCompany);
 AuthRouter.post(
   "/togglestatus-companies",
