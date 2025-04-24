@@ -14,6 +14,7 @@ export const generatePDF = async (req, res) => {
     }
 
     const userId = user._id.toString();
+    const fileName = `${user.candidate_name}.pdf`;
 
     // Launch puppeteer using Vercel-compatible chromium
     const browser = await puppeteer.launch({
@@ -62,7 +63,7 @@ export const generatePDF = async (req, res) => {
     // Set headers and send the PDF
     res.set({
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="user_${userId}.pdf"`,
+      "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Length": pdfBuffer.length,
     });
 
