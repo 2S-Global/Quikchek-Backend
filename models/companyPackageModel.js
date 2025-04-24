@@ -16,6 +16,13 @@ const companyPackageSchema = new mongoose.Schema(
     discount_percent: {
       type: Number,
     },
+    aadhar_otp: {
+      type: String,
+      default: 'disable',
+    },
+    aadhar_price: {
+      type: Number,
+    },
     is_del: { type: Boolean, default: false },
   },
   { timestamps: true }
