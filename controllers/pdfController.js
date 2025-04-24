@@ -66,6 +66,7 @@ export const generatePDF = async (req, res) => {
       "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Length": pdfBuffer.length,
     });
+    console.log("PDF generated successfully file name ," + fileName);
 
     return res.end(pdfBuffer);
   } catch (error) {
