@@ -1,24 +1,29 @@
 import UserVerification from "../models/userVerificationModel.js";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium"; // Vercel-compatible Chromium
 import GeneratePDF from "./Helpers/pdfHelper.js";
 
 export const generatePDF = async (req, res) => {
   try {
     const order_id = req.body.order_id;
 
-    // Fetching the user based on the order_id
+    // Fetch the verified user
     const user = await UserVerification.findById(order_id);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const userId = user._id.toString();
 
+    // Launch puppeteer using Vercel-compatible chromium
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
     });
+
+    const page = await browser.newPage();
 
     const htmlContent = GeneratePDF({ user });
 
@@ -37,8 +42,7 @@ export const generatePDF = async (req, res) => {
       </div>
     `;
 
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle2" });
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -55,10 +59,7 @@ export const generatePDF = async (req, res) => {
     await page.close();
     await browser.close();
 
-    // Optional: Save locally for debugging
-    //  fs.writeFileSync(`./debug_user_${userId}.pdf`, pdfBuffer);
-
-    // Set headers and send the PDF file as response
+    // Set headers and send the PDF
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="user_${userId}.pdf"`,
