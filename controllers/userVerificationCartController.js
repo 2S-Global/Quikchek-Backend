@@ -512,9 +512,65 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
     }
   };
 
-  
-
   export const getAllVerifiedCandidateByCompanyForAdmin = async (req, res) => {
+    try {
+
+      const { company_id } = req.body;
+
+      const paidUsers = await UserVerification.find({ role: 1, is_del: false, all_verified: 1, employer_id: company_id})
+        .populate("employer_id", "name") // only get employer name
+        .sort({ createdAt: -1 });
+  
+      if (!paidUsers.length) {
+        return res.status(200).json({
+          message: "No verified candidates found",
+          data: [],
+        });
+      }
+  
+      const processedUsers = paidUsers.map((user) => {
+        const userObj = user.toObject();
+        const verificationsDone = [];
+  
+        // Check which verification responses exist and add to the array
+        if (userObj.pan_response) verificationsDone.push("PAN");
+        if (userObj.aadhaar_response) verificationsDone.push("Aadhaar");
+        if (userObj.dl_response) verificationsDone.push("DL");
+        if (userObj.passport_response) verificationsDone.push("Passport");
+        if (userObj.epic_response) verificationsDone.push("Voter ID");
+        if (userObj.uan_response) verificationsDone.push("UAN");
+        if (userObj.epfo_response) verificationsDone.push("EPFO");
+  
+        return {
+          employer_name: userObj.employer_id?.name || "N/A",
+          date: new Date(userObj.createdAt).toLocaleDateString(),
+          verifications_done: verificationsDone.join(", "),
+          status: "verified", // since we're only fetching all_verified = 1
+          candidate_name: userObj.candidate_name,
+          candidate_email: userObj.candidate_email,
+          candidate_mobile: userObj.candidate_mobile,
+          candidate_dob: userObj.candidate_dob,
+          candidate_address: userObj.candidate_address,
+          candidate_gender: userObj.candidate_gender,
+          id: userObj._id,
+        };
+      });
+  
+      return res.status(200).json({
+        message: "Verified candidates fetched successfully",
+        data: processedUsers,
+      });
+    } catch (error) {
+      console.error("Error fetching verified candidates:", error);
+      return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+        data: [],
+      });
+    }
+  };
+
+  export const getAllVerifiedCandidateByCompanyForAdmin24042025 = async (req, res) => {
     try {
   
     const { company_id } = req.body;
