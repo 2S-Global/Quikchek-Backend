@@ -7,7 +7,7 @@ import nodemailer from "nodemailer";
 // Create or Update Company Package
 export const createCompanyPackage = async (req, res) => {
   try {
-    const { companyId, selected_plan, discount_percent } = req.body;
+    const { companyId, selected_plan, discount_percent, aadhar_otp, aadhar_price } = req.body;
 
     if (!companyId || !selected_plan) {
       return res.status(400).json({
@@ -31,6 +31,8 @@ export const createCompanyPackage = async (req, res) => {
         companyId,
         selected_plan: planIds,
         discount_percent: finalDiscount,
+        aadhar_otp: aadhar_otp,
+        aadhar_price: aadhar_price,
       },
       {
         new: true,
