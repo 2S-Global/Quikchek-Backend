@@ -602,7 +602,7 @@ export const loginUser = async (req, res) => {
 export const listCompanies = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
-    const companies = await User.find({ is_del: false, role: 1, self_registered: 0 }).select("-password");
+    const companies = await User.find({ is_del: false, role: 1, self_registered: { $ne: 1 }  }).select("-password");
 
     if (!companies.length) {
       return res.status(404).json({ message: "No companies found" });
