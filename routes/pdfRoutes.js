@@ -19,6 +19,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Generate PDF for verified users
-pdfRouter.get("/generate-pdf", generatePDF);
+pdfRouter.post("/generate-pdf", generatePDF);
 
 export default pdfRouter;
