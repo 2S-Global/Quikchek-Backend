@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 // Register a new user
 
 
@@ -18,7 +19,6 @@ cloudinary.config({
 });
 
 const getResourceType = (mimetype) => {
-  console.log("MIME Type:", mimetype); // Debugging log
   if (mimetype?.startsWith('image/')) return 'image';
   if (mimetype === 'application/pdf') return 'raw';
   return 'auto';  // Default to 'auto' for other types
@@ -26,17 +26,17 @@ const getResourceType = (mimetype) => {
 
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
-  const extension = path.extname(originalName)?.slice(1) || '';  // Extract the file extension
+  const extension = path.extname(originalName)?.slice(1) || '';  // Extract file extension
 
-  console.log("Resource Type:", resourceType);  // Debugging log
-  console.log("File Extension:", extension);  // Debugging log
+  // Generate a unique public_id using UUID + timestamp and append the file extension
+  const publicId = `${uuidv4()}_${Date.now()}.${extension}`;
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
         resource_type: resourceType,  // Resource type determined by MIME type
-        format: extension,  // File extension passed as format
+        public_id: publicId,  // Set custom public_id with extension
       },
       (error, result) => {
         if (error) {
