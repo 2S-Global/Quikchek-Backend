@@ -346,7 +346,6 @@ export const RegisterFrontEnd = async (req, res) => {
 
 
 
-
 export const editUser = async (req, res) => {
   const {
     name,
@@ -375,6 +374,14 @@ export const editUser = async (req, res) => {
           return res.status(200).json({ success: true, message: "Email already exists" });
         }
 
+        const getDetails = await User.findOne({
+          _id: id,
+          is_del: false,
+        });
+        
+       const oldemail = getDetails.email;
+       console.log(oldemail);
+
     if (name !== undefined) updatedFields.name = name;
     if (allowed_verifications !== undefined)
       updatedFields.allowed_verifications = allowed_verifications;
@@ -401,6 +408,48 @@ export const editUser = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
+     if(oldemail != email){
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.hostinger.com", // fixed typo
+        port: 465,
+        secure: true, // true for port 465
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+  
+      const mailOptions = {
+        from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject:
+          "Your Email Address Has Been Updated QuikChek - Fast & Accurate KYC Verification Platform",
+        html: `
+        <div style="text-align: center; margin-bottom: 20px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    </div>
+          <p>Dear <strong>${name}</strong>,</p>
+          <p>We wanted to let you know that the email address associated with your account was recently changed.</p>
+
+            <p><strong>New Email Address::</strong> ${email}</p>
+        
+          <p>If you made this change, no further action is needed.</p>
+        
+          <p>If you didn’t make this change or believe it was done in error, please contact our support team immediately so we can help secure your account.</p>
+          <br />
+          <p>Sincerely,<br />
+          The Admin Team<br />
+          <strong>Global Employability Information Services India Limited</strong></p>
+        `,
+      };
+  
+      await transporter.sendMail(mailOptions);
+
+     }
+
+
 
     res.status(200).json({
       success: true,
