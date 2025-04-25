@@ -55,11 +55,26 @@ export const addUserToCart = async (req, res) => {
     const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber } = req.body;
 
     // Upload documents to Cloudinary
-const panImageUrl = req.files?.pandoc ? await uploadToCloudinary(req.files.pandoc[0].buffer, 'pan_doc') : null;
-const aadharImageUrl = req.files?.aadhaardoc ? await uploadToCloudinary(req.files.aadhaardoc[0].buffer, 'aadhaar_doc') : null;
-const dlImageUrl = req.files?.licensedoc ? await uploadToCloudinary(req.files.licensedoc[0].buffer, 'licensedoc') : null;
-const passportImageUrl = req.files?.doc ? await uploadToCloudinary(req.files.doc[0].buffer, 'doc') : null;
-const epicImageUrl = req.files?.voterdoc ? await uploadToCloudinary(req.files.voterdoc[0].buffer, 'voter_doc') : null;
+const panImageUrl = req.files?.pandoc
+  ? await uploadToCloudinary(req.files.pandoc[0].buffer, 'pan_doc', req.files.pandoc[0].mimetype)
+  : null;
+
+const aadharImageUrl = req.files?.aadhaardoc
+  ? await uploadToCloudinary(req.files.aadhaardoc[0].buffer, 'aadhaar_doc', req.files.aadhaardoc[0].mimetype)
+  : null;
+
+const dlImageUrl = req.files?.licensedoc
+  ? await uploadToCloudinary(req.files.licensedoc[0].buffer, 'licensedoc', req.files.licensedoc[0].mimetype)
+  : null;
+
+const passportImageUrl = req.files?.doc
+  ? await uploadToCloudinary(req.files.doc[0].buffer, 'doc', req.files.doc[0].mimetype)
+  : null;
+
+const epicImageUrl = req.files?.voterdoc
+  ? await uploadToCloudinary(req.files.voterdoc[0].buffer, 'voter_doc', req.files.voterdoc[0].mimetype)
+  : null;
+
 
 
     const newUserCart = new UserCartVerification({
