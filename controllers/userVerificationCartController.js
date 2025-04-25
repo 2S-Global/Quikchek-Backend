@@ -17,13 +17,21 @@ cloudinary.config({
 });
 
 // Function to upload a file to Cloudinary
-const uploadToCloudinary = async (fileBuffer, filename) => {
+const getResourceType = (mimetype) => {
+  if (mimetype.startsWith('image/')) return 'image';
+  if (mimetype === 'application/pdf') return 'raw';
+  return 'auto';
+};
+
+const uploadToCloudinary = async (fileBuffer, filename, mimetype) => {
+  const resourceType = getResourceType(mimetype);
+
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
+        resource_type: resourceType,
         // public_id: filename,
-        resource_type: 'raw',
       },
       (error, result) => {
         if (error) {
@@ -33,7 +41,7 @@ const uploadToCloudinary = async (fileBuffer, filename) => {
         resolve(result.secure_url);
       }
     );
-    stream.end(fileBuffer); // pass buffer to Cloudinary stream
+    stream.end(fileBuffer);
   });
 };
 
