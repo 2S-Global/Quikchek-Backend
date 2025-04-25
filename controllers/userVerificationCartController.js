@@ -21,46 +21,51 @@ cloudinary.config({
 const getResourceType = (mimetype) => {
   if (mimetype?.startsWith('image/')) return 'image';
   if (mimetype === 'application/pdf') return 'raw';
-  return 'auto'; // Default to 'auto' for other types
+  return 'auto';
 };
 
 // Function to upload to Cloudinary
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
-  const extension = path.extname(originalName)?.slice(1) || ''; // Extract file extension
+  const extension = path.extname(originalName).slice(1).toLowerCase() || ''; // Extract extension (e.g., 'pdf')
 
-  // Generate a unique public_id using UUID + timestamp
-  let publicId = `${uuidv4()}_${Date.now()}`;
-  
-  // For 'raw' resources (e.g., PDFs), include the extension in the public_id
-  if (resourceType === 'raw' && extension) {
-    publicId = `${publicId}.${extension}`;
-  }
+  // Log inputs for debugging
+  console.log('Uploading to Cloudinary:', { originalName, mimetype, resourceType, extension });
 
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: 'user_verification_documents',
-        resource_type: resourceType,
-        public_id: publicId,
-        format: extension || undefined, // Set format explicitly, or undefined if no extension
-      },
-      (error, result) => {
-        if (error) {
-          console.error('Cloudinary Upload Error:', error);
-          reject(error);
-        } else {
-          // Ensure the URL includes the extension for raw resources
-          let secureUrl = result.secure_url;
-          if (resourceType === 'raw' && extension && !secureUrl.endsWith(`.${extension}`)) {
-            secureUrl = `${secureUrl}.${extension}`;
+  // Generate a unique public_id with extension for raw resources
+  const publicId = `${uuidv4()}_${Date.now()}${extension ? '.' + extension : ''}`;
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'user_verification_documents',
+          resource_type: resourceType,
+          public_id: publicId,
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary Upload Error:', error);
+            reject(error);
+          } else {
+            resolve(result);
           }
-          resolve(secureUrl);
         }
-      }
-    );
-    stream.end(fileBuffer); // Pass file buffer to the upload stream
-  });
+      );
+      stream.end(fileBuffer);
+    });
+
+    // Log the result for debugging
+    console.log('Cloudinary Upload Result:', {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+      format: result.format,
+    });
+
+    return result.secure_url;
+  } catch (error) {
+    throw new Error(`Cloudinary upload failed: ${error.message}`);
+  }
 };
 
 export const addUserToCart = async (req, res) => {
@@ -74,24 +79,44 @@ export const addUserToCart = async (req, res) => {
 
     // Upload documents to Cloudinary
 const panImageUrl = req.files?.pandoc
-  ? await uploadToCloudinary(req.files.pandoc[0].buffer, 'pan_doc', req.files.pandoc[0].mimetype)
-  : null;
+      ? await uploadToCloudinary(
+          req.files.pandoc[0].buffer,
+          req.files.pandoc[0].originalname,
+          req.files.pandoc[0].mimetype
+        )
+      : null;
 
-const aadharImageUrl = req.files?.aadhaardoc
-  ? await uploadToCloudinary(req.files.aadhaardoc[0].buffer, 'aadhaar_doc', req.files.aadhaardoc[0].mimetype)
-  : null;
+    const aadharImageUrl = req.files?.aadhaardoc
+      ? await uploadToCloudinary(
+          req.files.aadhaardoc[0].buffer,
+          req.files.aadhaardoc[0].originalname,
+          req.files.aadhaardoc[0].mimetype
+        )
+      : null;
 
-const dlImageUrl = req.files?.licensedoc
-  ? await uploadToCloudinary(req.files.licensedoc[0].buffer, 'licensedoc', req.files.licensedoc[0].mimetype)
-  : null;
+    const dlImageUrl = req.files?.licensedoc
+      ? await uploadToCloudinary(
+          req.files.licensedoc[0].buffer,
+          req.files.licensedoc[0].originalname,
+          req.files.licensedoc[0].mimetype
+        )
+      : null;
 
-const passportImageUrl = req.files?.doc
-  ? await uploadToCloudinary(req.files.doc[0].buffer, 'doc', req.files.doc[0].mimetype)
-  : null;
+    const passportImageUrl = req.files?.doc
+      ? await uploadToCloudinary(
+          req.files.doc[0].buffer,
+          req.files.doc[0].originalname,
+          req.files.doc[0].mimetype
+        )
+      : null;
 
-const epicImageUrl = req.files?.voterdoc
-  ? await uploadToCloudinary(req.files.voterdoc[0].buffer, 'voter_doc', req.files.voterdoc[0].mimetype)
-  : null;
+    const epicImageUrl = req.files?.voterdoc
+      ? await uploadToCloudinary(
+          req.files.voterdoc[0].buffer,
+          req.files.voterdoc[0].originalname,
+          req.files.voterdoc[0].mimetype
+        )
+      : null;
 
 
 
