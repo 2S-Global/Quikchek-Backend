@@ -5,7 +5,7 @@ import Package from "../models/packageModel.js";
 import CompanyPackage from "../models/companyPackageModel.js";
 import mongoose from "mongoose";
 import multer from 'multer';
-import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 // Register a new user
 
 
@@ -20,7 +20,7 @@ cloudinary.config({
 const uploadToCloudinary = async (file) => {
   try {
     const result = await cloudinary.v2.uploader.upload(file.path, {
-      folder: 'user_verification_documents', // Optional folder
+      folder: 'user_verification_documents',
     });
     return result.secure_url; // Return the file URL
   } catch (error) {
@@ -29,77 +29,58 @@ const uploadToCloudinary = async (file) => {
   }
 };
 
-export const addUserToCart = async (req, res) => {
-    try {
-
-        const user_id = req.userId;
-        //check user exists
-        if (!user_id) {
-            return res.status(400).json({ message: "User ID is required" });
-        }
-
-
-        const {
-            plan,
-            name,
-            email,
-            phone,
-            dob,
-            address,
-            gender,
-            panname,
-            pannumber,
-            pandoc,
-            aadhaarname,
-            aadhaarnumber,
-            aadhaardoc,
-            licensename,
-            licensenumber,
-            licensenumdoc,
-            passportname,
-            passportnumber,
-            passportdoc,
-            votername,
-            voternumber,
-            voterdoc,
-            additionalfields,
-            uannumber
-        } = req.body;
-
-        const newUserCart = new UserCartVerification({
-            employer_id : user_id,
-            plan : plan,
-            candidate_name : name,
-            candidate_email : email,
-            candidate_mobile : phone,
-            candidate_dob : dob,
-            candidate_address : address,
-            candidate_gender : gender,
-            pan_name : panname,
-            pan_number : pannumber,
-            pan_image: pandoc ? await uploadToCloudinary(pandoc) : null,
-            aadhar_name : aadhaarname,
-            aadhar_number : aadhaarnumber,
-            aadhar_image: aadhaardoc ? await uploadToCloudinary(aadhaardoc) : null,
-            dl_name : licensename,
-            dl_number : licensenumber,
-            dl_image: licensenumdoc ? await uploadToCloudinary(licensenumdoc) : null,
-            passport_name : passportname,
-            passport_file_number : passportnumber,
-            passport_image: passportdoc ? await uploadToCloudinary(passportdoc) : null,
-            epic_name : votername,
-            epic_number : voternumber,
-            epic_image: voterdoc ? await uploadToCloudinary(voterdoc) : null,
-            additionalfields : additionalfields,
-            uan_number:uannumber
-        });
-
-        await newUserCart.save();
-        res.status(201).json({ success: true, message: "User verification cart added successfully", data: newUserCart });
-    } catch (error) {
-        res.status(401).json({ success: false, message: "Error adding user verification cart", error: error.message });
+const addUserToCart = async (req, res) => {
+  try {
+    const user_id = req.userId;
+    if (!user_id) {
+      return res.status(400).json({ message: "User ID is required" });
     }
+
+    const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber } = req.body;
+
+    // Upload documents to Cloudinary
+    const panImageUrl = pandoc ? await uploadToCloudinary(req.files.pandoc[0]) : null;
+    const aadharImageUrl = aadhaardoc ? await uploadToCloudinary(req.files.aadhaardoc[0]) : null;
+    const dlImageUrl = licensenumdoc ? await uploadToCloudinary(req.files.licensenumdoc[0]) : null;
+    const passportImageUrl = passportdoc ? await uploadToCloudinary(req.files.passportdoc[0]) : null;
+    const epicImageUrl = voterdoc ? await uploadToCloudinary(req.files.voterdoc[0]) : null;
+
+    const newUserCart = new UserCartVerification({
+      employer_id: user_id,
+      plan: plan,
+      candidate_name: name,
+      candidate_email: email,
+      candidate_mobile: phone,
+      candidate_dob: dob,
+      candidate_address: address,
+      candidate_gender: gender,
+      pan_name: panname,
+      pan_number: pannumber,
+      pan_image: panImageUrl,
+      aadhar_name: aadhaarname,
+      aadhar_number: aadhaarnumber,
+      aadhar_image: aadharImageUrl,
+      dl_name: licensename,
+      dl_number: licensenumber,
+      dl_image: dlImageUrl,
+      passport_name: passportname,
+      passport_file_number: passportnumber,
+      passport_image: passportImageUrl,
+      epic_name: votername,
+      epic_number: voternumber,
+      epic_image: epicImageUrl,
+      additionalfields: additionalfields,
+      uan_number: uannumber,
+    });
+
+    await newUserCart.save();
+    res.status(201).json({ success: true, message: "User verification cart added successfully", data: newUserCart });
+  } catch (error) {
+    console.error("Error adding user to cart:", error);
+    res.status(401).json({ success: false, message: "Error adding user verification cart", error: error.message });
+  }
 };
+
 
 
 export const getUserVerificationCartByEmployerAll = async (req, res) => {
