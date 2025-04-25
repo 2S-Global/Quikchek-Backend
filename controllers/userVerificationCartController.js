@@ -23,7 +23,7 @@ const uploadToCloudinary = async (fileBuffer, filename) => {
       {
         folder: 'user_verification_documents',
         // public_id: filename,
-        resource_type: 'auto',
+        resource_type: 'raw',
       },
       (error, result) => {
         if (error) {
