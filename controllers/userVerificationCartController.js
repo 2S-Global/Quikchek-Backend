@@ -17,23 +17,26 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Function to upload a file to Cloudinary
 const getResourceType = (mimetype) => {
+  console.log("MIME Type:", mimetype); // Debugging log
   if (mimetype?.startsWith('image/')) return 'image';
   if (mimetype === 'application/pdf') return 'raw';
-  return 'auto';
+  return 'auto';  // Default to 'auto' for other types
 };
 
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
-  const extension = path.extname(originalName)?.slice(1) || '';
+  const extension = path.extname(originalName)?.slice(1) || '';  // Extract the file extension
+
+  console.log("Resource Type:", resourceType);  // Debugging log
+  console.log("File Extension:", extension);  // Debugging log
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
-        resource_type: resourceType,
-        format: extension,
+        resource_type: resourceType,  // Resource type determined by MIME type
+        format: extension,  // File extension passed as format
       },
       (error, result) => {
         if (error) {
@@ -44,9 +47,10 @@ export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => 
         }
       }
     );
-    stream.end(fileBuffer);
+    stream.end(fileBuffer);  // Pass file buffer to the upload stream
   });
 };
+
 export const addUserToCart = async (req, res) => {
   try {
     const user_id = req.userId;
