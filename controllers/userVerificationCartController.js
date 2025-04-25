@@ -33,8 +33,9 @@ export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => 
   console.log('Uploading to Cloudinary:', { originalName, mimetype, resourceType, extension });
 
   // Generate a unique public_id with extension for raw resources
-  // const publicId = `${uuidv4()}_${Date.now()}`;
-  const publicId = `${uuidv4()}_${Date.now()}${extension ? '.' + extension : ''}`;
+    const publicId = `${uuidv4()}_${Date.now()}.pdf`;
+
+  // const publicId = `${uuidv4()}_${Date.now()}${extension ? '.' + extension : ''}`;
 
   try {
     const result = await new Promise((resolve, reject) => {
