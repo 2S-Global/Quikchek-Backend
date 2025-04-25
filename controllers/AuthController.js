@@ -467,7 +467,7 @@ export const sendAccessEmail = async (req, res) => {
         <p>Your corporate account has been successfully created with the following credentials:</p>
         <ul>
           <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Password:</strong> ${password}</li>
+          <li><strong>Password:</strong> ${newPassword}</li>
         </ul>
       
         <p>
