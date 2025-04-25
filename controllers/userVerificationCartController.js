@@ -5,8 +5,29 @@ import Package from "../models/packageModel.js";
 import CompanyPackage from "../models/companyPackageModel.js";
 import mongoose from "mongoose";
 import multer from 'multer';
-import { uploadToCloudinary } from '../config/cloudinary.js';
+import cloudinary from 'cloudinary';
 // Register a new user
+
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Function to upload a file to Cloudinary
+const uploadToCloudinary = async (file) => {
+  try {
+    const result = await cloudinary.v2.uploader.upload(file.path, {
+      folder: 'user_verification_documents', // Optional folder
+    });
+    return result.secure_url; // Return the file URL
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error);
+    throw new Error('File upload failed');
+  }
+};
 
 export const addUserToCart = async (req, res) => {
     try {
