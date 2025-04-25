@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
-import upload from '../middleware/upload';
+// import uploadmiddleware from '../middleware/upload';
 import {
     addUserToCart,
     getUserVerificationCartByEmployer,
