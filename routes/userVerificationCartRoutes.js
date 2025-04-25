@@ -39,7 +39,7 @@ userRouter.post('/add_user_cart',  upload.fields([
     { name: 'pandoc', maxCount: 1 },
     { name: 'aadhaardoc', maxCount: 1 },
     { name: 'licensenumdoc', maxCount: 1 },
-    { name: 'passportdoc', maxCount: 1 },
+    { name: 'doc', maxCount: 1 },
     { name: 'voterdoc', maxCount: 1 }
   ]), userAuth, Companymid, addUserToCart);
 userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
