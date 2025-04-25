@@ -21,35 +21,45 @@ cloudinary.config({
 const getResourceType = (mimetype) => {
   if (mimetype?.startsWith('image/')) return 'image';
   if (mimetype === 'application/pdf') return 'raw';
-  return 'auto';  // Default to 'auto' for other types
+  return 'auto'; // Default to 'auto' for other types
 };
 
 // Function to upload to Cloudinary
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
-  const extension = path.extname(originalName)?.slice(1) || '';  // Extract file extension
+  const extension = path.extname(originalName)?.slice(1) || ''; // Extract file extension
+
+  // Generate a unique public_id using UUID + timestamp
+  let publicId = `${uuidv4()}_${Date.now()}`;
   
-  // Generate a unique public_id using UUID + timestamp without the extension
-  const publicId = `${uuidv4()}_${Date.now()}`;
+  // For 'raw' resources (e.g., PDFs), include the extension in the public_id
+  if (resourceType === 'raw' && extension) {
+    publicId = `${publicId}.${extension}`;
+  }
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
-        resource_type: resourceType,  // Resource type determined by MIME type
-        public_id: publicId,  // Set custom public_id without extension
-        format: extension,  // Set the format explicitly to retain the extension
+        resource_type: resourceType,
+        public_id: publicId,
+        format: extension || undefined, // Set format explicitly, or undefined if no extension
       },
       (error, result) => {
         if (error) {
           console.error('Cloudinary Upload Error:', error);
           reject(error);
         } else {
-          resolve(result.secure_url);
+          // Ensure the URL includes the extension for raw resources
+          let secureUrl = result.secure_url;
+          if (resourceType === 'raw' && extension && !secureUrl.endsWith(`.${extension}`)) {
+            secureUrl = `${secureUrl}.${extension}`;
+          }
+          resolve(secureUrl);
         }
       }
     );
-    stream.end(fileBuffer);  // Pass file buffer to the upload stream
+    stream.end(fileBuffer); // Pass file buffer to the upload stream
   });
 };
 
