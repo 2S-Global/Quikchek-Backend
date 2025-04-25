@@ -515,7 +515,7 @@ export const sendAccessEmail = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ message: "New password sent to your email" });
+    res.status(200).json({ success: true, message: "New password sent to your email" });
   } catch (error) {
     console.error("Forgot password error:", error);
     res
