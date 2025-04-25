@@ -156,7 +156,7 @@ export const resendCompanyPackageEmail = async (req, res) => {
     const companyPackage = await CompanyPackage.findOne({ companyId });
 
     if (!company || !companyPackage) {
-      return res.status(404).json({ success: false, message: "Company or Package not found" });
+      return res.status(200).json({ success: true, message: "Company Package not found" });
     }
 
     const { selected_plan, discount_percent } = companyPackage;
