@@ -7,6 +7,7 @@ import {
   createCompanyPackage,
   getCompanyPackagesByCompanyId,
   getPackageByCompany,
+  resendCompanyPackageEmail,
 } from "../controllers/companyPackageController.js";
 
 //Middleware
@@ -52,5 +53,7 @@ userRouter.post(
   Companymid,
   getPackageByCompany
 );
+
+userRouter.post("/resendCompanyPackageEmail",upload.none(), userAuth, adminMiddleware, resendCompanyPackageEmail);
 
 export default userRouter;

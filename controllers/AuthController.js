@@ -406,15 +406,19 @@ export const editUser = async (req, res) => {
 
 export const sendAccessEmail = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { companyId } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email, is_del: false, is_active: true });
+    const user = await User.findOne({ _id: companyId, is_del: false, is_active: true });
     if (!user) {
       return res
         .status(200)
         .json({ message: "User not found with this email" });
     }
+
+    const email= user.email;
+
+   // console.log(user)
 
     // Generate a new arbitrary password (e.g. 8 characters)
     const generatePassword = () => {
