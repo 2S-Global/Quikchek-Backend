@@ -17,16 +17,24 @@ cloudinary.config({
 });
 
 // Function to upload a file to Cloudinary
-const uploadToCloudinary = async (file) => {
-  try {
-    const result = await cloudinary.v2.uploader.upload(file.path, {
-      folder: 'user_verification_documents',
-    });
-    return result.secure_url; // Return the file URL
-  } catch (error) {
-    console.error('Error uploading to Cloudinary:', error);
-    throw new Error('File upload failed');
-  }
+const uploadToCloudinary = async (fileBuffer, filename) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'user_verification_documents',
+        public_id: filename,
+        resource_type: 'auto',
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary Upload Error:', error);
+          return reject(error);
+        }
+        resolve(result.secure_url);
+      }
+    );
+    stream.end(fileBuffer); // pass buffer to Cloudinary stream
+  });
 };
 
 export const addUserToCart = async (req, res) => {
@@ -39,11 +47,12 @@ export const addUserToCart = async (req, res) => {
     const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber } = req.body;
 
     // Upload documents to Cloudinary
-    const panImageUrl = pandoc ? await uploadToCloudinary(req.files.pandoc[0]) : null;
-    const aadharImageUrl = aadhaardoc ? await uploadToCloudinary(req.files.aadhaardoc[0]) : null;
-    const dlImageUrl = licensenumdoc ? await uploadToCloudinary(req.files.licensenumdoc[0]) : null;
-    const passportImageUrl = passportdoc ? await uploadToCloudinary(req.files.passportdoc[0]) : null;
-    const epicImageUrl = voterdoc ? await uploadToCloudinary(req.files.voterdoc[0]) : null;
+const panImageUrl = req.files?.pandoc ? await uploadToCloudinary(req.files.pandoc[0].buffer, 'pan_doc') : null;
+const aadharImageUrl = req.files?.aadhaardoc ? await uploadToCloudinary(req.files.aadhaardoc[0].buffer, 'aadhaar_doc') : null;
+const dlImageUrl = req.files?.licensenumdoc ? await uploadToCloudinary(req.files.licensenumdoc[0].buffer, 'license_doc') : null;
+const passportImageUrl = req.files?.passportdoc ? await uploadToCloudinary(req.files.passportdoc[0].buffer, 'passport_doc') : null;
+const epicImageUrl = req.files?.voterdoc ? await uploadToCloudinary(req.files.voterdoc[0].buffer, 'voter_doc') : null;
+
 
     const newUserCart = new UserCartVerification({
       employer_id: user_id,
