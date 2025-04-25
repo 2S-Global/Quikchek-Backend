@@ -49,7 +49,7 @@ export const addUserToCart = async (req, res) => {
     // Upload documents to Cloudinary
 const panImageUrl = req.files?.pandoc ? await uploadToCloudinary(req.files.pandoc[0].buffer, 'pan_doc') : null;
 const aadharImageUrl = req.files?.aadhaardoc ? await uploadToCloudinary(req.files.aadhaardoc[0].buffer, 'aadhaar_doc') : null;
-const dlImageUrl = req.files?.licensenumdoc ? await uploadToCloudinary(req.files.licensenumdoc[0].buffer, 'license_doc') : null;
+const dlImageUrl = req.files?.licensedoc ? await uploadToCloudinary(req.files.licensedoc[0].buffer, 'licensedoc') : null;
 const passportImageUrl = req.files?.doc ? await uploadToCloudinary(req.files.doc[0].buffer, 'doc') : null;
 const epicImageUrl = req.files?.voterdoc ? await uploadToCloudinary(req.files.voterdoc[0].buffer, 'voter_doc') : null;
 
