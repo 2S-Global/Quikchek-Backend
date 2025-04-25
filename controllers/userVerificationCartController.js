@@ -24,19 +24,21 @@ const getResourceType = (mimetype) => {
   return 'auto';  // Default to 'auto' for other types
 };
 
+// Function to upload to Cloudinary
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
   const extension = path.extname(originalName)?.slice(1) || '';  // Extract file extension
-
-  // Generate a unique public_id using UUID + timestamp and append the file extension
-  const publicId = `${uuidv4()}_${Date.now()}.${extension}`;
+  
+  // Generate a unique public_id using UUID + timestamp without the extension
+  const publicId = `${uuidv4()}_${Date.now()}`;
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
         resource_type: resourceType,  // Resource type determined by MIME type
-        public_id: publicId,  // Set custom public_id with extension
+        public_id: publicId,  // Set custom public_id without extension
+        format: extension,  // Set the format explicitly to retain the extension
       },
       (error, result) => {
         if (error) {
