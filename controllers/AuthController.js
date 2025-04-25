@@ -350,6 +350,7 @@ export const RegisterFrontEnd = async (req, res) => {
 export const editUser = async (req, res) => {
   const {
     name,
+    email,
     allowed_verifications,
     transaction_fee,
     transaction_gst,
@@ -363,6 +364,16 @@ export const editUser = async (req, res) => {
 
   try {
     const updatedFields = {};
+        // Check if user already exists
+        const existingUser = await User.findOne({
+          email,
+          _id: { $ne: id },
+          is_del: false,
+          is_active: true,
+        });
+        if (existingUser) {
+          return res.status(200).json({ success: true, message: "Email already exists" });
+        }
 
     if (name !== undefined) updatedFields.name = name;
     if (allowed_verifications !== undefined)
@@ -373,6 +384,7 @@ export const editUser = async (req, res) => {
       updatedFields.transaction_gst = transaction_gst;
 
     updatedFields.phone_number = phone_number;
+    updatedFields.email = email;
     updatedFields.address = address;
     updatedFields.gst_no = gst_no;
     updatedFields.package_id = package_id;
