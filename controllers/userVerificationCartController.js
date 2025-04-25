@@ -19,23 +19,19 @@ cloudinary.config({
 });
 
 const getResourceType = (mimetype) => {
-  if (mimetype?.startsWith('image/')) return 'image';
-  if (mimetype === 'application/pdf') return 'raw';
-  return 'auto';
+  return 'auto'; // Always return 'auto'
 };
 
 // Function to upload to Cloudinary
 export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
-  const resourceType = getResourceType(mimetype);
-  const extension = path.extname(originalName).slice(1).toLowerCase() || ''; // Extract extension (e.g., 'pdf')
+  const resourceType = getResourceType(mimetype); // Always returns 'auto'
+  const extension = path.extname(originalName).slice(1).toLowerCase() || ''; // Extract extension
 
   // Log inputs for debugging
-  console.log('Uploading to Cloudinary:', { originalName, mimetype, resourceType, extension });
+  // console.log('Uploading to Cloudinary:', { originalName, mimetype, resourceType, extension });
 
-  // Generate a unique public_id with extension for raw resources
-    const publicId = `${uuidv4()}_${Date.now()}.pdf`;
-
-  // const publicId = `${uuidv4()}_${Date.now()}${extension ? '.' + extension : ''}`;
+  // Generate a unique public_id with extension for all resources
+  // const publicId = `${uuidv4()}_${Date.now()}.${extension || 'pdf'}`; 
 
   try {
     const result = await new Promise((resolve, reject) => {
@@ -43,7 +39,7 @@ export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => 
         {
           folder: 'user_verification_documents',
           resource_type: resourceType,
-          public_id: publicId,
+          // public_id: publicId,
         },
         (error, result) => {
           if (error) {
@@ -57,13 +53,7 @@ export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => 
       stream.end(fileBuffer);
     });
 
-    // Log the result for debugging
-    console.log('Cloudinary Upload Result:', {
-      secure_url: result.secure_url,
-      public_id: result.public_id,
-      format: result.format,
-    });
-
+  
     return result.secure_url;
   } catch (error) {
     throw new Error(`Cloudinary upload failed: ${error.message}`);
