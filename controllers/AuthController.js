@@ -73,7 +73,7 @@ export const registerUser = async (req, res) => {
       discount_percent,
     } = req.body;
     const role = 1;
-    const self_registered=0;
+    const self_registered = 0;
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, password" });
@@ -132,7 +132,7 @@ export const registerUser = async (req, res) => {
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
       html: `
       <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
         <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
@@ -202,8 +202,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
-
 // Register a new user
 export const RegisterFrontEnd = async (req, res) => {
   try {
@@ -215,10 +213,10 @@ export const RegisterFrontEnd = async (req, res) => {
       phone_number,
       address,
       gst_no,
-      required_services
+      required_services,
     } = req.body;
     const role = 1;
-    const self_registered=1;
+    const self_registered = 1;
     // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, password" });
@@ -274,7 +272,7 @@ export const RegisterFrontEnd = async (req, res) => {
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
       html: `
       <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
         <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
@@ -344,8 +342,6 @@ export const RegisterFrontEnd = async (req, res) => {
   }
 };
 
-
-
 export const editUser = async (req, res) => {
   const {
     name,
@@ -363,24 +359,26 @@ export const editUser = async (req, res) => {
 
   try {
     const updatedFields = {};
-        // Check if user already exists
-        const existingUser = await User.findOne({
-          email,
-          _id: { $ne: id },
-          is_del: false,
-          is_active: true,
-        });
-        if (existingUser) {
-          return res.status(200).json({ success: true, message: "Email already exists" });
-        }
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      email,
+      _id: { $ne: id },
+      is_del: false,
+      is_active: true,
+    });
+    if (existingUser) {
+      return res
+        .status(200)
+        .json({ success: true, message: "Email already exists" });
+    }
 
-        const getDetails = await User.findOne({
-          _id: id,
-          is_del: false,
-        });
-        
-       const oldemail = getDetails.email;
-       console.log(oldemail);
+    const getDetails = await User.findOne({
+      _id: id,
+      is_del: false,
+    });
+
+    const oldemail = getDetails.email;
+    console.log(oldemail);
 
     if (name !== undefined) updatedFields.name = name;
     if (allowed_verifications !== undefined)
@@ -409,8 +407,7 @@ export const editUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-     if(oldemail != email){
-
+    if (oldemail != email) {
       const transporter = nodemailer.createTransport({
         host: "smtp.hostinger.com", // fixed typo
         port: 465,
@@ -420,7 +417,7 @@ export const editUser = async (req, res) => {
           pass: process.env.EMAIL_PASS,
         },
       });
-  
+
       const mailOptions = {
         from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
         to: email,
@@ -444,12 +441,9 @@ export const editUser = async (req, res) => {
           <strong>Global Employability Information Services India Limited</strong></p>
         `,
       };
-  
+
       await transporter.sendMail(mailOptions);
-
-     }
-
-
+    }
 
     res.status(200).json({
       success: true,
@@ -463,23 +457,25 @@ export const editUser = async (req, res) => {
   }
 };
 
-
-
 export const sendAccessEmail = async (req, res) => {
   try {
     const { companyId } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ _id: companyId, is_del: false, is_active: true });
+    const user = await User.findOne({
+      _id: companyId,
+      is_del: false,
+      is_active: true,
+    });
     if (!user) {
       return res
         .status(200)
         .json({ message: "User not found with this email" });
     }
 
-    const email= user.email;
+    const email = user.email;
 
-   // console.log(user)
+    // console.log(user)
 
     // Generate a new arbitrary password (e.g. 8 characters)
     const generatePassword = () => {
@@ -576,7 +572,9 @@ export const sendAccessEmail = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ success: true, message: "New password sent to your email" });
+    res
+      .status(200)
+      .json({ success: true, message: "New password sent to your email" });
   } catch (error) {
     console.error("Forgot password error:", error);
     res
@@ -585,14 +583,12 @@ export const sendAccessEmail = async (req, res) => {
   }
 };
 
-
-
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email,is_del: false, is_active: true });
+    const user = await User.findOne({ email, is_del: false, is_active: true });
     if (!user) {
       return res
         .status(404)
@@ -634,7 +630,7 @@ export const forgotPassword = async (req, res) => {
       to: email,
       subject: "Password Reset Successful - Action Required",
       html: `<div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/z17uasoek8vat5czluvg.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
               <h3>Dear ${user.name},</h3>
               <p>Your password has been successfully reset as per your request. Please find your new login credentials below:</p>
@@ -787,7 +783,11 @@ export const loginUser = async (req, res) => {
 export const listCompanies = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
-    const companies = await User.find({ is_del: false, role: 1, self_registered: { $ne: 1 }  }).select("-password");
+    const companies = await User.find({
+      is_del: false,
+      role: 1,
+      self_registered: { $ne: 1 },
+    }).select("-password");
 
     if (!companies.length) {
       return res.status(404).json({ message: "No companies found" });
@@ -796,7 +796,7 @@ export const listCompanies = async (req, res) => {
     // Get order counts grouped by employer_id
     const orderCounts = await UserVerification.aggregate([
       { $match: { is_del: false } },
-      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } }
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
     ]);
 
     // Convert orderCounts to a map for quick lookup
@@ -827,11 +827,14 @@ export const listCompanies = async (req, res) => {
   }
 };
 
-
 export const listSelfRegisteredCompanies = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
-    const companies = await User.find({ is_del: false, role: 1, self_registered: 1 }).select("-password");
+    const companies = await User.find({
+      is_del: false,
+      role: 1,
+      self_registered: 1,
+    }).select("-password");
 
     if (!companies.length) {
       return res.status(200).json({ message: "No companies found" });
@@ -840,7 +843,7 @@ export const listSelfRegisteredCompanies = async (req, res) => {
     // Get order counts grouped by employer_id
     const orderCounts = await UserVerification.aggregate([
       { $match: { is_del: false } },
-      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } }
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
     ]);
 
     // Convert orderCounts to a map for quick lookup
@@ -870,7 +873,6 @@ export const listSelfRegisteredCompanies = async (req, res) => {
     });
   }
 };
-
 
 export const listFieldsByCompany = async (req, res) => {
   try {

@@ -18,7 +18,7 @@ export const inviteController = async (req, res) => {
   try {
     const emailContent = `
      <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/blpawxigmdssnw9y21ge.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
     
     <p>Dear <strong>${name}</strong>,</p>

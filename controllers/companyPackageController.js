@@ -7,7 +7,13 @@ import nodemailer from "nodemailer";
 // Create or Update Company Package
 export const createCompanyPackage = async (req, res) => {
   try {
-    const { companyId, selected_plan, discount_percent, aadhar_otp, aadhar_price } = req.body;
+    const {
+      companyId,
+      selected_plan,
+      discount_percent,
+      aadhar_otp,
+      aadhar_price,
+    } = req.body;
 
     if (!companyId || !selected_plan) {
       return res.status(400).json({
@@ -51,7 +57,9 @@ export const createCompanyPackage = async (req, res) => {
     }
 
     // Fetch plan names and details
-    const plans = await Package.find({ _id: { $in: planIds } }).select("name description");
+    const plans = await Package.find({ _id: { $in: planIds } }).select(
+      "name description"
+    );
     const planDetailsHtml = plans
       .map(
         (plan) => `
@@ -86,7 +94,7 @@ export const createCompanyPackage = async (req, res) => {
       subject: "QuikChek Account Activation and Package Details",
       html: `  
       <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/lpvojh112at5ljbragy0.jpg" alt="Banner" style="width: 100%; height: auto;" />
       </div>
       
         <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -99,7 +107,11 @@ export const createCompanyPackage = async (req, res) => {
           <p>Based on your industry segment and requirements, the following package is now active for your account:</p>
 
           ${planDetailsHtml}
-        ${finalDiscount > 0 ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>` : ""}
+        ${
+          finalDiscount > 0
+            ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>`
+            : ""
+        }
           <p>With this activated package, you can now begin utilizing QuikChek's fast and accurate KYC verification services.</p>
 
           <p>To access the platform and begin your verifications, please log in using your credentials at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
@@ -139,16 +151,14 @@ export const createCompanyPackage = async (req, res) => {
   }
 };
 
-
-
-
-
 export const resendCompanyPackageEmail = async (req, res) => {
   try {
     const { companyId } = req.body;
 
     if (!companyId) {
-      return res.status(400).json({ success: false, message: "Company ID is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Company ID is required" });
     }
 
     // Get company and package
@@ -156,7 +166,9 @@ export const resendCompanyPackageEmail = async (req, res) => {
     const companyPackage = await CompanyPackage.findOne({ companyId });
 
     if (!company || !companyPackage) {
-      return res.status(200).json({ success: true, message: "Company Package not found" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Company Package not found" });
     }
 
     const { selected_plan, discount_percent } = companyPackage;
@@ -170,7 +182,9 @@ export const resendCompanyPackageEmail = async (req, res) => {
     }
 
     // Get plan details
-    const plans = await Package.find({ _id: { $in: planIds } }).select("name description");
+    const plans = await Package.find({ _id: { $in: planIds } }).select(
+      "name description"
+    );
     const planDetailsHtml = plans
       .map(
         (plan) => `
@@ -200,7 +214,7 @@ export const resendCompanyPackageEmail = async (req, res) => {
       subject: "QuikChek Account Activation and Package Details - Resend",
       html: `
         <div style="text-align: center; margin-bottom: 20px;">
-          <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316860/QuikChek%20images/owceg8jalnqjjgutsgz4.jpg" alt="Banner" style="width: 100%; height: auto;" />
+          <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/lpvojh112at5ljbragy0.jpg" alt="Banner" style="width: 100%; height: auto;" />
         </div>
 
         <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -212,7 +226,11 @@ export const resendCompanyPackageEmail = async (req, res) => {
 
           <p>Your active service package details:</p>
           ${planDetailsHtml}
-          ${discount_percent > 0 ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>` : ""}
+          ${
+            discount_percent > 0
+              ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>`
+              : ""
+          }
 
           <p>Start using your services at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
 
@@ -240,10 +258,6 @@ export const resendCompanyPackageEmail = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
-
-
 
 export const getCompanyPackagesByCompanyId = async (req, res) => {
   try {
