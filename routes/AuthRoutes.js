@@ -51,6 +51,7 @@ AuthRouter.post("/get_company_details", upload.none(), getUserDetailsById);
 // Login user
 AuthRouter.post("/login", upload.none(), loginUser);
 AuthRouter.post("/forgotpass", upload.none(), forgotPassword);
+AuthRouter.post("/sendAccessEmail", upload.none(), sendAccessEmail);
 
 // Register company
 AuthRouter.post(

@@ -402,12 +402,132 @@ export const editUser = async (req, res) => {
   }
 };
 
+
+
+export const sendAccessEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email, is_del: false, is_active: true });
+    if (!user) {
+      return res
+        .status(200)
+        .json({ message: "User not found with this email" });
+    }
+
+    // Generate a new arbitrary password (e.g. 8 characters)
+    const generatePassword = () => {
+      const chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
+      let password = "";
+      for (let i = 0; i < 10; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return password;
+    };
+
+    const newPassword = generatePassword();
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password in DB
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+    // Send email with new password
+    const transporter = nodemailer.createTransport({
+      host: "smtp.hostinger.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject:
+        "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
+      html: `
+      <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
+  </div>
+        <p>Dear <strong>${user.name}</strong>,</p>
+        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>
+          We are pleased to provide you with access to our newly launched platform,
+          <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
+          designed for fast and accurate verification of KYC documents. This platform will
+          streamline your verification processes, enhance efficiency, and ensure compliance.
+        </p>
+      
+        <p>Your corporate account has been successfully created with the following credentials:</p>
+        <ul>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Password:</strong> ${password}</li>
+        </ul>
+      
+        <p>
+          Please log in to the platform at 
+          <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a> 
+          using the provided credentials. We strongly recommend that you change your password
+          upon your first login for security reasons.
+        </p>
+      
+        <p><strong>Key Features and Benefits of QuikChek:</strong></p>
+        <ul>
+          <li>Rapid Verification: Significantly reduced turnaround times for KYC document verification.</li>
+          <li>Enhanced Accuracy: Advanced technology minimizes errors and ensures reliable results.</li>
+          <li>Secure Platform: Built with robust security measures to protect sensitive data.</li>
+          <li>Comprehensive Coverage: Supports a wide range of KYC documents.</li>
+          <li>User-Friendly Interface: Intuitive design for a smooth verification experience.</li>
+          <li>Audit Trail: Complete record of all verification activity.</li>
+        </ul>
+      
+        <p>
+          We are confident that QuikChek will significantly improve your KYC verification workflow.
+        </p>
+      
+        <p>
+          For any assistance with the platform, including login issues or technical support, please contact our support team at:
+        </p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:info@geisil.com">info@geisil.com</a></li>
+          <li><strong>Phone:</strong> 9831823898</li>
+        </ul>
+      
+        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>We look forward to supporting your KYC verification needs.</p>
+      
+        <br />
+        <p>Sincerely,<br />
+        The Admin Team<br />
+        <strong>Global Employability Information Services India Limited</strong></p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "New password sent to your email" });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res
+      .status(201)
+      .json({ message: "Error resetting password", error: error.message });
+  }
+};
+
+
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email,is_del: false, is_active: true });
     if (!user) {
       return res
         .status(404)
