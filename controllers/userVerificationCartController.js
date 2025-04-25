@@ -29,7 +29,7 @@ const uploadToCloudinary = async (file) => {
   }
 };
 
-const addUserToCart = async (req, res) => {
+export const addUserToCart = async (req, res) => {
   try {
     const user_id = req.userId;
     if (!user_id) {
