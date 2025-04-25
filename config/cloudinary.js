@@ -1,4 +1,4 @@
-// src/utils/cloudinaryConfig.js
+
 
 import cloudinary from 'cloudinary';
 
