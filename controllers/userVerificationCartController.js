@@ -22,7 +22,7 @@ const uploadToCloudinary = async (fileBuffer, filename) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
-        public_id: filename,
+        // public_id: filename,
         resource_type: 'auto',
       },
       (error, result) => {
