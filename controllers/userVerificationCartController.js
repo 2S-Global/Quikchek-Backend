@@ -4,6 +4,8 @@ import User from "../models/userModel.js";
 import Package from "../models/packageModel.js";
 import CompanyPackage from "../models/companyPackageModel.js";
 import mongoose from "mongoose";
+import multer from 'multer';
+import { uploadToCloudinary } from '../config/cloudinary';
 // Register a new user
 
 export const addUserToCart = async (req, res) => {
