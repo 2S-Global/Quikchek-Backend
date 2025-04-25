@@ -6,6 +6,7 @@ import CompanyPackage from "../models/companyPackageModel.js";
 import mongoose from "mongoose";
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
+import path from 'path';
 // Register a new user
 
 
@@ -18,33 +19,34 @@ cloudinary.config({
 
 // Function to upload a file to Cloudinary
 const getResourceType = (mimetype) => {
-  if (mimetype.startsWith('image/')) return 'image';
+  if (mimetype?.startsWith('image/')) return 'image';
   if (mimetype === 'application/pdf') return 'raw';
   return 'auto';
 };
 
-const uploadToCloudinary = async (fileBuffer, filename, mimetype) => {
+export const uploadToCloudinary = async (fileBuffer, originalName, mimetype) => {
   const resourceType = getResourceType(mimetype);
+  const extension = path.extname(originalName)?.slice(1) || '';
 
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: 'user_verification_documents',
         resource_type: resourceType,
-        // public_id: filename,
+        format: extension,
       },
       (error, result) => {
         if (error) {
           console.error('Cloudinary Upload Error:', error);
-          return reject(error);
+          reject(error);
+        } else {
+          resolve(result.secure_url);
         }
-        resolve(result.secure_url);
       }
     );
     stream.end(fileBuffer);
   });
 };
-
 export const addUserToCart = async (req, res) => {
   try {
     const user_id = req.userId;
