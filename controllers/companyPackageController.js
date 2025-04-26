@@ -358,11 +358,4 @@ export const sidebarAadharOtp=async (req,res) =>{
     });
   }
 };
-// Utility to parse plan_id string/array
-const parsePlanIds = (selected_plan) => {
-  if (typeof selected_plan === "string") {
-    return selected_plan.split(",").map((id) => id.trim());
-  }
-  return Array.isArray(selected_plan) ? selected_plan : [];
-  
-}
+
