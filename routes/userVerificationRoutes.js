@@ -3,7 +3,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import {listUserVerifiedList,verifyPAN,verifyEPIC,cloneAndMoveRecordById,verifyAadhaar,verifyPassport,verifyDL,searchUserVerifiedList,verifiedDetails,paynow, verifyDataBackground ,verifyUan,verifyEpfo} from '../controllers/userVerificationController.js';
+import {listUserVerifiedList,verifyPAN,verifyEPIC,cloneAndMoveRecordById,verifyAadhaar,verifyPassport,verifyDL,searchUserVerifiedList,verifiedDetails,paynow, verifyDataBackground ,verifyUan,verifyEpfo,aadharWithOtp,verifyOtp} from '../controllers/userVerificationController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
