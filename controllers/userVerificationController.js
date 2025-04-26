@@ -976,8 +976,8 @@ export const aadharWithOtp = async (req, res) => {
     const payload = {
       mode: "sync",
       data: {
-        customer_aadhaar_number: "580185645039",
-        name_to_match: "SAYAN MONDAL",
+        customer_aadhaar_number: aadhaarNumber",
+        name_to_match: nameToMatch,
         consent: "Y",
         consent_text: "I hereby declare my consent agreement for fetching my information via ZOOP API"
       },
@@ -1004,6 +1004,48 @@ export const aadharWithOtp = async (req, res) => {
 
   } catch (error) {
     console.error('Error requesting Aadhaar OTP:', error.response?.data || error.message);
+
+    // ✅ Send error response to client
+    return res.status(500).json({ success: false, error: error.response?.data || error.message });
+  }
+};
+
+
+export const verifyOtp = async (req, res) => {
+  try {
+    const { otp, request_id } = req.body;  // Assuming client sends OTP and request_id as POST body
+
+    const payload = {
+      mode: "sync",
+      data: {
+        request_id: request_id,
+        otp: otp,
+        consent: "Y",
+        consent_text: "I hereby declare my consent agreement for fetching my information via ZOOP API"
+      },
+      task_id: "08b01aa8-9487-4e6d-a0f0-c796839d6b77"
+    };
+
+    const headers = {
+      'app-id': '67b8252871c07100283cedc6',
+      'api-key': '52HD084-W614E0Q-JQY5KJG-R8EW1TW',
+      'Content-Type': 'application/json'
+    };
+
+    // Call Zoop API for OTP verification
+    const response = await axios.post(
+      'https://test.zoop.one/in/identity/okyc/otp/verify',
+      payload,
+      { headers }
+    );
+
+    console.log('OTP Verification Response:', response.data);
+
+    // ✅ Send the response back to the client
+    return res.status(200).json({ success: true, data: response.data });
+
+  } catch (error) {
+    console.error('Error verifying OTP:', error.response?.data || error.message);
 
     // ✅ Send error response to client
     return res.status(500).json({ success: false, error: error.response?.data || error.message });
