@@ -330,8 +330,8 @@ const parsePlanIds = (selected_plan) => {
 };
 
 
-export const sidebarAadharOtp=async (req,res) =>{
- try {
+export const sidebarAadharOtp = async (req, res) => {
+  try {
     const companyId = new mongoose.Types.ObjectId(req.userId);
 
     if (!companyId) {
@@ -341,17 +341,23 @@ export const sidebarAadharOtp=async (req,res) =>{
       });
     }
 
-    const data = await CompanyPackage.findOne({ companyId: companyId })
-     
- if (!data) {
+    const data = await CompanyPackage.findOne({ companyId });
+
+    if (!data) {
       return res.status(200).json({
         success: false,
-        aadhar_otp:"disable",
+        aadhar_otp: "disable",
         message: "No packages found for this company",
       });
     }
 
-    res.status(200).json({ success: true, data });
+
+    const aadharOtpStatus = data.aadhar_otp;
+
+    return res.status(200).json({
+      success: true,
+      aadhar_otp: aadharOtpStatus,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
