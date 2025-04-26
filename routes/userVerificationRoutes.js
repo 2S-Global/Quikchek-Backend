@@ -42,7 +42,7 @@ userRouter.post("/paynow",upload.none(),userAuth, Companymid,paynow);
 userRouter.get("/verifyDataBackground",verifyDataBackground);
 userRouter.post("/verifyUan",verifyUan);
 userRouter.post("/verifyEpfo",verifyEpfo);
-// userRouter.post("/aadharWithOtp",aadharWithOtp);
-// userRouter.post("/verifyOtp",verifyOtp);
+userRouter.post("/aadharWithOtp",aadharWithOtp);
+userRouter.post("/verifyOtp",verifyOtp);
 
 export default userRouter;
