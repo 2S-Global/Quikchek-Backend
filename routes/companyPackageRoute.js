@@ -8,6 +8,7 @@ import {
   getCompanyPackagesByCompanyId,
   getPackageByCompany,
   resendCompanyPackageEmail,
+  sidebarAadharOtp
 } from "../controllers/companyPackageController.js";
 
 //Middleware
@@ -55,5 +56,6 @@ userRouter.post(
 );
 
 userRouter.post("/resendCompanyPackageEmail",upload.none(), userAuth, adminMiddleware, resendCompanyPackageEmail);
+userRouter.post("/sidebarAadharOtp", userAuth, Companymid, sidebarAadharOtp);
 
 export default userRouter;
