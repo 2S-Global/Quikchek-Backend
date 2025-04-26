@@ -328,3 +328,41 @@ const parsePlanIds = (selected_plan) => {
   }
   return Array.isArray(selected_plan) ? selected_plan : [];
 };
+
+
+export const sidebarAadharOtp=async (req,res) =>{
+ try {
+    const companyId = new mongoose.Types.ObjectId(req.userId);
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is missing",
+      });
+    }
+
+    const data = await CompanyPackage.findOne({ companyId: companyId })
+     
+ if (!data) {
+      return res.status(200).json({
+        success: false,
+        message: "No packages found for this company",
+      });
+    }
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// Utility to parse plan_id string/array
+const parsePlanIds = (selected_plan) => {
+  if (typeof selected_plan === "string") {
+    return selected_plan.split(",").map((id) => id.trim());
+  }
+  return Array.isArray(selected_plan) ? selected_plan : [];
+  
+}
