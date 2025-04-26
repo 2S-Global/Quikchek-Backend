@@ -346,6 +346,7 @@ export const sidebarAadharOtp=async (req,res) =>{
  if (!data) {
       return res.status(200).json({
         success: false,
+        aadhar_otp:disable,
         message: "No packages found for this company",
       });
     }
