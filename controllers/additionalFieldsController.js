@@ -122,7 +122,7 @@ export const listFieldsByCompany = async (req, res) => {
 
         const allowedTypes = (packagedetails.allowed_verifications || []).map(v => v.trim().toUpperCase());
         
-        const allTypes = ["PAN", "AADHAAR", "DL", "EPIC", "PASSPORT"];
+        const allTypes = ["PAN", "AADHAAR", "DL", "EPIC", "PASSPORT", "UAN"];
         const allowedVerificationsObj = {};
         allTypes.forEach(type => {
           allowedVerificationsObj[type] = allowedTypes.includes(type);

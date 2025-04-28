@@ -67,7 +67,7 @@ export const addUserToCart = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber } = req.body;
+    const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber, uanname, uandoc } = req.body;
 
     // Upload documents to Cloudinary
 const panImageUrl = req.files?.pandoc
@@ -110,6 +110,14 @@ const panImageUrl = req.files?.pandoc
         )
       : null;
 
+      const uanImageUrl = req.files?.uandoc
+      ? await uploadToCloudinary(
+          req.files.uandoc[0].buffer,
+          req.files.uandoc[0].originalname,
+          req.files.uandoc[0].mimetype
+        )
+      : null;  
+
 
 
     const newUserCart = new UserCartVerification({
@@ -138,6 +146,8 @@ const panImageUrl = req.files?.pandoc
       epic_image: epicImageUrl,
       additionalfields: additionalfields,
       uan_number: uannumber,
+      uan_name: uanname,
+      uan_image: uanImageUrl,
     });
 
     await newUserCart.save();
@@ -189,6 +199,11 @@ export const getUserVerificationCartByEmployerAll = async (req, res) => {
                 totalVerifications++;
                 payFor.push("EPIC");
             }
+            if (cart.uan_number) {
+              totalVerifications++;
+              payFor.push("UAN");
+          }
+
 
             return {
                 ...cart._doc,  // Spread existing user cart data
@@ -284,7 +299,7 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
                     sgst_percent: "0.00",
                     total: "0.00"
                 },
-                message: "No unpaid verification cart items found."
+                message: "No unpaid verification cart items found." 
             });
         }
 
@@ -324,6 +339,7 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
             if (cart.dl_number) payForArray.push("Driving Licence");
             if (cart.passport_file_number) payForArray.push("Passport");
             if (cart.epic_number) payForArray.push("Voter ID (EPIC)");
+            if (cart.uan_number) payForArray.push("UAN");
         
             const totalVerifications = payForArray.length;
         

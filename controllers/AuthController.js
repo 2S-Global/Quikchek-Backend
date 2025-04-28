@@ -747,17 +747,26 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
-    // const user = await User.findOne({ email, is_del: false, is_active: true });
-    const user = await User.findOne({ email});
+    // Find user by email
+    const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "User not found." });
     }
 
-    // If password is hashed, compare using bcrypt
+    // Check if account is deleted
+    if (user.is_del) {
+      return res.status(403).json({ message: "Your account has been deleted. Please contact support." });
+    }
+
+    // Check if account is deactivated
+    if (!user.is_active) {
+      return res.status(403).json({ message: "Your account has been deactivated. Please contact support." });
+    }
+
+    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
 
-    // If passwords don't match
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -774,10 +783,9 @@ export const loginUser = async (req, res) => {
       data: user,
       role: user.role,
     });
+
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error logging in user", error: error.message });
+    res.status(500).json({ message: "Error logging in user", error: error.message });
   }
 };
 

@@ -40,7 +40,8 @@ userRouter.post('/add_user_cart',  upload.fields([
     { name: 'aadhaardoc', maxCount: 1 },
     { name: 'licensedoc', maxCount: 1 },
     { name: 'doc', maxCount: 1 },
-    { name: 'voterdoc', maxCount: 1 }
+    { name: 'voterdoc', maxCount: 1 },
+    { name: 'uandoc', maxCount: 1 }
   ]), userAuth, Companymid, addUserToCart);
 userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
 userRouter.get('/list_user_cart_all', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployerAll);

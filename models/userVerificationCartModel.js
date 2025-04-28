@@ -99,6 +99,9 @@ const userVerificationCartSchema = new mongoose.Schema(
         uan_number: {
         type:String,
          },
+        uan_image: {
+        type:String,
+        },
        uan_response: { 
             type: Object
         },
