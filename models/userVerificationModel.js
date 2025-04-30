@@ -96,24 +96,28 @@ const userVerificationSchema = new mongoose.Schema(
       type: String, // Ensure marks is stored properly
     },
 
-     uan_name: {
-        type:String,
-         },
-        uan_number: {
-        type:String,
-         },
-       uan_response: { 
-            type: Object
-        },
-        epfo_name:{
-            type:String,
-        },
-        epfo_number:{
-            type:String,
-        },
-        epfo_response:{
-        type: Object
-        },
+    uan_name: {
+    type:String,
+    },
+    uan_number: {
+    type:String,
+    },
+    uan_response: { 
+    type: Object
+    },
+    epfo_name:{
+    type:String,
+    },
+    epfo_number:{
+    type:String,
+    },
+    epfo_response:{
+    type: Object
+    },
+    aadhat_otp: {
+      type: String,
+      default: 'no',
+    },    
     updatedAt: {
       type: Date,
       default: Date.now,

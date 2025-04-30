@@ -193,7 +193,3 @@ export const deleteField = async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting field", error: error.message });
     }
 };
-
-
-
-

@@ -1,4 +1,5 @@
 import UserCartVerification from "../models/userVerificationCartModel.js";
+import UserCartVerificationAadhatOTP from "../models/userVerificationCartAadhatOTPModel.js";
 import UserVerification from "../models/userVerificationModel.js";
 import User from "../models/userModel.js";
 import Package from "../models/packageModel.js";
@@ -69,6 +70,39 @@ export const addUserToCart = async (req, res) => {
 
     const { plan, name, email, phone, dob, address, gender, panname, pannumber, pandoc, aadhaarname, aadhaarnumber, aadhaardoc, licensename, licensenumber, licensenumdoc, passportname, passportnumber, passportdoc, votername, voternumber, voterdoc, additionalfields, uannumber, uanname, uandoc } = req.body;
 
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      const aadhaarRegex = /^\d{12}$/;
+      const dlRegex = /^[A-Z]{2}\d{2}\d{11}$/;
+      const epicRegex = /^[A-Z]{3}[0-9]{7}$/;
+      const uanRegex = /^\d{12}$/;
+
+
+          // Validate PAN
+      if (pannumber && !panRegex.test(pannumber)) {
+        return res.status(200).json({ success: false, message: "Invalid PAN number format." });
+      }
+      
+      // Validate Aadhaar
+      if (aadhaarnumber && !aadhaarRegex.test(aadhaarnumber)) {
+        return res.status(200).json({ success: false, message: "Invalid Aadhaar number format." });
+      }
+      
+      // Validate DL
+      if (licensenumber && !dlRegex.test(licensenumber)) {
+        return res.status(200).json({ success: false, message: "Invalid Driving License number format." });
+      }
+      
+      // Validate EPIC
+      if (voternumber && !epicRegex.test(voternumber)) {
+        return res.status(200).json({ success: false, message: "Invalid Voter ID (EPIC) number format." });
+      }
+      
+      // Validate UAN
+      if (uannumber && !uanRegex.test(uannumber)) {
+        return res.status(200).json({ success: false, message: "Invalid UAN number format." });
+      }
+
+    
     // Upload documents to Cloudinary
 const panImageUrl = req.files?.pandoc
       ? await uploadToCloudinary(
@@ -157,6 +191,204 @@ const panImageUrl = req.files?.pandoc
     res.status(401).json({ success: false, message: "Error adding user verification cart", error: error.message });
   }
 };
+
+
+
+
+export const addUserToCartAadharOTP = async (req, res) => {
+  try {
+    const user_id = req.userId;
+    if (!user_id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+
+    
+    const companyPackage = await CompanyPackage.findOne({
+      companyId: user_id,
+      is_del: false,
+    });
+
+    if (!companyPackage || companyPackage.aadhar_otp !== "enable") {
+      return res.status(200).json({
+        success: false,
+        message: "Aadhar OTP verification is not enabled for this company.",
+      });
+    }
+
+    
+      // ✅ Check for existing unpaid cart
+  const existingCart = await UserCartVerificationAadhatOTP.findOne({
+    employer_id: user_id,
+    is_paid: 0,
+    });
+  
+    if (existingCart) {
+    return res.status(200).json({
+    success: false,
+    message: "A cart already exists for this user. Please complete the payment before adding a new one.",
+    });
+    }
+
+    const { name, email, phone, dob, address, gender, aadhar_name, aadhar_number, aadhaardoc } = req.body;
+
+    // Upload documents to Cloudinary
+
+
+    const aadharImageUrl = req.files?.aadhaardoc
+      ? await uploadToCloudinary(
+          req.files.aadhaardoc[0].buffer,
+          req.files.aadhaardoc[0].originalname,
+          req.files.aadhaardoc[0].mimetype
+        )
+      : null;
+
+
+
+    const newUserCart = new UserCartVerificationAadhatOTP({
+      employer_id: user_id,
+      candidate_name: name,
+      candidate_email: email,
+      candidate_mobile: phone,
+      candidate_dob: dob,
+      candidate_address: address,
+      candidate_gender: gender,
+      aadhar_name: aadhar_name,
+      aadhar_number: aadhar_number,
+      aadhar_image: aadharImageUrl,
+    });
+
+    await newUserCart.save();
+    res.status(201).json({ success: true, message: "User verification cart added successfully", data: newUserCart });
+  } catch (error) {
+    console.error("Error adding user to cart:", error);
+    res.status(401).json({ success: false, message: "Error adding user verification cart", error: error.message });
+  }
+};
+
+
+export const getCartDetailsAadhatOTP = async (req, res) => {
+  try {
+      const employer_id = req.userId;
+       const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
+        if (!employer) {
+          return res.status(404).json({ success: false, message: "Employer not found" });
+      }
+      const userCarts = await UserCartVerificationAadhatOTP.find({ employer_id, is_del: false });
+
+      const discountPercentData = await CompanyPackage.findOne({ companyId: employer_id});
+
+
+       const verificationCharge = parseFloat(discountPercentData.aadhar_price || 0);
+      const gstPercent = 18/100;
+      
+      let totalVerifications = 0;
+      // const verificationCharge = 50;
+
+      // Process each user's cart
+
+      console.log("Verification Charge ==>",verificationCharge);
+      const userData = userCarts.map(cart => {
+          let payFor = [];
+
+
+          if (cart.aadhar_number) {
+              totalVerifications++;
+              payFor.push("Aadhar With OTP");
+          }
+         
+
+          return {
+              ...cart._doc,  // Spread existing user cart data
+              selected_verifications: payFor.join(",") // Add pay_for to each user entry
+          };
+      });
+
+      const subtotal = totalVerifications * verificationCharge;
+
+      const gstAmount = subtotal * gstPercent;
+      const total = subtotal + gstAmount;
+
+      
+      const cgst = gstAmount / 2;
+      const sgst = gstAmount / 2;
+
+      res.status(200).json({ 
+          success: true, 
+          data: userData, // Updated user list with pay_for field
+          billing: {
+
+            total_verifications: totalVerifications,
+            wallet_amount: "0.00",
+            fund_status: "NA",
+            subtotal: subtotal.toFixed(2),
+            discount: "0.00",
+            discount_percent: "0.00",
+            cgst: cgst.toFixed(2),
+            cgst_percent: (gstPercent * 50).toFixed(2),
+            sgst: sgst.toFixed(2),
+            sgst_percent: (gstPercent * 50).toFixed(2),
+            total: total.toFixed(2)
+          }
+      });
+  } catch (error) {
+      res.status(401).json({ success: false, message: "Error fetching user verification carts", error: error.message });
+  }
+};
+
+
+
+export const deleteUserAadharOTP = async (req, res) => {
+  try {
+      const { id } = req.body;
+
+      // Validate ID
+      if (!id) {
+          return res.status(400).json({ message: "ID is required" });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid ID format" });
+      }
+
+      // Delete user from database
+      const deletedUser = await UserCartVerificationAadhatOTP.findByIdAndDelete(id);
+
+      if (!deletedUser) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+
+                 return res.status(200).json({
+                     success: true,
+                     data: [],
+                     overall_billing: {
+                         total_verifications: 0,
+                         wallet_amount: "0.00",
+                         fund_status: "0",
+                         subtotal: "0.00",
+                         discount: "0.00",
+                         discount_percent: "0.00",
+                         cgst: "0.00",
+                         cgst_percent: "0.00",
+                         sgst: "0.00",
+                         sgst_percent: "0.00",
+                         total: "0.00"
+                     },
+                     message: "No unpaid verification cart items found."
+                 });
+
+     
+            
+
+  } catch (error) {
+      return res.status(500).json({
+          message: "Error deleting user",
+          error: error.message,
+      });
+  }
+};
+
 
 
 
@@ -869,6 +1101,3 @@ export const deleteUser = async (req, res) => {
         });
     }
 };
-
-
-

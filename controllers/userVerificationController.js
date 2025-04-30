@@ -5,7 +5,7 @@ import axios from "axios";
 
 import Transaction from "../models/transactionModel.js";
 import User from "../models/userModel.js";
-
+import UserCartVerificationAadhatOTP from "../models/userVerificationCartAadhatOTPModel.js";
 
 // Register a new user
 export const listUserVerifiedList = async (req, res) => {
@@ -590,6 +590,223 @@ export const paynow_TODAY_14 = async (req, res) => {
 };
 
 
+export const paynowAadharOTP = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+
+    if (!amount || !payment_method) {
+      return res.status(400).json({ error: "Payment details are incomplete." });
+    }
+
+    const parsedAmount = parseFloat(amount);
+
+    const user = await User.findById(employer_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (payment_method === "online") {
+      if (!razorpay_response?.razorpay_payment_id) {
+        return res.status(400).json({ error: "Razorpay payment ID is missing." });
+      }
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+    // Update is_paid field
+    const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
+      { employer_id: employer_id },
+      { $set: { is_paid: 1, aadhat_otp: 'yes', createdAt: new Date() } }
+    );
+
+    if (updatedUsers.modifiedCount === 0) {
+      return res.status(404).json({ message: "No users found for this employer" });
+    }
+
+    // Get users to archive
+    const usersToArchive = await UserCartVerificationAadhatOTP.find({
+      employer_id: employer_id,
+      is_paid: 1,
+    });
+
+    if (usersToArchive.length === 0) {
+      return res.status(404).json({ message: "No updated users to archive" });
+    }
+
+    // Use the first user to get Aadhaar details (assuming same for all)
+    const aadhaarNumber = usersToArchive[0]?.aadhar_number || '';
+    const nameToMatch = usersToArchive[0]?.aadhar_name || '';
+
+    // Generate and assign order_id to each record
+    const orderPrefix = `ORD-${Date.now()}`;
+    const usersWithOrderId = usersToArchive.map((user, index) => {
+      const obj = user.toObject();
+      obj.order_id = `${orderPrefix}-${index + 1}`;
+      delete obj._id; // Remove _id so MongoDB can generate a new one
+      return obj;
+    });
+
+const userId = usersToArchive[0]?._id;
+     // amount: parsedAmount,
+    // Save transaction after userIds is ready
+    const transaction = new Transaction({
+      employer_id: employer_id,
+      transactionId: razorpay_response.razorpay_payment_id,
+      amount: parsedAmount,
+      paymentids: paymentIds || null,
+      order_ids: userId,
+      payment_method: payment_method,
+      payment_type: "debit",
+    });
+
+    await transaction.save();
+
+    // Optional: Insert into archive collection
+    // await UserVerification.insertMany(usersWithOrderId);
+    const insertedDoc = await UserVerification.create(usersWithOrderId[0]);
+    const newId = insertedDoc._id;
+    // Optional: Remove from cart after archiving
+    // await UserCartVerificationAadhatOTP.deleteMany({ employer_id: employer_id, is_paid: 1 });
+    await UserCartVerificationAadhatOTP.deleteOne({ employer_id: employer_id, is_paid: 1 });
+
+    // Prepare Zoop payload
+    const payload = {
+      mode: "sync",
+      data: {
+        customer_aadhaar_number: aadhaarNumber,
+        name_to_match: nameToMatch,
+        consent: "Y",
+        consent_text: "I hereby declare my consent agreement for fetching my information via ZOOP API",
+      },
+      task_id: "08b01aa8-9487-4e6d-a0f0-c796839d6b77",
+    };
+
+    const headers = {
+      'app-id': '67b8252871c07100283cedc6',
+      'api-key': '52HD084-W614E0Q-JQY5KJG-R8EW1TW',
+      'Content-Type': 'application/json',
+    };
+
+    const response = await axios.post(
+      'https://test.zoop.one/in/identity/okyc/otp/request',
+      payload,
+      { headers }
+    );
+
+    return res.status(200).json({
+      message: "Payment processed, verifications archived, and transaction recorded",
+      aadhar_response: response.data,
+      archivedUsersCount: usersWithOrderId.length,
+      remainingWalletBalance: user.wallet_amount,
+      newId:newId
+    });
+
+  } catch (error) {
+    console.error("Payment Error:", error);
+    return res.status(500).json({
+      message: "Error processing payment",
+      error: error.message,
+    });
+  }
+};
+
+
+export const paynowAadharOTP_30042025 = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+
+    if (!amount || !payment_method) {
+      return res.status(400).json({ error: "Payment details are incomplete." });
+    }
+
+    const user = await User.findById(employer_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (payment_method === "online") {
+      if (!razorpay_response?.razorpay_payment_id) {
+        return res.status(400).json({ error: "Razorpay payment ID is missing." });
+      }
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+    // Update is_paid field
+    const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
+      { employer_id: employer_id },
+      { $set: { is_paid: 1, createdAt: new Date() } }
+    );
+
+    if (updatedUsers.modifiedCount === 0) {
+      return res.status(404).json({ message: "No users found for this employer" });
+    }
+
+    const usersToArchive = await UserCartVerificationAadhatOTP.find({
+      employer_id: employer_id,
+      is_paid: 1,
+    });
+
+    if (usersToArchive.length === 0) {
+      return res.status(404).json({ message: "No updated users to archive" });
+    }
+
+    // ✅ Generate and assign order_id to each record
+    const orderPrefix = `ORD-${Date.now()}`;
+    const usersWithOrderId = usersToArchive.map((user, index) => {
+      const obj = user.toObject();
+      obj.order_id = `${orderPrefix}-${index + 1}`;
+      delete obj._id; // Remove _id so MongoDB can generate a new one
+      return obj;
+    });
+
+    await UserVerification.insertMany(usersWithOrderId);
+
+    const userIds = usersToArchive.map(user => user._id);
+
+   // await UserCartVerificationAadhatOTP.deleteMany({ employer_id: employer_id, is_paid: 1 });
+
+    const transaction = new Transaction({
+      employer_id: employer_id,
+      transactionId: payment_method === "online"
+        ? razorpay_response.razorpay_payment_id
+        : `wallet_${Date.now()}`,
+      amount: amount,
+      paymentids: paymentIds || null,
+      order_ids: userIds.join(','),
+      payment_method: payment_method,
+      payment_type: "debit",
+    });
+
+    await transaction.save();
+
+    return res.status(200).json({
+      message: "Payment processed, verifications archived, and transaction recorded",
+      archivedUsersCount: usersWithOrderId.length,
+      remainingWalletBalance: user.wallet_amount,
+    });
+
+  } catch (error) {
+    console.error("Payment Error:", error);
+    return res.status(500).json({
+      message: "Error processing payment",
+      error: error.message,
+    });
+  }
+};
+
 
 export const paynow = async (req, res) => {
   try {
@@ -1027,10 +1244,12 @@ export const aadharWithOtp = async (req, res) => {
 };
 
 
-export const verifyOtp = async (req, res) => {
+export const verifyOtpAadhar = async (req, res) => {
   try {
-    const { otp, request_id } = req.body;  // Assuming client sends OTP and request_id as POST body
+    // Destructure request body to get otp, request_id, and newId
+    const { otp, request_id, newId } = req.body;
 
+    // Prepare the payload to send to Zoop API
     const payload = {
       mode: "sync",
       data: {
@@ -1042,13 +1261,14 @@ export const verifyOtp = async (req, res) => {
       task_id: "08b01aa8-9487-4e6d-a0f0-c796839d6b77"
     };
 
+    // Define headers for the API request
     const headers = {
       'app-id': '67b8252871c07100283cedc6',
       'api-key': '52HD084-W614E0Q-JQY5KJG-R8EW1TW',
       'Content-Type': 'application/json'
     };
 
-    // Call Zoop API for OTP verification
+    // Call Zoop API to verify OTP
     const response = await axios.post(
       'https://test.zoop.one/in/identity/okyc/otp/verify',
       payload,
@@ -1057,16 +1277,30 @@ export const verifyOtp = async (req, res) => {
 
     console.log('OTP Verification Response:', response.data);
 
-    // ✅ Send the response back to the client
-    return res.status(200).json({ success: true, data: response.data });
+    // If OTP is successfully verified, update the document in UserVerification collection
+    const updatedDoc = await UserVerification.findByIdAndUpdate(
+      newId, // Document ID to update
+      { 
+        $set: { 
+          aadhaar_response: response.data,
+          all_verified:1
+        }
+      },
+      { new: true } // Option to return the updated document
+    );
+
+    // Send response back to client with the updated document
+    return res.status(200).json({
+      success: true,
+      message: "Aadhaar verification is complete. You can check the details in the Download Center",
+      data: response.data,
+      updatedDoc: updatedDoc
+    });
 
   } catch (error) {
     console.error('Error verifying OTP:', error.response?.data || error.message);
-
-    // ✅ Send error response to client
+    
+    // Send error response to client in case of failure
     return res.status(500).json({ success: false, error: error.response?.data || error.message });
   }
 };
-
-
-

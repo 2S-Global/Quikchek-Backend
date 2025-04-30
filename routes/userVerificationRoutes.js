@@ -3,7 +3,7 @@ import multer from 'multer';
 import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 
-import {listUserVerifiedList,verifyPAN,verifyEPIC,cloneAndMoveRecordById,verifyAadhaar,verifyPassport,verifyDL,searchUserVerifiedList,verifiedDetails,paynow, verifyDataBackground ,verifyUan,verifyEpfo,aadharWithOtp,verifyOtp} from '../controllers/userVerificationController.js';
+import {listUserVerifiedList,verifyPAN,verifyEPIC,cloneAndMoveRecordById,verifyAadhaar,verifyPassport,verifyDL,searchUserVerifiedList,verifiedDetails,paynow,paynowAadharOTP, verifyDataBackground ,verifyUan,verifyEpfo, verifyOtpAadhar  } from '../controllers/userVerificationController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -39,10 +39,11 @@ userRouter.post("/verifyDL",upload.none(), userAuth, Companymid, verifyDL);
 userRouter.post("/searchUserVerifiedList",upload.none(), userAuth, Companymid, searchUserVerifiedList);
 userRouter.post("/verifiedDetails",upload.none(),verifiedDetails);
 userRouter.post("/paynow",upload.none(),userAuth, Companymid,paynow);
+userRouter.post("/paynowaadharotp",upload.none(),userAuth, Companymid,paynowAadharOTP);
 userRouter.get("/verifyDataBackground",verifyDataBackground);
 userRouter.post("/verifyUan",verifyUan);
 userRouter.post("/verifyEpfo",verifyEpfo);
-userRouter.post("/aadharWithOtp",aadharWithOtp);
-userRouter.post("/verifyOtp",verifyOtp);
+userRouter.post("/verifyOtpAadhar",verifyOtpAadhar);
+
 
 export default userRouter;

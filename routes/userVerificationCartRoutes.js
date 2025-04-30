@@ -8,7 +8,10 @@ import {
     getUserVerificationCartByEmployer,
     getUserVerificationCartByEmployerAll,getPaidUserVerificationCartByEmployer,deleteUser,
     getAllVerifiedCandidateAdmin,
-    getAllVerifiedCandidateByCompanyForAdmin
+    getAllVerifiedCandidateByCompanyForAdmin,
+    getCartDetailsAadhatOTP,
+    deleteUserAadharOTP,
+    addUserToCartAadharOTP
 } from '../controllers/userVerificationCartController.js'; // Adjust the path according to your project structure
 
 //Middleware
@@ -43,6 +46,15 @@ userRouter.post('/add_user_cart',  upload.fields([
     { name: 'voterdoc', maxCount: 1 },
     { name: 'uandoc', maxCount: 1 }
   ]), userAuth, Companymid, addUserToCart);
+
+userRouter.post('/add_user_cart_aadhao_otp', upload.fields([
+    { name: 'aadhaardoc', maxCount: 1 }
+  ]), userAuth, Companymid, addUserToCartAadharOTP);
+
+userRouter.post('/deleteUserAadharOTP', upload.none(), userAuth, Companymid, deleteUserAadharOTP);
+userRouter.get('/list_user_cart_aadhar_otp', upload.none(), userAuth, Companymid, getCartDetailsAadhatOTP);
+
+
 userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
 userRouter.get('/list_user_cart_all', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployerAll);
 userRouter.post('/getPaidUserVerificationCartByEmployer', upload.none(), userAuth, Companymid, getPaidUserVerificationCartByEmployer);

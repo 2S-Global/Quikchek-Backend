@@ -365,4 +365,3 @@ export const sidebarAadharOtp = async (req, res) => {
     });
   }
 };
-
