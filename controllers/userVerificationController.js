@@ -915,7 +915,15 @@ function convertDateFormat(dateString) {
 export const verifyDataBackground = async (req, res) => {
   try {
     // Fetch only one user that needs verification
-    const userCart = await UserVerification.findOne({ is_paid: 1, is_del: false, all_verified: 0 });
+    const userCart = await UserVerification.findOne({
+      is_paid: 1,
+      is_del: false,
+      all_verified: 0,
+      $or: [
+        { aadhat_otp: "no" },
+        { aadhat_otp: { $exists: false } }
+      ]
+    });
 
     if (!userCart) {
       console.log("No users left for verification.");
