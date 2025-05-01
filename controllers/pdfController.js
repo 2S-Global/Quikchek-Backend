@@ -1,12 +1,12 @@
 import UserVerification from "../models/userVerificationModel.js";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium"; // Vercel-compatible Chromium
 import GeneratePDF from "./Helpers/pdfHelper.js";
 
 export const generatePDF = async (req, res) => {
   try {
     const order_id = req.body.order_id;
-    /*  const order_id = "6813298f10db5ded6443f785";
-     */
+
     // Fetch the verified user
     const user = await UserVerification.findById(order_id);
     if (!user) {
@@ -16,8 +16,14 @@ export const generatePDF = async (req, res) => {
     const userId = user._id.toString();
     const fileName = `${user.candidate_name}.pdf`;
 
-    // Launch Puppeteer with full build (auto-installed Chromium)
-    const browser = await puppeteer.launch({ headless: true });
+    // Launch puppeteer using Vercel-compatible chromium
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+    });
+
     const page = await browser.newPage();
 
     const htmlContent = GeneratePDF({ user });
@@ -70,13 +76,14 @@ export const generatePDF = async (req, res) => {
     await page.close();
     await browser.close();
 
+    // Set headers and send the PDF
     res.set({
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${fileName}"`,
       "Content-Length": pdfBuffer.length,
     });
+    console.log("PDF generated successfully file name ," + fileName);
 
-    console.log("PDF generated successfully:", fileName);
     return res.end(pdfBuffer);
   } catch (error) {
     console.error("Error generating PDF:", error);
