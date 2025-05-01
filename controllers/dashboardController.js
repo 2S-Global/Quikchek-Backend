@@ -31,7 +31,10 @@ export const getTotal = async (req, res) => {
       ])
     ]);
 
-    const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0; // Safely access the result
+   // const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0; // Safely access the result
+
+    const totalTransactionAmount = parseFloat((totalTransactionAmountAgg[0]?.total || 0).toFixed(2));
+
 
     res.status(200).json({
       success: true,
@@ -300,7 +303,8 @@ const user_id = new mongoose.Types.ObjectId(req.userId);
       ])
     ]);
 
-    const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
+   // const totalTransactionAmount = totalTransactionAmountAgg[0]?.total || 0;
+    const totalTransactionAmount = parseFloat((totalTransactionAmountAgg[0]?.total || 0).toFixed(2));
 
     res.status(200).json({
       success: true,
