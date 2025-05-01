@@ -3,7 +3,7 @@ import multer from "multer";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 
-import { generatePDF } from "../controllers/pdfController.js";
+import { generatePDF, otpgeneratePDF } from "../controllers/pdfController.js";
 
 dotenv.config();
 // Configure Cloudinary
@@ -20,5 +20,5 @@ const upload = multer({ storage: storage });
 
 // Generate PDF for verified users
 pdfRouter.post("/generate-pdf", generatePDF);
-
+pdfRouter.post("/otp-generate-pdf", otpgeneratePDF);
 export default pdfRouter;
