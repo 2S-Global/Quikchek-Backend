@@ -7,6 +7,8 @@ import Transaction from "../models/transactionModel.js";
 import User from "../models/userModel.js";
 import UserCartVerificationAadhatOTP from "../models/userVerificationCartAadhatOTPModel.js";
 
+import allOrdersData from "../models/allOrders.js";
+
 // Register a new user
 export const listUserVerifiedList = async (req, res) => {
   try {
@@ -816,7 +818,7 @@ export const paynow = async (req, res) => {
       return res.status(400).json({ error: "User ID is missing." });
     }
 
-    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+    const { razorpay_response, amount, paymentIds, payment_method, overall_billing } = req.body;
 
     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
@@ -841,10 +843,40 @@ export const paynow = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
+// Add all data in Orders Table
+//const moment = require('moment');
+// Get current date and time
+//const now = ${Date.now()};
+// Generate order number
+const orderNumber = `ORD-${Date.now()}`;
+
+// Generate invoice number
+const invoiceNumber = `INV-${Date.now()}`;
+
+
+    const newUserCart = new allOrdersData({
+      employer_id: employer_id,
+      order_number: orderNumber,
+      invoice_number: invoiceNumber,
+      subtotal: overall_billing.subtotal,
+      cgst: overall_billing.cgst,
+      cgst_percent: overall_billing.cgst_percent,
+      sgst: overall_billing.sgst,
+      sgst_percent: overall_billing.sgst_percent,
+      total_amount: overall_billing.total,
+      discount_percent: overall_billing.discount_percent,
+      discount_amount: overall_billing.discount,
+      total_numbers_users: overall_billing.total_verifications,
+    });
+
+  const savedCart = await newUserCart.save();
+  const insertedId = savedCart._id;
+
+
     // Update is_paid field
     const updatedUsers = await UserCartVerification.updateMany(
       { employer_id: employer_id },
-      { $set: { is_paid: 1, createdAt: new Date() } }
+      { $set: { is_paid: 1, createdAt: new Date(), order_ref_id: insertedId  } }
     );
 
     if (updatedUsers.modifiedCount === 0) {
@@ -873,10 +905,11 @@ export const paynow = async (req, res) => {
 
     const userIds = usersToArchive.map(user => user._id);
 
-    await UserCartVerification.deleteMany({ employer_id: employer_id, is_paid: 1 });
+  await UserCartVerification.deleteMany({ employer_id: employer_id, is_paid: 1 });
 
     const transaction = new Transaction({
       employer_id: employer_id,
+      order_ref_id:insertedId,
       transactionId: payment_method === "online"
         ? razorpay_response.razorpay_payment_id
         : `wallet_${Date.now()}`,
@@ -898,7 +931,7 @@ export const paynow = async (req, res) => {
   } catch (error) {
     console.error("Payment Error:", error);
     return res.status(500).json({
-      message: "Error processing payment",
+      message: "Error processing payment22",
       error: error.message,
     });
   }
