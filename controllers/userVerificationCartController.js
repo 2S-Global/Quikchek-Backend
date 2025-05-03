@@ -1269,12 +1269,22 @@ export const listAllTransactionByCompany = async (req, res) => {
       });
     }
 
-    const formattedTransactions = allTransactions.map((order) => {
+    const formattedTransactions = await Promise.all(
+      allTransactions.map(async (order) => {
       const orderObj = order.toObject();
 
       const hasValidCgst = orderObj.cgst && orderObj.cgst_percent;
       const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
       const hasValidDiscount = orderObj.discount_amount && orderObj.discount_percent;
+
+
+       // Count users related to this transaction
+       const userCount = await UserVerification.countDocuments({
+        order_ref_id: orderObj._id,
+        is_del: false,
+      });
+
+
     
       return {
         employer_name: orderObj.employer_id?.name || "N/A",
@@ -1286,11 +1296,13 @@ export const listAllTransactionByCompany = async (req, res) => {
         sgst: hasValidSgst ? `${orderObj.sgst} (${orderObj.sgst_percent}%)` : "NA",
         discount: hasValidDiscount ? `${orderObj.discount_amount} (${orderObj.discount_percent}%)` : "NA",
         total_amount: orderObj.total_amount ?? "N/A",
-        total_users: orderObj.total_numbers_users ?? "N/A",
+        total_users: userCount ?? "N/A",
         id: orderObj._id,
       };
-    });
+    })
+  );
 
+    
     return res.status(200).json({
       success: true,
       message: "Company transactions fetched successfully",
