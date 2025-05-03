@@ -3,6 +3,8 @@ import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium"; // Vercel-compatible Chromium
 import GeneratePDF from "./Helpers/pdfHelper.js";
 import OtpGeneratePDF from "./Helpers/otppdfHelper.js";
+import { getInvoiceData } from "./Helpers/dataHelper.js";
+import InvoiceGenerate from "./Helpers/invoicepdf.js";
 export const generatePDF = async (req, res) => {
   try {
     const order_id = req.body.order_id;
@@ -176,5 +178,58 @@ export const otpgeneratePDF = async (req, res) => {
   } catch (error) {
     console.error("Error generating PDF:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const InvoicePDF = async (req, res) => {
+  const { order_id } = req.body;
+
+  if (!order_id) {
+    return res.status(400).json({ message: "Order ID is required" });
+  }
+
+  try {
+    const data = await getInvoiceData(order_id);
+    // Fetch the verified user
+
+    const fileName = `${data.company_details.name}.pdf`;
+
+    // Launch puppeteer using Vercel-compatible chromium
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+    });
+
+    const htmlContent = InvoiceGenerate({ data }); //this will be changed to invoice pdf
+
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+
+      margin: {
+        top: "20px",
+        bottom: "20px",
+      },
+    });
+
+    await page.close();
+    await browser.close();
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${fileName}"`,
+      "Content-Length": pdfBuffer.length,
+    });
+
+    console.log("PDF generated successfully:", fileName);
+    return res.end(pdfBuffer);
+
+    //res.status(201).json({ data });
+  } catch (error) {
+    console.error("Error generating invoice PDF data:", error.message);
+    res.status(500).json({ message: error.message });
   }
 };
