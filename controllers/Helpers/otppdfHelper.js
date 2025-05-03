@@ -87,7 +87,7 @@ const OtpGeneratePDF = ({ user }) => {
       <div class="mt-2">
         <!-- Photo on one side and other details on the other -->
         <div class="row">
-          <div class="col-md-5 mb-3 text-center">
+          <div class="col-md-5c mb-3 text-center">
             <!-- This is heading -->
             <h5 class="fw-bold text-dark mb-2 me-2 d-block">Image as per Aadhaar</h5>
             <img

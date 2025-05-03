@@ -201,6 +201,7 @@ export const InvoicePDF = async (req, res) => {
       headless: chromium.headless,
       defaultViewport: chromium.defaultViewport,
     });
+    const page = await browser.newPage();
 
     const htmlContent = InvoiceGenerate({ data }); //this will be changed to invoice pdf
 
