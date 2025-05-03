@@ -14,7 +14,6 @@ const userVerificationCartSchema = new mongoose.Schema(
         plan: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Package',
-            required: true
         }, 
         amount: {
             type: String,
