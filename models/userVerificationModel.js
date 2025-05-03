@@ -7,8 +7,20 @@ const userVerificationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    order_ref_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'allOrdersData',
+      },
     order_id:{
       type: String,
+    },
+    plan: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Package',
+    required: true
+    }, 
+    amount: {
+    type: String,
     },
     pdf_url: {
       type: String,

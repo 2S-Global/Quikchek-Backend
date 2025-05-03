@@ -4,6 +4,7 @@ import UserVerification from "../models/userVerificationModel.js";
 import User from "../models/userModel.js";
 import Package from "../models/packageModel.js";
 import CompanyPackage from "../models/companyPackageModel.js";
+import allOrdersData from "../models/allOrders.js";
 import mongoose from "mongoose";
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
@@ -152,11 +153,16 @@ const panImageUrl = req.files?.pandoc
         )
       : null;  
 
-
+      const packagedetails = await Package.findById(plan);    
+      if (!packagedetails) {
+      return res.status(200).json({ success: false, message: "Package Not Found.." });
+      }
+      const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
 
     const newUserCart = new UserCartVerification({
       employer_id: user_id,
       plan: plan,
+      amount: verificationamount,
       candidate_name: name,
       candidate_email: email,
       candidate_mobile: phone,
@@ -1100,4 +1106,203 @@ export const deleteUser = async (req, res) => {
             error: error.message,
         });
     }
+};
+
+export const getUserVerificationCartByEmployerFromAdmin = async (req, res) => {
+  try {
+     // const employer_id = req.userId;
+
+      const { employer_id } = req.body;
+
+      // Ensure employer is valid
+      const employer = await User.findOne({ _id: employer_id, role: 1, is_del: false });
+
+      if (!employer) {
+          return res.status(200).json({ success: false, message: "Employer not found" });
+      }
+
+
+
+      const userCarts = await UserCartVerification.find({ employer_id, is_del: false, is_paid: 0 });
+
+      if (!userCarts || userCarts.length === 0) {
+          return res.status(200).json({
+              success: true,
+              company_name: employer.name,
+              data: [],
+              overall_billing: {
+                  total_verifications: 0,
+                  wallet_amount: "0.00",
+                  fund_status: "0",
+                  subtotal: "0.00",
+                  discount: "0.00",
+                  discount_percent: "0.00",
+                  cgst: "0.00",
+                  cgst_percent: "0.00",
+                  sgst: "0.00",
+                  sgst_percent: "0.00",
+                  total: "0.00"
+              },
+              message: "No unpaid verification cart items found." 
+          });
+      }
+
+      let overallTotalVerifications = 0;
+      let overallSubtotal = 0;
+      let gstPercent = 18 / 100;
+
+
+    
+      const discountPercentData = await CompanyPackage.findOne({ companyId: employer_id});
+       
+      if (!discountPercentData) {
+          return res.status(404).json({ success: false, message: "Discount Percent not found" });
+      }  
+      console.log('Discount ==>>',discountPercentData.discount_percent);
+      const discountPercent=parseFloat(discountPercentData.discount_percent || 0) / 100;
+
+      
+
+      const formattedData = await Promise.all(userCarts.map(async (cart) => {
+          console.log('Plan ID ==>>', cart.plan);
+      
+          const packagedetails = await Package.findById(cart.plan);
+      
+          if (!packagedetails) {
+              throw new Error("Package not found"); // or handle differently
+          }
+      
+          console.log('Plan Price ==>>', packagedetails.transaction_fee);
+      
+          const verificationCharge = parseFloat(packagedetails.transaction_fee || 0);
+          console.log(verificationCharge);
+      
+          const payForArray = [];
+          if (cart.pan_number) payForArray.push("PAN");
+          if (cart.aadhar_number) payForArray.push("Aadhaar");
+          if (cart.dl_number) payForArray.push("Driving Licence");
+          if (cart.passport_file_number) payForArray.push("Passport");
+          if (cart.epic_number) payForArray.push("Voter ID (EPIC)");
+          if (cart.uan_number) payForArray.push("UAN");
+      
+          const totalVerifications = payForArray.length;
+      
+          const subtotal = verificationCharge;
+      
+          overallTotalVerifications += totalVerifications;
+          overallSubtotal += subtotal;
+      
+          return {
+              id: cart._id,
+              name: cart.candidate_name,
+              mobile: cart.candidate_mobile || "",
+              payFor: payForArray.join(", "),
+              amount: subtotal
+          };
+      }));
+
+      const discountAmount = overallSubtotal * discountPercent;
+      const discountedSubtotal = overallSubtotal - discountAmount;
+
+      const gstAmount = discountedSubtotal * gstPercent;
+      const cgst = gstAmount / 2;
+      const sgst = gstAmount / 2;
+
+      const total = discountedSubtotal + gstAmount;
+
+    //  const fundStatus = wallet_amount >= total ? "1" : "0";
+
+      res.status(200).json({
+          success: true,
+          company_name: employer.name,
+          data: formattedData,
+          overall_billing: {
+              total_verifications: overallTotalVerifications,
+              wallet_amount: "0.00",
+              fund_status: "NA",
+              subtotal: overallSubtotal.toFixed(2),
+              discount: discountAmount.toFixed(2),
+              discount_percent: (discountPercent * 100).toFixed(2),
+              cgst: cgst.toFixed(2),
+              cgst_percent: (gstPercent * 50).toFixed(2),
+              sgst: sgst.toFixed(2),
+              sgst_percent: (gstPercent * 50).toFixed(2),
+              total: total.toFixed(2)
+          }
+      });
+
+  } catch (error) {
+      res.status(401).json({
+          success: false,
+          message: "Error fetching user verification carts",
+          error: error.message
+      });
+  }
+};
+
+export const listAllTransactionByCompany = async (req, res) => {
+  try {
+    const company_id = req.userId;
+
+    console.log(company_id);
+
+    if (!company_id) {
+      return res.status(400).json({
+        success: false,
+        message: "company_id is required",
+        data: [],
+      });
+    }
+
+    const allTransactions = await allOrdersData.find({
+      is_del: false,
+      employer_id: company_id,
+    })
+      .populate("employer_id", "name") // only fetch employer name
+      .sort({ createdAt: -1 });
+
+    if (!allTransactions.length) {
+      return res.status(200).json({
+        success: false,
+        message: "No transactions found for this company",
+        data: [],
+      });
+    }
+
+    const formattedTransactions = allTransactions.map((order) => {
+      const orderObj = order.toObject();
+
+      const hasValidCgst = orderObj.cgst && orderObj.cgst_percent;
+      const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
+      const hasValidDiscount = orderObj.discount_amount && orderObj.discount_percent;
+    
+      return {
+        employer_name: orderObj.employer_id?.name || "N/A",
+        order_number: orderObj.order_number,
+        invoice_number: orderObj.invoice_number,
+        date: new Date(orderObj.createdAt).toLocaleDateString(),
+        subtotal: orderObj.subtotal ?? "N/A",
+        cgst: hasValidCgst ? `${orderObj.cgst} (${orderObj.cgst_percent}%)` : "NA",
+        sgst: hasValidSgst ? `${orderObj.sgst} (${orderObj.sgst_percent}%)` : "NA",
+        discount: hasValidDiscount ? `${orderObj.discount_amount} (${orderObj.discount_percent}%)` : "NA",
+        total_amount: orderObj.total_amount ?? "N/A",
+        total_users: orderObj.total_numbers_users ?? "N/A",
+        id: orderObj._id,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Company transactions fetched successfully",
+      data: formattedTransactions,
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+      data: [],
+    });
+  }
 };

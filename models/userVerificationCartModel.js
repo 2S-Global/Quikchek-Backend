@@ -7,9 +7,17 @@ const userVerificationCartSchema = new mongoose.Schema(
             ref: 'User',
             required: true
         },
+        order_ref_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'allOrdersData',
+            },
         plan: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Package',
+            required: true
+        }, 
+        amount: {
+            type: String,
             required: true
         }, 
         candidate_name: {

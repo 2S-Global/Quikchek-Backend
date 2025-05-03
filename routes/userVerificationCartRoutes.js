@@ -11,7 +11,9 @@ import {
     getAllVerifiedCandidateByCompanyForAdmin,
     getCartDetailsAadhatOTP,
     deleteUserAadharOTP,
-    addUserToCartAadharOTP
+    addUserToCartAadharOTP,
+    getUserVerificationCartByEmployerFromAdmin,
+    listAllTransactionByCompany
 } from '../controllers/userVerificationCartController.js'; // Adjust the path according to your project structure
 
 //Middleware
@@ -56,10 +58,15 @@ userRouter.get('/list_user_cart_aadhar_otp', upload.none(), userAuth, Companymid
 
 
 userRouter.get('/list_user_cart', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployer);
+userRouter.post('/list_user_cart_admin', upload.none(), userAuth, Adminmid, getUserVerificationCartByEmployerFromAdmin);
+
+
 userRouter.get('/list_user_cart_all', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployerAll);
 userRouter.post('/getPaidUserVerificationCartByEmployer', upload.none(), userAuth, Companymid, getPaidUserVerificationCartByEmployer);
 userRouter.post('/getAllVerifiedCandidateAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateAdmin);
 userRouter.post('/getAllVerifiedCandidateByCompanyForAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateByCompanyForAdmin);
 userRouter.post('/deleteUser', upload.none(), userAuth, Companymid, deleteUser);
+
+userRouter.post('/list_all_transaction_company', upload.none(), userAuth, Companymid, listAllTransactionByCompany);
 
 export default userRouter;
