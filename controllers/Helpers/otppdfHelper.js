@@ -109,7 +109,7 @@ const OtpGeneratePDF = ({ user }) => {
     : { src: unverifiedlogo, alt: "Not Verified" };
 
   const aadhaar_header = `<h5 class="fw-bold text-dark mb-2 d-flex align-items-center">
-    AADHAAR
+    AADHAAR with OTP
     <img
       src="${aadhaarStatus.src}"
       alt="${aadhaarStatus.alt}"
