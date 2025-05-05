@@ -54,12 +54,12 @@ export const generatePDF = async (req, res) => {
     });
 
     const footerTemplate = `
-      <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc;">
-        <p style="font-size: 10px; text-align: center; margin: 0;">Verified by QuikCheck using Digilocker</p>
-         <p style="font-size: 10px; text-align: center; margin: 0;">Created At: ${createdAt}</p>
-        Page <span class="pageNumber"></span> of <span class="totalPages"></span>
-      </div>
-    `;
+    <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc;">
+      <p style="font-size: 10px; text-align: center; margin: 0;">This KYC verification is being done as per the request from "Consulting Demo" by QuikCheck using Digilocker. The result is not</p>
+      <p style="font-size: 10px; text-align: center; margin: 0;">for any promotional & commercial purposes. I agree to all Terms and Conditions. Created At: ${createdAt}</p>
+      Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+    </div>
+  `;
 
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
@@ -142,9 +142,10 @@ export const otpgeneratePDF = async (req, res) => {
     });
 
     const footerTemplate = `
-    <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc; line-height: 1.6;">
-      <p style="font-size: 10px; text-align: center; margin: 0;">Verified by QuikCheck using Digilocker</p>
-       <p style="font-size: 10px; text-align: center; margin: 0;">Created At: ${createdAt}</p>
+    <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc;">
+      <p style="font-size: 10px; text-align: center; margin: 0;">This KYC verification is being done as per the request from "Consulting Demo" by QuikCheck using Digilocker. The result is not</p>
+      <p style="font-size: 10px; text-align: center; margin: 0;">for any promotional & commercial purposes. I agree to all Terms and Conditions. Created At: ${createdAt}</p>
+     
       Page <span class="pageNumber"></span> of <span class="totalPages"></span>
     </div>
   `;
