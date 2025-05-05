@@ -10,7 +10,7 @@ const GeneratePDF = ({ user }) => {
     "https://res.cloudinary.com/da4unxero/image/upload/v1746423964/QuikChek%20images/wrxu8see8swig14psk2j.png";
 
   const userId = user._id.toString();
-  const userName = user.candidate_name;
+  const userName = user.candidate_name ?? "N/A";
   const dob = user.candidate_dob;
   const dobDate = new Date(dob);
 
@@ -18,8 +18,8 @@ const GeneratePDF = ({ user }) => {
   const month = String(dobDate.getMonth() + 1).padStart(2, "0");
   const year = dobDate.getFullYear();
   const formattedDob = `${day}/${month}/${year}`;
-  const phone = user.candidate_mobile;
-  const Email = user.candidate_email;
+  const phone = user.candidate_mobile ?? "N/A";
+  const Email = user.candidate_email ?? "N/A";
   const GenderRaw = user?.candidate_gender ?? "N/A";
   const Gender =
     GenderRaw.charAt(0).toUpperCase() + GenderRaw.slice(1).toLowerCase();
@@ -74,12 +74,24 @@ const GeneratePDF = ({ user }) => {
   const candidateInfo = `
 <h4 class="text-primary">Candidate Information</h4>
 <div class="row g-1">
-  <div class="col-md-6"><div class="mb-1"><strong>Full Name:</strong> ${userName}</div></div>
-  <div class="col-md-6"><div class="mb-1"><strong>Date Of Birth:</strong> ${formattedDob}</div></div>
-  <div class="col-md-6"><div class="mb-1"><strong>Phone Number:</strong> ${phone}</div></div>
-  <div class="col-md-6"><div class="mb-1"><strong>Email:</strong> ${Email}</div></div>
-  <div class="col-md-6"><div class="mb-1"><strong>Address:</strong> ${user.candidate_address}</div></div>
-  <div class="col-md-6"><div class="mb-1"><strong>Gender:</strong> ${Gender}</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Full Name:</strong> ${
+    userName ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Date Of Birth:</strong> ${
+    formattedDob ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Phone Number:</strong> ${
+    phone ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Email:</strong> ${
+    Email ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Address:</strong> ${
+    user.candidate_address ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Gender:</strong> ${
+    Gender ?? "N/A"
+  }</div></div>
 </div>
 `;
 
