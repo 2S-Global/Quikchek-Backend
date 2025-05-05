@@ -1,4 +1,5 @@
 import UserVerification from "../models/userVerificationModel.js";
+import User from "../models/userModel.js";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium"; // Vercel-compatible Chromium
 import GeneratePDF from "./Helpers/pdfHelper.js";
@@ -14,7 +15,11 @@ export const generatePDF = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    const company_details = await User.findById(user.employer_id).lean();
+    if (!company_details) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+    const company_name = company_details.name;
     const userId = user._id.toString();
     const fileName = `${user.candidate_name}.pdf`;
 
@@ -55,7 +60,7 @@ export const generatePDF = async (req, res) => {
 
     const footerTemplate = `
     <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc;">
-      <p style="font-size: 10px; text-align: center; margin: 0;">This KYC verification is being done as per the request from "Consulting Demo" by QuikCheck using Digilocker. The result is not</p>
+      <p style="font-size: 10px; text-align: center; margin: 0;">This KYC verification is being done as per the request from "${company_name}" by QuikCheck using Digilocker. The result is not</p>
       <p style="font-size: 10px; text-align: center; margin: 0;">for any promotional & commercial purposes. I agree to all Terms and Conditions. Created At: ${createdAt}</p>
       Page <span class="pageNumber"></span> of <span class="totalPages"></span>
     </div>
