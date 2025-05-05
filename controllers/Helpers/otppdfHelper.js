@@ -1,8 +1,15 @@
 const OtpGeneratePDF = ({ user }) => {
   const logo =
     "https://res.cloudinary.com/da4unxero/image/upload/v1746082140/QuikChek%20images/yfkxavqtaqqubl96zadp.png";
+  const verifiedlogo =
+    "https://res.cloudinary.com/da4unxero/image/upload/v1746423837/QuikChek%20images/wy0gvhzwwjorpasihucf.png";
+  const unverifiedlogo =
+    "https://res.cloudinary.com/da4unxero/image/upload/v1746423901/QuikChek%20images/otptu7jh6ontg8sr2xem.png";
+  const notapplicablelogo =
+    "https://res.cloudinary.com/da4unxero/image/upload/v1746423964/QuikChek%20images/wrxu8see8swig14psk2j.png";
+
   const userId = user._id.toString();
-  const userName = user.candidate_name;
+  const userName = user.candidate_name ?? "N/A";
   const dob = user.candidate_dob;
   const dobDate = new Date(dob);
 
@@ -10,9 +17,12 @@ const OtpGeneratePDF = ({ user }) => {
   const month = String(dobDate.getMonth() + 1).padStart(2, "0");
   const year = dobDate.getFullYear();
   const formattedDob = `${day}/${month}/${year}`;
-  const phone = user.candidate_mobile;
-  const Email = user.candidate_email;
-  const Gender = user?.candidate_gender ?? "N/A";
+  const phone = user.candidate_mobile ?? "N/A";
+  const Email = user.candidate_email ?? "N/A";
+  const GenderRaw = user?.candidate_gender ?? "N/A";
+  const Gender =
+    GenderRaw.charAt(0).toUpperCase() + GenderRaw.slice(1).toLowerCase();
+
   const verification_time = new Date(user.createdAt).toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "2-digit",
@@ -62,14 +72,26 @@ const OtpGeneratePDF = ({ user }) => {
 
   const candidateInfo = `
   <h4 class="text-primary">Candidate Information</h4>
-  <div class="row g-1">
-    <div class="col-md-6"><div class="mb-1"><strong>Full Name:</strong> ${userName}</div></div>
-    <div class="col-md-6"><div class="mb-1"><strong>Date Of Birth:</strong> ${formattedDob}</div></div>
-    <div class="col-md-6"><div class="mb-1"><strong>Phone Number:</strong> ${phone}</div></div>
-    <div class="col-md-6"><div class="mb-1"><strong>Email:</strong> ${Email}</div></div>
-    <div class="col-md-6"><div class="mb-1"><strong>Address:</strong> ${user.candidate_address}</div></div>
-    <div class="col-md-6"><div class="mb-1"><strong>Gender:</strong> ${Gender}</div></div>
-  </div>
+<div class="row g-1">
+  <div class="col-md-6"><div class="mb-1"><strong>Full Name:</strong> ${
+    userName ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Date Of Birth:</strong> ${
+    formattedDob ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Phone Number:</strong> ${
+    phone ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Email:</strong> ${
+    Email ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Address:</strong> ${
+    user.candidate_address ?? "N/A"
+  }</div></div>
+  <div class="col-md-6"><div class="mb-1"><strong>Gender:</strong> ${
+    Gender ?? "N/A"
+  }</div></div>
+</div>
   `;
 
   const verificationDetails = `
@@ -78,16 +100,34 @@ const OtpGeneratePDF = ({ user }) => {
     <span class="text-muted fs-6">(Verified at: ${verification_time})</span>
   </h4>
   `;
+
+  /* Aahaar */
+  const aadhaarStatus = !user?.aadhaar_response
+    ? { src: notapplicablelogo, alt: "N/A" }
+    : user?.aadhaar_response?.response_code == 100
+    ? { src: verifiedlogo, alt: "Verified" }
+    : { src: unverifiedlogo, alt: "Not Verified" };
+
+  const aadhaar_header = `<h5 class="fw-bold text-dark mb-2 d-flex align-items-center">
+    AADHAAR
+    <img
+      src="${aadhaarStatus.src}"
+      alt="${aadhaarStatus.alt}"
+      class="ms-2"
+      style="width: 80px; height: 20px;"
+    />
+  </h5>`;
   const aadhaarDetails = `
   <div class="col-md-12 mb-3" id="aadhaar_response">
     <div class="p-3 shadow-sm rounded bg-light">
       <div class="d-flex align-items-center mb-3">
+        ${aadhaar_header}
        
       </div>
       <div class="mt-2">
         <!-- Photo on one side and other details on the other -->
         <div class="row">
-          <div class="col-md-5 mb-3 text-center">
+          <div class="col-md-6 mb-3 text-center">
             <!-- This is heading -->
             <h5 class="fw-bold text-dark mb-2 me-2 d-block">Image as per Aadhaar</h5>
             <img
@@ -101,7 +141,7 @@ const OtpGeneratePDF = ({ user }) => {
               style="max-width: 150px; max-height: 150px;"
             />
           </div>
-          <div class="col-md-7 mb-3">
+          <div class="col-md-6 mb-3">
             <!-- This is heading -->
             <h5 class="fw-bold text-dark mb-3 d-block">Personal Details as per Aadhaar</h5>
 
