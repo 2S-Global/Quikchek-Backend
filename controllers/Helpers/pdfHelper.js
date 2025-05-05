@@ -115,7 +115,7 @@ const GeneratePDF = ({ user }) => {
           src="${panStatus.src}"
           alt="${panStatus.alt}"
           class="ms-2"
-          style="width: 100px; height: 20px;"
+          style="width: 80px; height: 20px;"
         />
       </h5>`;
 
@@ -150,7 +150,7 @@ const GeneratePDF = ({ user }) => {
       src="${passportStatus.src}"
       alt="${passportStatus.alt}"
       class="ms-2"
-      style="width: 100px; height: 20px;"
+      style="width: 80px; height: 20px;"
     />
   </h5>`;
   const passportDetails = `
@@ -194,7 +194,7 @@ ${user?.passport_response?.result?.passport_applied_date ?? "N/A"}
       src="${aadhaarStatus.src}"
       alt="${aadhaarStatus.alt}"
       class="ms-2"
-      style="width: 100px; height: 20px;"
+      style="width: 80px; height: 20px;"
     />
   </h5>`;
   const aadhaarDetails = `
@@ -227,7 +227,7 @@ ${user?.passport_response?.result?.passport_applied_date ?? "N/A"}
       src="${dlStatus.src}"
       alt="${dlStatus.alt}"
       class="ms-2"
-      style="width: 100px; height: 20px;"
+      style="width: 80px; height: 20px;"
     />
   </h5>`;
 
@@ -336,7 +336,7 @@ ${user?.passport_response?.result?.passport_applied_date ?? "N/A"}
       src="${epicStatus.src}"
       alt="${epicStatus.alt}"
       class="ms-2"
-      style="width: 100px; height: 20px;"
+      style="width: 80px; height: 20px;"
     />
   </h5>`;
   const epicResult = user?.epic_response?.result || {};
