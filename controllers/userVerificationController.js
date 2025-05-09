@@ -9,6 +9,8 @@ import UserCartVerificationAadhatOTP from "../models/userVerificationCartAadhatO
 
 import allOrdersData from "../models/allOrders.js";
 
+import nodemailer from "nodemailer";
+
 // Register a new user
 export const listUserVerifiedList = async (req, res) => {
   try {
@@ -810,7 +812,7 @@ export const paynowAadharOTP_30042025 = async (req, res) => {
 };
 
 
-export const paynow = async (req, res) => {
+export const paynow_09052025 = async (req, res) => {
   try {
     const employer_id = req.userId;
 
@@ -1343,5 +1345,260 @@ export const verifyOtpAadhar = async (req, res) => {
     
     // Send error response to client in case of failure
     return res.status(500).json({ success: false, error: error.response?.data || error.message });
+  }
+};
+
+
+
+export const paynow = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    const { razorpay_response, amount, paymentIds, payment_method, overall_billing } = req.body;
+
+    if (!amount || !payment_method) {
+      return res.status(400).json({ error: "Payment details are incomplete." });
+    }
+
+    const user = await User.findById(employer_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (payment_method === "Wallet") {
+      if (!user.wallet_amount || user.wallet_amount < amount) {
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+      user.wallet_amount -= amount;
+      await user.save();
+    } else if (payment_method === "online") {
+      if (!razorpay_response?.razorpay_payment_id) {
+        return res.status(400).json({ error: "Razorpay payment ID is missing." });
+      }
+    } else {
+      return res.status(400).json({ error: "Invalid payment method." });
+    }
+
+// Add all data in Orders Table
+//const moment = require('moment');
+// Get current date and time
+//const now = ${Date.now()};
+// Generate order number
+const orderNumber = `ORD-${Date.now()}`;
+
+// Generate invoice number
+const invoiceNumber = `INV-${Date.now()}`;
+
+
+    const newUserCart = new allOrdersData({
+      employer_id: employer_id,
+      order_number: orderNumber,
+      invoice_number: invoiceNumber,
+      subtotal: overall_billing.subtotal,
+      cgst: overall_billing.cgst,
+      cgst_percent: overall_billing.cgst_percent,
+      sgst: overall_billing.sgst,
+      sgst_percent: overall_billing.sgst_percent,
+      total_amount: overall_billing.total,
+      discount_percent: overall_billing.discount_percent,
+      discount_amount: overall_billing.discount,
+      total_numbers_users: overall_billing.total_verifications,
+    });
+
+  const savedCart = await newUserCart.save();
+  const insertedId = savedCart._id;
+
+
+    // Update is_paid field
+    const updatedUsers = await UserCartVerification.updateMany(
+      { employer_id: employer_id },
+      { $set: { is_paid: 1, createdAt: new Date(), order_ref_id: insertedId  } }
+    );
+
+
+    if (updatedUsers.modifiedCount === 0) {
+      return res.status(404).json({ message: "No users found for this employer" });
+    }
+
+
+
+    // Fetch all cart items for this order
+    const cartItems = await UserCartVerification.find({ employer_id, order_ref_id: insertedId });
+
+    // Generate order details table
+  const orderDetailsTable = cartItems.map((item, index) => {
+  let payFor = [];
+
+  if (item.pan_number) payFor.push("PAN");
+  if (item.aadhar_number) payFor.push("Aadhar");
+  if (item.dl_number) payFor.push("Driving Licence");
+  if (item.passport_file_number) payFor.push("Passport");
+  if (item.epic_number) payFor.push("EPIC");
+  if (item.uan_number) payFor.push("UAN");
+
+  const selectedVerifications = payFor.join(", ");
+
+  return `
+    <tr>
+      <td style="text-align: center;">${index + 1}</td>
+      <td style="text-align: center;">${item.candidate_name}</td>
+      <td style="text-align: center;">${item.candidate_email}</td>
+      <td style="text-align: center;">${selectedVerifications}</td>
+    </tr>
+  `;
+}).join("");
+
+    const emailTable = `
+      <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Candidate Name</th>
+            <th>Candidate Email</th>
+            <th>Paid for</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${orderDetailsTable}
+        </tbody>
+      </table>
+    `;
+
+
+
+
+
+    const usersToArchive = await UserCartVerification.find({
+      employer_id: employer_id,
+      is_paid: 1,
+    });
+
+    if (usersToArchive.length === 0) {
+      return res.status(404).json({ message: "No updated users to archive" });
+    }
+
+    // ✅ Generate and assign order_id to each record
+    const orderPrefix = `ORD-${Date.now()}`;
+    const usersWithOrderId = usersToArchive.map((user, index) => {
+      const obj = user.toObject();
+      obj.order_id = `${orderPrefix}-${index + 1}`;
+      delete obj._id; // Remove _id so MongoDB can generate a new one
+      return obj;
+    });
+
+    await UserVerification.insertMany(usersWithOrderId);
+
+    const userIds = usersToArchive.map(user => user._id);
+
+   await UserCartVerification.deleteMany({ employer_id: employer_id, is_paid: 1 });
+
+    const transaction = new Transaction({
+      employer_id: employer_id,
+      order_ref_id:insertedId,
+      transactionId: payment_method === "online"
+        ? razorpay_response.razorpay_payment_id
+        : `wallet_${Date.now()}`,
+      amount: amount,
+      paymentids: paymentIds || null,
+      order_ids: userIds.join(','),
+      payment_method: payment_method,
+      payment_type: "debit",
+    });
+
+    await transaction.save();
+
+
+    // Send email with login credentials
+    const transporter = nodemailer.createTransport({
+      host: "smtp.hostinger.com", // fixed typo
+      port: 465,
+      secure: true, // true for port 465
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject:
+        "Order Confirmation : QuikChek - Thank You for Your Purchase!",
+      html: `
+      <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
+  </div>
+        <p>Dear <strong>${user.name}</strong>,</p>
+        <p>Thank you for shopping with QuikChek. We have successfully received your order, and it's now being processed.</p>
+        <p><strong>Order Details:</strong></p>
+        <p>Order Number: #${orderNumber}</p>
+        <p>Payment Amount: #${overall_billing.total}</p>
+        <p>Payment Method: Online</p>
+
+        <p>Thank you for shopping with QuikChek. Here are your order details:</p>
+        ${emailTable}
+      
+        <p>If you have any questions or need further assistance, feel free to reach out to our support team at support@quikchek.in or call us at 8697744701.</p>
+        <p>Thank you for choosing QuikChek. We appreciate your trust in us and look forward to serving you again.</p>
+        <br />
+        <p>Sincerely,<br />
+        The Admin Team<br />
+        <strong>Global Employability Information Services India Limited</strong></p>
+
+        <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+
+    const mailOptions2 = {
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject:
+        "Payment Received: QuikChek - Your Order is Confirmed!",
+      html: `
+      <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
+  </div>
+        <p>Dear <strong>${user.name}</strong>,</p>
+        <p>Thank you for your payment! We are pleased to inform you that your payment for Order #${orderNumber} has been successfully processed.</p>
+       
+        <p>Thank you for shopping with QuikChek. Here are your order details:</p>
+        ${emailTable}
+      
+        <p>If you have any questions or need further assistance, feel free to reach out to our support team at support@quikchek.in or call us at 8697744701.</p>
+        <p>Thank you for choosing QuikChek. We appreciate your trust in us and look forward to serving you again.</p>
+        <br />
+        <p>Sincerely,<br />
+        The Admin Team<br />
+        <strong>Global Employability Information Services India Limited</strong></p>
+
+                <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
+      `,
+    };   
+
+    await transporter.sendMail(mailOptions2);
+
+    return res.status(200).json({
+      message: "Payment processed, verifications archived, and transaction recorded",
+      archivedUsersCount: usersWithOrderId.length,
+      remainingWalletBalance: user.wallet_amount,
+    });
+
+  } catch (error) {
+    console.error("Payment Error:", error);
+    return res.status(500).json({
+      message: "Error processing payment22",
+      error: error.message,
+    });
   }
 };
