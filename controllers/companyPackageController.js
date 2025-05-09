@@ -13,6 +13,8 @@ export const createCompanyPackage = async (req, res) => {
       discount_percent,
       aadhar_otp,
       aadhar_price,
+      hotel_module,
+      housing_module
     } = req.body;
 
     if (!companyId || !selected_plan) {
@@ -39,6 +41,8 @@ export const createCompanyPackage = async (req, res) => {
         discount_percent: finalDiscount,
         aadhar_otp: aadhar_otp,
         aadhar_price: aadhar_price,
+        hotel_module: hotel_module,
+        housing_module: housing_module,
       },
       {
         new: true,
@@ -353,10 +357,14 @@ export const sidebarAadharOtp = async (req, res) => {
 
 
     const aadharOtpStatus = data.aadhar_otp;
+    const hoteltatus = data.hotel_module;
+    const housingStatus = data.housing_module;
 
     return res.status(200).json({
       success: true,
       aadhar_otp: aadharOtpStatus,
+      hoteltatus: hoteltatus,
+      housingStatus: housingStatus,
     });
   } catch (error) {
     res.status(500).json({
