@@ -13,7 +13,8 @@ import {
     deleteUserAadharOTP,
     addUserToCartAadharOTP,
     getUserVerificationCartByEmployerFromAdmin,
-    listAllTransactionByCompany
+    listAllTransactionByCompany,
+    listAllTransactionByCompanyAdmin
 } from '../controllers/userVerificationCartController.js'; // Adjust the path according to your project structure
 
 //Middleware
@@ -68,5 +69,7 @@ userRouter.post('/getAllVerifiedCandidateByCompanyForAdmin', upload.none(), user
 userRouter.post('/deleteUser', upload.none(), userAuth, Companymid, deleteUser);
 
 userRouter.post('/list_all_transaction_company', upload.none(), userAuth, Companymid, listAllTransactionByCompany);
+
+userRouter.post('/list_all_transaction_company_admin', upload.none(), userAuth, Adminmid, listAllTransactionByCompanyAdmin);
 
 export default userRouter;
