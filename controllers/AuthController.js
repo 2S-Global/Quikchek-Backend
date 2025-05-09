@@ -186,6 +186,10 @@ export const registerUser = async (req, res) => {
         <p>Sincerely,<br />
         The Admin Team<br />
         <strong>Global Employability Information Services India Limited</strong></p>
+
+         <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
       `,
     };
 
@@ -325,6 +329,10 @@ export const RegisterFrontEnd = async (req, res) => {
         <p>Sincerely,<br />
         The Admin Team<br />
         <strong>Global Employability Information Services India Limited</strong></p>
+
+         <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
       `,
     };
 
@@ -366,13 +374,11 @@ export const verifyEmail = async (req, res) => {
     await user.save();
 
     return res.status(200).json({ message: "Email verified successfully." });
-
   } catch (error) {
     console.error(error);
     return res.status(400).json({ message: "Invalid or expired token." });
   }
 };
-
 
 export const editUser = async (req, res) => {
   const {
@@ -471,6 +477,10 @@ export const editUser = async (req, res) => {
           <p>Sincerely,<br />
           The Admin Team<br />
           <strong>Global Employability Information Services India Limited</strong></p>
+
+           <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
         `,
       };
 
@@ -599,6 +609,9 @@ export const sendAccessEmail = async (req, res) => {
         <p>Sincerely,<br />
         The Admin Team<br />
         <strong>Global Employability Information Services India Limited</strong></p>
+         <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
       `,
     };
 
@@ -675,6 +688,10 @@ export const forgotPassword = async (req, res) => {
               </p>
               <br/>
               <p>Stay secure,<br/>Geisil Team</p>
+
+               <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
           `,
     };
 
@@ -788,16 +805,22 @@ export const loginUser = async (req, res) => {
 
     // Check if account is deleted
     if (user.is_del) {
-      return res.status(403).json({ message: "Your account has been deleted. Please contact support." });
+      return res.status(403).json({
+        message: "Your account has been deleted. Please contact support.",
+      });
     }
 
     // Check if account is deactivated
     if (!user.is_active) {
-      return res.status(403).json({ message: "Your account has been deactivated. Please contact support." });
+      return res.status(403).json({
+        message: "Your account has been deactivated. Please contact support.",
+      });
     }
 
     if (!user.isVerified) {
-      return res.status(403).json({ message: "Your Email is not Verified.Please Verify it first." });
+      return res.status(403).json({
+        message: "Your Email is not Verified.Please Verify it first.",
+      });
     }
 
     // Check password
@@ -819,9 +842,10 @@ export const loginUser = async (req, res) => {
       data: user,
       role: user.role,
     });
-
   } catch (error) {
-    res.status(500).json({ message: "Error logging in user", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error logging in user", error: error.message });
   }
 };
 
@@ -871,7 +895,6 @@ export const listCompanies = async (req, res) => {
     });
   }
 };
-
 
 export const listCompaniesAll = async (req, res) => {
   try {

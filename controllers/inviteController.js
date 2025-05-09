@@ -69,7 +69,11 @@ export const inviteController = async (req, res) => {
    Email: hello@geisil.com , <br/>
    Mobile: +91 9831823898
 <br/>
-    <a href="https://geisil.com/" target="_blank">www.geisil.com</a></p>    
+    <a href="https://geisil.com/" target="_blank">www.geisil.com</a></p>   
+    
+     <div style="text-align: center; margin-top: 30px;">
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    </div>
     `;
 
     const transporter = nodemailer.createTransport({
