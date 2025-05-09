@@ -17,6 +17,8 @@ import {
   RegisterFrontEnd,
   listSelfRegisteredCompanies,
   sendAccessEmail,
+  listCompaniesAll,
+  verifyEmail
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -63,6 +65,7 @@ AuthRouter.post(
   registerCompany
 );
 AuthRouter.post("/list-companies", userAuth, adminMiddleware, listCompanies);
+AuthRouter.post("/list-companies_all", userAuth, adminMiddleware, listCompaniesAll);
 AuthRouter.post("/list-companies-self", userAuth, adminMiddleware, listSelfRegisteredCompanies);
 AuthRouter.post("/delete-companies", userAuth, adminMiddleware, deleteCompany);
 AuthRouter.post(
@@ -71,5 +74,6 @@ AuthRouter.post(
   adminMiddleware,
   toggleCompanyStatus
 );
+AuthRouter.get("/verify-email/:token", verifyEmail);
 
 export default AuthRouter;
