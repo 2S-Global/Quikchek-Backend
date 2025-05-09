@@ -114,6 +114,10 @@ export const registerUser = async (req, res) => {
       expiresIn: "30d",
     }); */
 
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "3d",
+    });
+
     // Send email with login credentials
     const transporter = nodemailer.createTransport({
       host: "smtp.hostinger.com", // fixed typo
@@ -149,12 +153,9 @@ export const registerUser = async (req, res) => {
           <li><strong>Password:</strong> ${password}</li>
         </ul>
       
-        <p>
-          Please log in to the platform at 
-          <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a> 
-          using the provided credentials. We strongly recommend that you change your password
-          upon your first login for security reasons.
-        </p>
+        <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/verification-email?token=${token}">Verify Email</a></p>
+       
+
       
         <p><strong>Key Features and Benefits of QuikChek:</strong></p>
         <ul>
@@ -254,6 +255,10 @@ export const RegisterFrontEnd = async (req, res) => {
       expiresIn: "30d",
     }); */
 
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "3d",
+    });
+
     // Send email with login credentials
     const transporter = nodemailer.createTransport({
       host: "smtp.hostinger.com", // fixed typo
@@ -289,12 +294,7 @@ export const RegisterFrontEnd = async (req, res) => {
           <li><strong>Password:</strong> ${password}</li>
         </ul>
       
-        <p>
-          Please log in to the platform at 
-          <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a> 
-          using the provided credentials. We strongly recommend that you change your password
-          upon your first login for security reasons.
-        </p>
+       <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/verification-email?token=${token}">Verify Email</a></p>
       
         <p><strong>Key Features and Benefits of QuikChek:</strong></p>
         <ul>
@@ -341,6 +341,38 @@ export const RegisterFrontEnd = async (req, res) => {
       .json({ message: "Error creating user", error: error.message });
   }
 };
+
+export const verifyEmail = async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { userId } = decoded;
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if already verified
+    if (user.isVerified) {
+      return res.status(200).json({ message: "Email is already verified." });
+    }
+
+    // Mark user as verified
+    user.isVerified = true;
+    await user.save();
+
+    return res.status(200).json({ message: "Email verified successfully." });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ message: "Invalid or expired token." });
+  }
+};
+
 
 export const editUser = async (req, res) => {
   const {
@@ -764,6 +796,10 @@ export const loginUser = async (req, res) => {
       return res.status(403).json({ message: "Your account has been deactivated. Please contact support." });
     }
 
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Your Email is not Verified.Please Verify it first." });
+    }
+
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
 
@@ -796,6 +832,53 @@ export const listCompanies = async (req, res) => {
       is_del: false,
       role: 1,
       self_registered: { $ne: 1 },
+    }).select("-password");
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No companies found" });
+    }
+
+    // Get order counts grouped by employer_id
+    const orderCounts = await UserVerification.aggregate([
+      { $match: { is_del: false } },
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+    ]);
+
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      orderMap[_id.toString()] = orderCount;
+    });
+
+    // Attach order count to each company
+    const companiesWithOrderCount = companies.map((company) => {
+      const companyId = company._id.toString();
+      return {
+        ...company.toObject(),
+        orderCount: orderMap[companyId] || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Companies retrieved successfully",
+      data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+
+export const listCompaniesAll = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find({
+      is_del: false,
+      role: 1,
     }).select("-password");
 
     if (!companies.length) {
