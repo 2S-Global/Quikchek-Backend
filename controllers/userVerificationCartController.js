@@ -1240,7 +1240,7 @@ export const getUserVerificationCartByEmployerFromAdmin = async (req, res) => {
   }
 };
 
-export const listAllTransactionByCompany = async (req, res) => {
+export const listAllTransactionByCompany_07052025 = async (req, res) => {
   try {
     const company_id = req.userId;
 
@@ -1269,22 +1269,12 @@ export const listAllTransactionByCompany = async (req, res) => {
       });
     }
 
-    const formattedTransactions = await Promise.all(
-      allTransactions.map(async (order) => {
+    const formattedTransactions = allTransactions.map((order) => {
       const orderObj = order.toObject();
 
       const hasValidCgst = orderObj.cgst && orderObj.cgst_percent;
       const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
       const hasValidDiscount = orderObj.discount_amount && orderObj.discount_percent;
-
-
-       // Count users related to this transaction
-       const userCount = await UserVerification.countDocuments({
-        order_ref_id: orderObj._id,
-        is_del: false,
-      });
-
-
     
       return {
         employer_name: orderObj.employer_id?.name || "N/A",
@@ -1296,13 +1286,177 @@ export const listAllTransactionByCompany = async (req, res) => {
         sgst: hasValidSgst ? `${orderObj.sgst} (${orderObj.sgst_percent}%)` : "NA",
         discount: hasValidDiscount ? `${orderObj.discount_amount} (${orderObj.discount_percent}%)` : "NA",
         total_amount: orderObj.total_amount ?? "N/A",
-        total_users: userCount ?? "N/A",
+        total_users: orderObj.total_numbers_users ?? "N/A",
         id: orderObj._id,
       };
-    })
-  );
+    });
 
+    return res.status(200).json({
+      success: true,
+      message: "Company transactions fetched successfully",
+      data: formattedTransactions,
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+      data: [],
+    });
+  }
+};
+
+export const listAllTransactionByCompany = async (req, res) => {
+  try {
+    const company_id = req.userId;
+    const { start_date, end_date } = req.body;
+
+    if (!company_id) {
+      return res.status(400).json({
+        success: false,
+        message: "company_id is required",
+        data: [],
+      });
+    }
+
+    // Build the date filter
+    const dateFilter = {};
+    if (start_date) {
+      dateFilter.$gte = new Date(new Date(start_date).setHours(0, 0, 0, 0)); // Start of the day
+    }
+    if (end_date) {
+      dateFilter.$lte = new Date(new Date(end_date).setHours(23, 59, 59, 999)); // End of the day
+    }
+
+    // Build the main filter object
+    const filter = {
+      is_del: false,
+      employer_id: company_id,
+    };
+
+    // Add date filter if provided
+    if (start_date || end_date) {
+      filter.createdAt = dateFilter;
+    }
+
+    const allTransactions = await allOrdersData.find(filter)
+      .populate("employer_id", "name") // only fetch employer name
+      .sort({ createdAt: -1 });
+
+    if (!allTransactions.length) {
+      return res.status(200).json({
+        success: true,
+        message: "No transactions found for this company",
+        data: [],
+      });
+    }
+
+    const formattedTransactions = allTransactions.map((order) => {
+      const orderObj = order.toObject();
+
+      const hasValidCgst = orderObj.cgst && orderObj.cgst_percent;
+      const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
+      const hasValidDiscount = orderObj.discount_amount && orderObj.discount_percent;
     
+      return {
+        employer_name: orderObj.employer_id?.name || "N/A",
+        order_number: orderObj.order_number,
+        invoice_number: orderObj.invoice_number,
+        date: new Date(orderObj.createdAt).toLocaleDateString(),
+        subtotal: orderObj.subtotal ?? "N/A",
+        cgst: hasValidCgst ? `${orderObj.cgst} (${orderObj.cgst_percent}%)` : "NA",
+        sgst: hasValidSgst ? `${orderObj.sgst} (${orderObj.sgst_percent}%)` : "NA",
+        discount: hasValidDiscount ? `${orderObj.discount_amount} (${orderObj.discount_percent}%)` : "NA",
+        total_amount: orderObj.total_amount ?? "N/A",
+        total_users: orderObj.total_numbers_users ?? "N/A",
+        id: orderObj._id,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Company transactions fetched successfully",
+      data: formattedTransactions,
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+      data: [],
+    });
+  }
+};
+
+
+export const listAllTransactionByCompanyAdmin = async (req, res) => {
+  try {
+    const { start_date, end_date, company_id } = req.body;
+
+    if (!company_id) {
+      return res.status(400).json({
+        success: false,
+        message: "company_id is required",
+        data: [],
+      });
+    }
+
+    // Build the date filter
+    const dateFilter = {};
+    if (start_date) {
+      dateFilter.$gte = new Date(new Date(start_date).setHours(0, 0, 0, 0)); // Start of the day
+    }
+    if (end_date) {
+      dateFilter.$lte = new Date(new Date(end_date).setHours(23, 59, 59, 999)); // End of the day
+    }
+
+    // Build the main filter object
+    const filter = {
+      is_del: false,
+      employer_id: company_id,
+    };
+
+    // Add date filter if provided
+    if (start_date || end_date) {
+      filter.createdAt = dateFilter;
+    }
+
+    const allTransactions = await allOrdersData.find(filter)
+      .populate("employer_id", "name") // only fetch employer name
+      .sort({ createdAt: -1 });
+
+    if (!allTransactions.length) {
+      return res.status(200).json({
+        success: true,
+        message: "No transactions found for this company",
+        data: [],
+      });
+    }
+
+    const formattedTransactions = allTransactions.map((order) => {
+      const orderObj = order.toObject();
+
+      const hasValidCgst = orderObj.cgst && orderObj.cgst_percent;
+      const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
+      const hasValidDiscount = orderObj.discount_amount && orderObj.discount_percent;
+    
+      return {
+        employer_name: orderObj.employer_id?.name || "N/A",
+        order_number: orderObj.order_number,
+        invoice_number: orderObj.invoice_number,
+        date: new Date(orderObj.createdAt).toLocaleDateString(),
+        subtotal: orderObj.subtotal ?? "N/A",
+        cgst: hasValidCgst ? `${orderObj.cgst} (${orderObj.cgst_percent}%)` : "NA",
+        sgst: hasValidSgst ? `${orderObj.sgst} (${orderObj.sgst_percent}%)` : "NA",
+        discount: hasValidDiscount ? `${orderObj.discount_amount} (${orderObj.discount_percent}%)` : "NA",
+        total_amount: orderObj.total_amount ?? "N/A",
+        total_users: orderObj.total_numbers_users ?? "N/A",
+        id: orderObj._id,
+      };
+    });
+
     return res.status(200).json({
       success: true,
       message: "Company transactions fetched successfully",
