@@ -23,6 +23,14 @@ const companyPackageSchema = new mongoose.Schema(
     aadhar_price: {
       type: Number,
     },
+    hotel_module: {
+      type: String,
+      default: 'disable',
+    },
+    housing_module: {
+      type: String,
+      default: 'disable',
+    },
     is_del: { type: Boolean, default: false },
   },
   { timestamps: true }
