@@ -60,7 +60,7 @@ export const sendEmail = async (req, res) => {
     "employer_id"
   );
   if (!email) {
-    return res.status(404).json({
+    return res.status(201).json({
       message: "No email record found",
     });
   }
