@@ -9,12 +9,7 @@ const SendEmail = ({ table_data, month_name, email, year }) => {
   console.log("email_address", email_address);
   console.log("company_name", company_name);
 
-  //check if email valid
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email_address)) {
-    return res.status(400).json({ message: "Invalid email" });
-  }
-  const email_send = "ab.dey2001@gmail.com";
+  const email_send = email_address;
 
   const table_html = `
   <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; margin-top: 20px;">

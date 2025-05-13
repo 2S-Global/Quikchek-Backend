@@ -127,6 +127,10 @@ export const sendEmail = async (req, res) => {
     await email.save();
   } catch (error) {
     console.error("Error sending email:", error);
+    email.email_sent = true;
+    email.feedback =
+      "Could not send email.Error sending email: " + error.message;
+    await email.save();
   }
 
   res.status(200).json({
