@@ -116,7 +116,9 @@ export const sendEmail = async (req, res) => {
       " and was sent by: " +
       mailOptions.from +
       "Email msg ID :" +
-      info.messageId;
+      info.messageId +
+      "company Name: " +
+      email.employer_id.name;
 
     // Update the email record to indicate that the email has been sent
     email.email_sent = true;
