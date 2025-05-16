@@ -1,11 +1,13 @@
 import UserVerification from "../models/userVerificationModel.js";
 import User from "../models/userModel.js";
+import Transaction from "../models/transactionModel.js";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium"; // Vercel-compatible Chromium
 import GeneratePDF from "./Helpers/pdfHelper.js";
 import OtpGeneratePDF from "./Helpers/otppdfHelper.js";
 import { getInvoiceData } from "./Helpers/dataHelper.js";
 import InvoiceGenerate from "./Helpers/invoicepdf.js";
+import ReportGenerate from "./Helpers/reportHelper.js";
 export const generatePDF = async (req, res) => {
   try {
     const order_id = req.body.order_id;
@@ -243,5 +245,142 @@ export const InvoicePDF = async (req, res) => {
   } catch (error) {
     console.error("Error generating invoice PDF data:", error.message);
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const ReportPDF = async (req, res) => {
+  const { start_date, end_date } = req.body;
+  console.log("ReportPDF");
+
+  if (!start_date || !end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date and end_date are required" });
+  }
+
+  if (start_date > end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date cannot be greater than end_date" });
+  }
+
+  try {
+    const all_transactions = await Transaction.find({
+      createdAt: {
+        $gte: new Date(start_date),
+        $lte: new Date(end_date),
+      },
+    }).populate({
+      path: "order_ref_id",
+      populate: {
+        path: "employer_id",
+        model: "User", // Make sure this matches your model name
+      },
+    });
+
+    const Payment_record = all_transactions.order_ref_id;
+
+    const table_data = all_transactions.map((txn) => {
+      const record = txn.order_ref_id || {};
+      const employer = record.employer_id || {};
+
+      const cgst = parseFloat(record.cgst) || 0;
+      const sgst = parseFloat(record.sgst) || 0;
+      const total_amount = parseFloat(record.total_amount) || 0;
+
+      const total_gst = cgst + sgst;
+      const main_amount = total_amount - total_gst;
+
+      console.log("main_amount", main_amount);
+      console.log("total_gst", total_gst);
+      console.log("total ", total_amount);
+
+      return {
+        date: record.createdAt || "",
+        customer_name: employer.name || "",
+        customer_email: employer.email || "",
+        customer_address: employer.address || "",
+        customer_gst: employer.gst_no || "",
+        invoice_no: record.invoice_number || "",
+        amount: main_amount,
+        gst: total_gst,
+      };
+    });
+
+    const htmlContent = ReportGenerate({
+      data: table_data,
+      start_date,
+      end_date,
+    });
+
+    const fileName = `Report_${start_date}_${end_date}.pdf`;
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+    });
+    const page = await browser.newPage();
+    const headerTemplate = `
+      <div style="width: 100%; text-align: center; font-size: 12px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+        <h2 style="margin: 0; color: #333;">GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED</h2>
+<p style="margin: 0; font-size: 10px; line-height: 1.6;">
+  Unit-404, 4th Floor, Webel IT Park (Phase-II),<br />
+  Rajarhat, DH Block (Newtown), Action Area 1D,<br />
+  Newtown, West Bengal 700160.
+</p>
+
+        <p style="margin: 0; font-size: 10px; line-height: 1.6;">hello@geisil.com | 00348101495</p>
+      </div>
+    `;
+    const createdAt = new Date().toLocaleString("en-IN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true, // for AM/PM format
+      timeZone: "Asia/Kolkata",
+    });
+
+    const footerTemplate = `
+      <div style="width: 100%; text-align: center; padding: 5px; font-size: 10px; border-top: 1px solid #ccc;">
+        <p style="margin: 0; font-size: 10px; line-height: 1.6;">Generated on ${createdAt}</p>
+        Page <span class="pageNumber"></span> of <span class="totalPages"></span>
+      </div>
+    `;
+
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      landscape: true,
+      displayHeaderFooter: true,
+      headerTemplate,
+      footerTemplate,
+      margin: {
+        top: "120px",
+        bottom: "40px",
+      },
+    });
+
+    await page.close();
+    await browser.close();
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${fileName}"`,
+      "Content-Length": pdfBuffer.length,
+    });
+
+    console.log("PDF generated successfully:", fileName);
+    return res.end(pdfBuffer);
+
+    //res.status(201).json({ table_data });
+  } catch (error) {
+    console.error("Error generating Report PDF data:", error.message);
+    return res.status(500).json({ message: error.message });
   }
 };

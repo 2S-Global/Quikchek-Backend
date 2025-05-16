@@ -7,6 +7,7 @@ import {
   generatePDF,
   otpgeneratePDF,
   InvoicePDF,
+  ReportPDF,
 } from "../controllers/pdfController.js";
 
 dotenv.config();
@@ -26,4 +27,5 @@ const upload = multer({ storage: storage });
 pdfRouter.post("/generate-pdf", generatePDF);
 pdfRouter.post("/otp-generate-pdf", otpgeneratePDF);
 pdfRouter.post("/invoice-pdf", InvoicePDF);
+pdfRouter.post("/report-pdf", upload.none(), ReportPDF);
 export default pdfRouter;
