@@ -460,3 +460,69 @@ export const ReportCsv = async (req, res) => {
     return res.status(500).json({ message: "Failed to generate CSV" });
   }
 };
+
+export const ReportTable = async (req, res) => {
+  const { start_date, end_date } = req.body;
+  console.log("ReportPDF");
+
+  if (!start_date || !end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date and end_date are required" });
+  }
+
+  if (start_date > end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date cannot be greater than end_date" });
+  }
+
+  try {
+    const all_transactions = await Transaction.find({
+      createdAt: {
+        $gte: new Date(start_date),
+        $lte: new Date(end_date),
+      },
+    }).populate({
+      path: "order_ref_id",
+      populate: {
+        path: "employer_id",
+        model: "User", // Make sure this matches your model name
+      },
+    });
+
+    const Payment_record = all_transactions.order_ref_id;
+
+    const table_data = all_transactions.map((txn) => {
+      const record = txn.order_ref_id || {};
+      const employer = record.employer_id || {};
+
+      const cgst = parseFloat(record.cgst) || 0;
+      const sgst = parseFloat(record.sgst) || 0;
+      const total_amount = parseFloat(record.total_amount) || 0;
+
+      const total_gst = cgst + sgst;
+      const main_amount = total_amount - total_gst;
+
+      console.log("main_amount", main_amount);
+      console.log("total_gst", total_gst);
+      console.log("total ", total_amount);
+
+      return {
+        date: record.createdAt || "",
+        customer_name: employer.name || "",
+        customer_email: employer.email || "",
+        customer_address: employer.address || "",
+        customer_gst: employer.gst_no || "",
+        invoice_no: record.invoice_number || "",
+        amount: main_amount,
+        gst: total_gst,
+      };
+    });
+
+    res.status(201).json({ table_data });
+  } catch (error) {
+    console.error("Error generating Report PDF data:", error.message);
+    return res.status(500).json({ message: error.message });
+  }
+};
