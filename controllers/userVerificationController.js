@@ -1733,7 +1733,7 @@ export const paynow = async (req, res) => {
         user.name +
         " Has Paid for Order #" +
         orderNumber,
-      cc: ["ab.dey2000@gmail.com", "avik@2sglobal.co"],
+      cc: ["kp.sunit@gmail.com", "avik@2sglobal.co", "dipanwita@2sglobal.co"],
       html: `
     <div style="text-align: center; margin-bottom: 20px;">
       <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
