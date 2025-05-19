@@ -8,6 +8,8 @@ import OtpGeneratePDF from "./Helpers/otppdfHelper.js";
 import { getInvoiceData } from "./Helpers/dataHelper.js";
 import InvoiceGenerate from "./Helpers/invoicepdf.js";
 import ReportGenerate from "./Helpers/reportHelper.js";
+import allOrdersData from "../models/allOrders.js";
+import { Parser } from "json2csv";
 export const generatePDF = async (req, res) => {
   try {
     const order_id = req.body.order_id;
@@ -382,5 +384,79 @@ export const ReportPDF = async (req, res) => {
   } catch (error) {
     console.error("Error generating Report PDF data:", error.message);
     return res.status(500).json({ message: error.message });
+  }
+};
+
+export const ReportCsv = async (req, res) => {
+  const { start_date, end_date } = req.body;
+  console.log("ReportCSV");
+
+  if (!start_date || !end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date and end_date are required" });
+  }
+
+  if (start_date > end_date) {
+    return res
+      .status(400)
+      .json({ message: "start_date cannot be greater than end_date" });
+  }
+
+  const start = new Date(start_date);
+  const end = new Date(end_date);
+
+  const Payment_record = await allOrdersData.find({
+    createdAt: { $gte: start, $lte: end },
+  });
+
+  if (!Payment_record || Payment_record.length === 0) {
+    return res.status(404).json({ message: "Payment record not found" });
+  }
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const table_data = Payment_record.map((txn) => ({
+    "Export Type": "WOPAY",
+    "Invoice Number": txn.invoice_number,
+    "Invoice date": formatDate(txn.createdAt),
+    "Invoice Value (Inr)": parseFloat(txn.total_amount),
+    "Port Code": "",
+    "Shipping Bill Number": "",
+    "Shipping Bill Date": "",
+    Rate: 0,
+    "Taxable Value (Inr)": parseFloat(txn.total_amount),
+    "Cess Amount": 0,
+  }));
+
+  try {
+    const fields = [
+      "Export Type",
+      "Invoice Number",
+      "Invoice date",
+      "Invoice Value (Inr)",
+      "Port Code",
+      "Shipping Bill Number",
+      "Shipping Bill Date",
+      "Rate",
+      "Taxable Value (Inr)",
+      "Cess Amount",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(table_data);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment(`report_${start_date}_to_${end_date}.csv`);
+    return res.send(csv);
+  } catch (err) {
+    console.error("CSV generation error:", err);
+    return res.status(500).json({ message: "Failed to generate CSV" });
   }
 };

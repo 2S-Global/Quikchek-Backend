@@ -8,6 +8,7 @@ import {
   otpgeneratePDF,
   InvoicePDF,
   ReportPDF,
+  ReportCsv,
 } from "../controllers/pdfController.js";
 
 dotenv.config();
@@ -28,4 +29,11 @@ pdfRouter.post("/generate-pdf", generatePDF);
 pdfRouter.post("/otp-generate-pdf", otpgeneratePDF);
 pdfRouter.post("/invoice-pdf", InvoicePDF);
 pdfRouter.post("/report-pdf", upload.none(), ReportPDF);
+pdfRouter.post(
+  "/report-csv",
+  upload.none(),
+  /* userAuth,
+  adminMiddleware, */
+  ReportCsv
+);
 export default pdfRouter;

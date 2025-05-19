@@ -8,6 +8,7 @@ import User from "../models/userModel.js";
 import UserCartVerificationAadhatOTP from "../models/userVerificationCartAadhatOTPModel.js";
 
 import allOrdersData from "../models/allOrders.js";
+import generateInvoiceNo from "../controllers/Helpers/generateInvoiceno.js";
 
 import nodemailer from "nodemailer";
 
@@ -1529,7 +1530,7 @@ export const paynow = async (req, res) => {
     const orderNumber = `ORD-${Date.now()}`;
 
     // Generate invoice number
-    const invoiceNumber = `INV-${Date.now()}`;
+    const invoiceNumber = await generateInvoiceNo();
 
     const newUserCart = new allOrdersData({
       employer_id: employer_id,
