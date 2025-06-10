@@ -79,6 +79,7 @@ export const validtoken = async (req, res) => {
     return res.status(500).json({
       message: "An error occurred while validating the token.",
       success: false,
+      isvalid: false,
     });
   }
 };
