@@ -18,13 +18,14 @@ import {
   listSelfRegisteredCompanies,
   sendAccessEmail,
   listCompaniesAll,
-  verifyEmail
+  verifyEmail,
+  validtoken,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
 import userAuth from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
- // Adjust path if needed
+// Adjust path if needed
 
 dotenv.config();
 // Configure Cloudinary
@@ -40,21 +41,45 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 //chabnge password
 AuthRouter.post("/change-password", upload.none(), userAuth, changePassword);
+//valid token
+AuthRouter.get("/validtoken", userAuth, validtoken);
+// Register user candidate
+AuthRouter.post("/register-frontend", upload.none(), RegisterFrontEnd);
 
 // Register user candidate
-AuthRouter.post( "/register-frontend", upload.none(), RegisterFrontEnd);
-
-
-// Register user candidate
-AuthRouter.post("/register", userAuth, adminMiddleware, upload.none(), registerUser);
-AuthRouter.post("/edit_user", userAuth, adminMiddleware, upload.none(), editUser);
-AuthRouter.post("/list_fields_by_company", userAuth, adminMiddleware, upload.none(), listFieldsByCompany);
+AuthRouter.post(
+  "/register",
+  userAuth,
+  adminMiddleware,
+  upload.none(),
+  registerUser
+);
+AuthRouter.post(
+  "/edit_user",
+  userAuth,
+  adminMiddleware,
+  upload.none(),
+  editUser
+);
+AuthRouter.post(
+  "/list_fields_by_company",
+  userAuth,
+  adminMiddleware,
+  upload.none(),
+  listFieldsByCompany
+);
 AuthRouter.post("/get_company_details", upload.none(), getUserDetailsById);
 
 // Login user
 AuthRouter.post("/login", upload.none(), loginUser);
 AuthRouter.post("/forgotpass", upload.none(), forgotPassword);
-AuthRouter.post("/sendAccessEmail", upload.none(), userAuth, adminMiddleware, sendAccessEmail);
+AuthRouter.post(
+  "/sendAccessEmail",
+  upload.none(),
+  userAuth,
+  adminMiddleware,
+  sendAccessEmail
+);
 
 // Register company
 AuthRouter.post(
@@ -65,8 +90,18 @@ AuthRouter.post(
   registerCompany
 );
 AuthRouter.post("/list-companies", userAuth, adminMiddleware, listCompanies);
-AuthRouter.post("/list-companies_all", userAuth, adminMiddleware, listCompaniesAll);
-AuthRouter.post("/list-companies-self", userAuth, adminMiddleware, listSelfRegisteredCompanies);
+AuthRouter.post(
+  "/list-companies_all",
+  userAuth,
+  adminMiddleware,
+  listCompaniesAll
+);
+AuthRouter.post(
+  "/list-companies-self",
+  userAuth,
+  adminMiddleware,
+  listSelfRegisteredCompanies
+);
 AuthRouter.post("/delete-companies", userAuth, adminMiddleware, deleteCompany);
 AuthRouter.post(
   "/togglestatus-companies",

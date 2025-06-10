@@ -56,6 +56,32 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const validtoken = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user || user.is_del) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+        isvalid: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Token is valid.",
+      success: true,
+      isvalid: true,
+    });
+  } catch (error) {
+    console.error("Error while validating token:", error);
+    return res.status(500).json({
+      message: "An error occurred while validating the token.",
+      success: false,
+    });
+  }
+};
 // Register a new user
 export const registerUser = async (req, res) => {
   try {
