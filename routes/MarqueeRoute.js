@@ -17,6 +17,13 @@ import {
 
 const MarqueeRouter = express.Router();
 
+/*/add_marquee
+/edit_marquee
+/delete_marquee
+/toggle_marquee_status
+/list_marquee //for all
+/all_list_marquee//for admin
+  */
 MarqueeRouter.post(
   "/add_marquee",
   upload.single("image"),
@@ -40,12 +47,7 @@ MarqueeRouter.put(
   toggleMarqueeStatus
 );
 
-MarqueeRouter.get("/list_marquee", upload.none(), listMarquee);
-MarqueeRouter.get(
-  "/all_list_marquee",
-  userAuth,
-  upload.none(),
-  All_listMarquee
-);
+MarqueeRouter.get("/list_marquee", listMarquee);
+MarqueeRouter.get("/all_list_marquee", userAuth, All_listMarquee);
 
 export default MarqueeRouter;
