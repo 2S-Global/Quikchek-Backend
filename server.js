@@ -27,6 +27,7 @@ import dashboardRoute from "./routes/dashboardRoute.js";
 import InviteRouter from "./routes/inviteRoute.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import email_router from "./routes/emailRoute.js";
+import MarqueeRouter from "./routes/MarqueeRoute.js";
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
@@ -45,6 +46,7 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/invite", InviteRouter);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/email", email_router);
+app.use("/api/marquee", MarqueeRouter);
 
 // Start server
 const PORT = process.env.PORT || 8080;
