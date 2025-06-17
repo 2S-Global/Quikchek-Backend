@@ -836,7 +836,7 @@ export const paynowAadharOTPFree = async (req, res) => {
     };
 
     const response = await axios.post(
-      "https://live.zoop.one/in/identity/okyc/otp/request",
+      "https://test.zoop.one/in/identity/okyc/otp/request",
       payload,
       { headers }
     );
