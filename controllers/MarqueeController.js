@@ -114,7 +114,9 @@ export const toggleMarqueeStatus = async (req, res) => {
     }
     marquee.is_active = !is_active;
     await marquee.save();
-    res.status(200).json({ message: "Marquee status updated successfully" });
+    res
+      .status(200)
+      .json({ message: "Marquee status updated successfully", success: true });
   } catch (err) {
     console.log(err);
   }
