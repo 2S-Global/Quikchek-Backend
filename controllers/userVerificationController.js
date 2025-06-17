@@ -698,7 +698,7 @@ export const paynowAadharOTP = async (req, res) => {
 
     const headers = {
       "app-id": "67b8252871c07100283cedc6",
-      "api-key": "52HD084-W614E0Q-JQY5KJG-R8EW1TW",
+      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1",
       "Content-Type": "application/json",
     };
 
@@ -830,13 +830,13 @@ export const paynowAadharOTPFree = async (req, res) => {
     };
 
     const headers = {
-      "app-id": "67b8252871c07100283cedc6",
-      "api-key": "52HD084-W614E0Q-JQY5KJG-R8EW1TW",
+      "app-id": "68020766d125b80028ec9ba0",
+      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1",
       "Content-Type": "application/json",
     };
 
     const response = await axios.post(
-      "https://test.zoop.one/in/identity/okyc/otp/request",
+      "https://live.zoop.one/in/identity/okyc/otp/request",
       payload,
       { headers }
     );
