@@ -112,7 +112,7 @@ export const toggleMarqueeStatus = async (req, res) => {
     if (!marquee) {
       return res.status(404).json({ message: "Marquee not found" });
     }
-    marquee.is_active = !is_active;
+    marquee.is_active = is_active;
     await marquee.save();
     res
       .status(200)
