@@ -24,7 +24,7 @@ const transactionSchema = new mongoose.Schema({
   },
   payment_method: {
     type: String,
-    enum: ["online", "Wallet"],
+    enum: ["online", "Wallet", "Free"],
   },
   payment_type: {
     type: String,
