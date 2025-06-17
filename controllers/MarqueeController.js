@@ -95,7 +95,9 @@ export const deleteMarquee = async (req, res) => {
     }
     marquee.is_del = true;
     await marquee.save();
-    res.status(200).json({ message: "Marquee deleted successfully" });
+    res
+      .status(200)
+      .json({ message: "Marquee deleted successfully", success: true });
   } catch (err) {
     console.log(err);
   }
