@@ -1988,7 +1988,7 @@ export const paynowFree = async (req, res) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+   // await transporter.sendMail(mailOptions);
 
     const mailOptions2 = {
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
@@ -2017,7 +2017,7 @@ export const paynowFree = async (req, res) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions2);
+ //   await transporter.sendMail(mailOptions2);
 
     const mailOptions3 = {
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
@@ -2059,7 +2059,7 @@ export const paynowFree = async (req, res) => {
   `,
     };
 
-    await transporter.sendMail(mailOptions3);
+  //  await transporter.sendMail(mailOptions3);
 
     return res.status(200).json({
       message:
