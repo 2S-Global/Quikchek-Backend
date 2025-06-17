@@ -74,7 +74,7 @@ export const editMarquee = async (req, res) => {
     await marquee.save();
     res.status(200).json({
       message: "Marquee updated successfully",
-      marquee,
+      data: marquee,
       success: true,
     });
   } catch (err) {
