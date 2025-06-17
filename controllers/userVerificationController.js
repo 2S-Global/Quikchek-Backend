@@ -1798,9 +1798,9 @@ export const paynowFree = async (req, res) => {
       overall_billing,
     } = req.body;
 
-    if (!amount || !payment_method) {
+/*     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
-    }
+    } */
 
     const user = await User.findById(employer_id);
     if (!user) {
