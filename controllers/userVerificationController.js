@@ -697,14 +697,23 @@ export const paynowAadharOTP = async (req, res) => {
     };
 
     const headers = {
+      /* 
       "app-id": "67b8252871c07100283cedc6",
-      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1",
+      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", */
       "Content-Type": "application/json",
     };
 
-    const response = await axios.post(
+    /*    const response = await axios.post(
       "https://live.zoop.one/in/identity/okyc/otp/request",
       payload,
+      { headers }
+    ); */
+    const response = await axios.post(
+      "https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp",
+      {
+        key: "0196b58f-2f35-4c99-b219-aa8339013476",
+        id_number: aadhaarNumber,
+      },
       { headers }
     );
 
@@ -725,9 +734,6 @@ export const paynowAadharOTP = async (req, res) => {
   }
 };
 
-
-
-
 export const paynowAadharOTPFree = async (req, res) => {
   try {
     const employer_id = req.userId;
@@ -738,7 +744,7 @@ export const paynowAadharOTPFree = async (req, res) => {
 
     const { amount, paymentIds, payment_method } = req.body;
 
-/*     if (!amount || !payment_method) {
+    /*     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
     } */
 
@@ -750,7 +756,6 @@ export const paynowAadharOTPFree = async (req, res) => {
     }
 
     if (payment_method === "Free") {
-
     } else {
       return res.status(400).json({ error: "Invalid payment method." });
     }
@@ -795,7 +800,7 @@ export const paynowAadharOTPFree = async (req, res) => {
     // Save transaction after userIds is ready
     const transaction = new Transaction({
       employer_id: employer_id,
-      transactionId: '',
+      transactionId: "",
       amount: parsedAmount,
       paymentids: paymentIds || null,
       order_ids: userId,
@@ -830,14 +835,23 @@ export const paynowAadharOTPFree = async (req, res) => {
     };
 
     const headers = {
+      /* 
       "app-id": "68020766d125b80028ec9ba0",
-      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1",
+      "api-key": "YAR46W0-0S0MS44-M6KV686-Q1X70Z1", */
       "Content-Type": "application/json",
     };
 
-    const response = await axios.post(
+    /*    const response = await axios.post(
       "https://live.zoop.one/in/identity/okyc/otp/request",
       payload,
+      { headers }
+    ); */
+    const response = await axios.post(
+      "https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp",
+      {
+        key: "0196b58f-2f35-4c99-b219-aa8339013476",
+        id_number: aadhaarNumber,
+      },
       { headers }
     );
 
@@ -857,11 +871,6 @@ export const paynowAadharOTPFree = async (req, res) => {
     });
   }
 };
-
-
-
-
-
 
 export const paynowAadharOTP_30042025 = async (req, res) => {
   try {
@@ -1572,15 +1581,26 @@ export const verifyOtpAadhar = async (req, res) => {
 
     // Define headers for the API request
     const headers = {
+      /* 
       "app-id": "67b8252871c07100283cedc6",
-      "api-key": "52HD084-W614E0Q-JQY5KJG-R8EW1TW",
+      "api-key": "52HD084-W614E0Q-JQY5KJG-R8EW1TW", */
       "Content-Type": "application/json",
     };
 
     // Call Zoop API to verify OTP
-    const response = await axios.post(
+    /* const response = await axios.post(
       "https://live.zoop.one/in/identity/okyc/otp/verify",
       payload,
+      { headers }
+    ); */
+
+    const response = await axios.post(
+      "https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp",
+      {
+        key: "0196b58f-2f35-4c99-b219-aa8339013476",
+        request_id: request_id,
+        otp: otp,
+      },
       { headers }
     );
 
@@ -1920,7 +1940,6 @@ export const paynow = async (req, res) => {
   }
 };
 
-
 export const paynowFree = async (req, res) => {
   try {
     const employer_id = req.userId;
@@ -1929,14 +1948,9 @@ export const paynowFree = async (req, res) => {
       return res.status(400).json({ error: "User ID is missing." });
     }
 
-    const {
-      amount,
-      paymentIds,
-      payment_method,
-      overall_billing,
-    } = req.body;
+    const { amount, paymentIds, payment_method, overall_billing } = req.body;
 
-/*     if (!amount || !payment_method) {
+    /*     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
     } */
 
@@ -1952,7 +1966,6 @@ export const paynowFree = async (req, res) => {
       user.wallet_amount -= amount;
       await user.save();
     } else if (payment_method === "Free") {
-
     } else {
       return res.status(400).json({ error: "Invalid payment method." });
     }
@@ -2074,7 +2087,7 @@ export const paynowFree = async (req, res) => {
     const transaction = new Transaction({
       employer_id: employer_id,
       order_ref_id: insertedId,
-      transactionId:'',
+      transactionId: "",
       amount: amount,
       paymentids: paymentIds || null,
       order_ids: userIds.join(","),
@@ -2126,7 +2139,7 @@ export const paynowFree = async (req, res) => {
       `,
     };
 
-   // await transporter.sendMail(mailOptions);
+    // await transporter.sendMail(mailOptions);
 
     const mailOptions2 = {
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
@@ -2155,7 +2168,7 @@ export const paynowFree = async (req, res) => {
       `,
     };
 
- //   await transporter.sendMail(mailOptions2);
+    //   await transporter.sendMail(mailOptions2);
 
     const mailOptions3 = {
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
@@ -2197,7 +2210,7 @@ export const paynowFree = async (req, res) => {
   `,
     };
 
-  //  await transporter.sendMail(mailOptions3);
+    //  await transporter.sendMail(mailOptions3);
 
     return res.status(200).json({
       message:
@@ -2213,4 +2226,3 @@ export const paynowFree = async (req, res) => {
     });
   }
 };
-
