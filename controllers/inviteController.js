@@ -77,8 +77,8 @@ export const inviteController = async (req, res) => {
     `;
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com",
-      port: 465,
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       secure: true,
       auth: {
         user: process.env.EMAIL_USER,
