@@ -147,9 +147,9 @@ export const registerUser = async (req, res) => {
 
     // Send email with login credentials
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com", // fixed typo
-      port: 465,
-      secure: true, // true for port 465
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -292,9 +292,9 @@ export const RegisterFrontEnd = async (req, res) => {
 
     // Send email with login credentials
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com", // fixed typo
-      port: 465,
-      secure: true, // true for port 465
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -474,9 +474,9 @@ export const editUser = async (req, res) => {
 
     if (oldemail != email) {
       const transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com", // fixed typo
-        port: 465,
-        secure: true, // true for port 465
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: true,
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
@@ -567,8 +567,8 @@ export const sendAccessEmail = async (req, res) => {
 
     // Send email with new password
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com",
-      port: 465,
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       secure: true,
       auth: {
         user: process.env.EMAIL_USER,
@@ -688,8 +688,8 @@ export const forgotPassword = async (req, res) => {
 
     // Send email with new password
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com",
-      port: 465,
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       secure: true,
       auth: {
         user: process.env.EMAIL_USER,

@@ -14,7 +14,7 @@ export const createCompanyPackage = async (req, res) => {
       aadhar_otp,
       aadhar_price,
       hotel_module,
-      housing_module
+      housing_module,
     } = req.body;
 
     if (!companyId || !selected_plan) {
@@ -79,8 +79,8 @@ export const createCompanyPackage = async (req, res) => {
     let transporter;
     try {
       transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com",
-        port: 465,
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
         secure: true,
         auth: {
           user: process.env.EMAIL_USER,
@@ -202,8 +202,8 @@ export const resendCompanyPackageEmail = async (req, res) => {
 
     // Email transporter
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com",
-      port: 465,
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       secure: true,
       auth: {
         user: process.env.EMAIL_USER,
@@ -333,7 +333,6 @@ const parsePlanIds = (selected_plan) => {
   return Array.isArray(selected_plan) ? selected_plan : [];
 };
 
-
 export const sidebarAadharOtp = async (req, res) => {
   try {
     const companyId = new mongoose.Types.ObjectId(req.userId);
@@ -354,7 +353,6 @@ export const sidebarAadharOtp = async (req, res) => {
         message: "No packages found for this company",
       });
     }
-
 
     const aadharOtpStatus = data.aadhar_otp;
     const hoteltatus = data.hotel_module;
