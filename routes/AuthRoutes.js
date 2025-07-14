@@ -9,6 +9,7 @@ import {
   registerCompany,
   listCompanies,
   deleteCompany,
+  deleteAccount,
   toggleCompanyStatus,
   editUser,
   forgotPassword,
@@ -25,6 +26,7 @@ import {
 
 import userAuth from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
+import Companymid from "../middleware/companyMiddleware.js";
 // Adjust path if needed
 
 dotenv.config();
@@ -103,6 +105,7 @@ AuthRouter.post(
   listSelfRegisteredCompanies
 );
 AuthRouter.post("/delete-companies", userAuth, adminMiddleware, deleteCompany);
+AuthRouter.post("/delete-account", userAuth, deleteAccount);
 AuthRouter.post(
   "/togglestatus-companies",
   userAuth,

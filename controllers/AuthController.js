@@ -1108,6 +1108,40 @@ export const deleteCompany = async (req, res) => {
   }
 };
 
+export const deleteAccount = async (req, res) => {
+  try {
+    const companyId = req.userId;
+
+    console.log("companyId", companyId);
+    // Validate and convert companyId to ObjectId
+
+    // Find and update the company
+    const deletedCompany = await User.findOneAndUpdate(
+      { _id: companyId, role: 1, is_del: false },
+      { is_del: true, updatedAt: new Date() },
+      { new: true }
+    );
+
+    if (!deletedCompany) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found or already deleted",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Company deleted successfully",
+      data: deletedCompany,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting company",
+      error: error.message,
+    });
+  }
+};
 export const toggleCompanyStatus = async (req, res) => {
   try {
     const { status, companyId } = req.body;
