@@ -9,28 +9,28 @@ const userVerificationSchema = new mongoose.Schema(
     },
     order_ref_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'allOrdersData',
-      },
-    order_id:{
+      ref: "allOrdersData",
+    },
+    order_id: {
       type: String,
     },
     plan: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Package',
-    }, 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Package",
+    },
     amount: {
-    type: String,
+      type: String,
     },
     pdf_url: {
       type: String,
     },
     candidate_name: {
       type: String,
-      required: true,
+      required: false,
     },
     candidate_email: {
       type: String,
-      required: true,
+      required: false,
     },
     candidate_mobile: {
       type: String,
@@ -108,27 +108,27 @@ const userVerificationSchema = new mongoose.Schema(
     },
 
     uan_name: {
-    type:String,
+      type: String,
     },
     uan_number: {
-    type:String,
+      type: String,
     },
-    uan_response: { 
-    type: Object
+    uan_response: {
+      type: Object,
     },
-    epfo_name:{
-    type:String,
+    epfo_name: {
+      type: String,
     },
-    epfo_number:{
-    type:String,
+    epfo_number: {
+      type: String,
     },
-    epfo_response:{
-    type: Object
+    epfo_response: {
+      type: Object,
     },
     aadhat_otp: {
       type: String,
-      default: 'no',
-    },    
+      default: "no",
+    },
     updatedAt: {
       type: Date,
       default: Date.now,
