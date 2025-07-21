@@ -180,7 +180,7 @@ export const registerUser = async (req, res) => {
           <li><strong>Password:</strong> ${password}</li>
         </ul>
       
-        <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/verification-email?token=${token}">Verify Email</a></p>
+        <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/api/auth/verify-email/token=${token}">Verify Email</a></p>
        
 
       
@@ -325,7 +325,7 @@ export const RegisterFrontEnd = async (req, res) => {
           <li><strong>Password:</strong> ${password}</li>
         </ul>
       
-       <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/verification-email?token=${token}">Verify Email</a></p>
+       <p>Click the link  to verify your email: <a href="${process.env.CLIENT_BASE_URL}/api/auth/verify-email/token=${token}">Verify Email</a></p>
       
         <p><strong>Key Features and Benefits of QuikChek:</strong></p>
         <ul>
