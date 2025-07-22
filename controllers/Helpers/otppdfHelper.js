@@ -132,8 +132,8 @@ const OtpGeneratePDF = ({ user }) => {
             <h5 class="fw-bold text-dark mb-2 me-2 d-block">Image as per Aadhaar</h5>
             <img
               src="${
-                user?.aadhaar_response?.result?.user_profile_image
-                  ? `data:image/jpeg;base64,${user.aadhaar_response.result.user_profile_image}`
+                user?.aadhaar_response?.data?.profile_image
+                  ? `data:image/jpeg;base64,${user.aadhaar_response.data.profile_image}`
                   : "/images/resource/no_user.png"
               }"
               alt="Profile"
