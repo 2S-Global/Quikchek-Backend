@@ -104,7 +104,8 @@ const OtpGeneratePDF = ({ user }) => {
   /* Aahaar */
   const aadhaarStatus = !user?.aadhaar_response
     ? { src: notapplicablelogo, alt: "N/A" }
-    : user?.aadhaar_response?.response_code == 100
+    : user?.aadhaar_response?.status_code == 200 ||
+      user?.aadhaar_response?.response_code == 100
     ? { src: verifiedlogo, alt: "Verified" }
     : { src: unverifiedlogo, alt: "Not Verified" };
 
@@ -117,6 +118,15 @@ const OtpGeneratePDF = ({ user }) => {
       style="width: 80px; height: 20px;"
     />
   </h5>`;
+
+  const base64Image =
+    user?.aadhaar_response?.data?.profile_image ||
+    user?.aadhaar_response?.result?.user_profile_image;
+
+  const profileImageSrc = base64Image
+    ? `data:image/jpeg;base64,${base64Image}`
+    : "/images/resource/no_user.png";
+
   const aadhaarDetails = `
   <div class="col-md-12 mb-3" id="aadhaar_response">
     <div class="p-3 shadow-sm rounded bg-light">
@@ -131,11 +141,7 @@ const OtpGeneratePDF = ({ user }) => {
             <!-- This is heading -->
             <h5 class="fw-bold text-dark mb-2 me-2 d-block">Image as per Aadhaar</h5>
             <img
-              src="${
-                user?.aadhaar_response?.data?.profile_image
-                  ? `data:image/jpeg;base64,${user.aadhaar_response.data.profile_image}`
-                  : "/images/resource/no_user.png"
-              }"
+              src=${profileImageSrc}
               alt="Profile"
               class="img-thumbnail rounded"
               style="max-width: 150px; max-height: 150px;"
@@ -148,52 +154,98 @@ const OtpGeneratePDF = ({ user }) => {
             <div class="d-flex align-items-center mb-1">
               <span class="fw-bold me-2">Full Name:</span>
               <span class="text-break">
-                ${user?.aadhaar_response?.result?.user_full_name || "N/A"}
+                ${
+                  user?.aadhaar_response?.data?.full_name ||
+                  user?.aadhaar_response?.result?.user_full_name ||
+                  "N/A"
+                }
               </span>
             </div>
             <div class="d-flex align-items-center mb-1">
               <span class="fw-bold me-2">Aadhaar Number:</span>
               <span class="text-break">
-                ${user?.aadhaar_response?.result?.user_aadhaar_number || "N/A"}
+                ${
+                  user?.aadhaar_response?.data?.aadhaar_number ||
+                  user?.aadhaar_response?.result?.user_aadhaar_number ||
+                  "N/A"
+                }
               </span>
             </div>
             <div class="d-flex align-items-center mb-1">
               <span class="fw-bold me-2">DOB:</span>
               <span class="text-break">
-                ${user?.aadhaar_response?.result?.user_dob || "N/A"}
+                ${
+                  user?.aadhaar_response?.data?.dob ||
+                  user?.aadhaar_response?.result?.user_dob ||
+                  "N/A"
+                }
               </span>
             </div>
             <div class="d-flex align-items-center mb-1">
               <span class="fw-bold me-2">Gender:</span>
               <span class="text-break">
-                ${user?.aadhaar_response?.result?.user_gender || "N/A"}
+                ${
+                  user?.aadhaar_response?.data?.gender ||
+                  user?.aadhaar_response?.result?.user_gender ||
+                  "N/A"
+                }
               </span>
             </div>
             <div class="d-flex mb-1">
               <span class="fw-bold me-2">Address:</span>
               <span class="text-break flex-grow-1">
-                ${
-                  [
-                    user?.aadhaar_response?.result?.user_address?.house,
-                    user?.aadhaar_response?.result?.user_address?.street,
-                    user?.aadhaar_response?.result?.user_address?.landmark,
-                    user?.aadhaar_response?.result?.user_address?.loc,
-                    user?.aadhaar_response?.result?.user_address?.po,
-                    user?.aadhaar_response?.result?.user_address?.vtc,
-                    user?.aadhaar_response?.result?.user_address?.subdist,
-                    user?.aadhaar_response?.result?.user_address?.dist,
-                    user?.aadhaar_response?.result?.user_address?.state,
-                    user?.aadhaar_response?.result?.user_address?.country,
-                  ]
-                    .filter(Boolean)
-                    .join(", ") || "N/A"
-                }
-              </span>
+                 ${
+                   ([
+                     user?.aadhaar_response?.data?.address?.house,
+                     user?.aadhaar_response?.data?.address?.street,
+                     user?.aadhaar_response?.data?.address?.landmark,
+                     user?.aadhaar_response?.data?.address?.loc,
+                     user?.aadhaar_response?.data?.address?.po,
+                     user?.aadhaar_response?.data?.address?.vtc,
+                     user?.aadhaar_response?.data?.address?.subdist,
+                     user?.aadhaar_response?.data?.address?.dist,
+                     user?.aadhaar_response?.data?.address?.state,
+                     user?.aadhaar_response?.data?.address?.country,
+                   ].filter(Boolean).length > 0
+                     ? [
+                         user?.aadhaar_response?.data?.address?.house,
+                         user?.aadhaar_response?.data?.address?.street,
+                         user?.aadhaar_response?.data?.address?.landmark,
+                         user?.aadhaar_response?.data?.address?.loc,
+                         user?.aadhaar_response?.data?.address?.po,
+                         user?.aadhaar_response?.data?.address?.vtc,
+                         user?.aadhaar_response?.data?.address?.subdist,
+                         user?.aadhaar_response?.data?.address?.dist,
+                         user?.aadhaar_response?.data?.address?.state,
+                         user?.aadhaar_response?.data?.address?.country,
+                       ]
+                     : [
+                         user?.aadhaar_response?.result?.user_address?.house,
+                         user?.aadhaar_response?.result?.user_address?.street,
+                         user?.aadhaar_response?.result?.user_address?.landmark,
+                         user?.aadhaar_response?.result?.user_address?.loc,
+                         user?.aadhaar_response?.result?.user_address?.po,
+                         user?.aadhaar_response?.result?.user_address?.vtc,
+                         user?.aadhaar_response?.result?.user_address?.subdist,
+                         user?.aadhaar_response?.result?.user_address?.dist,
+                         user?.aadhaar_response?.result?.user_address?.state,
+                         user?.aadhaar_response?.result?.user_address?.country,
+                       ]
+                   )
+                     .filter(Boolean)
+                     .join(", ") || "N/A"
+                 }
+</span>
+
             </div>
             <div class="d-flex align-items-center mb-1">
               <span class="fw-bold me-2">Zipcode:</span>
               <span class="text-break">
-                ${user?.aadhaar_response?.result?.address_zip || "N/A"}
+                ${
+                  user?.aadhaar_response?.data?.zip ||
+                  user?.aadhaar_response?.result?.address_zip ||
+                  "N/A"
+                }
               </span>
             </div>
           </div>
