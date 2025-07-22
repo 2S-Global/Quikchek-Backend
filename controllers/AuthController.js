@@ -920,7 +920,7 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, is_del: false });
 
     if (!user) {
       return res.status(401).json({ message: "User not found." });
