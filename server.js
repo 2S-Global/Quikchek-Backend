@@ -29,10 +29,13 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import email_router from "./routes/emailRoute.js";
 import MarqueeRouter from "./routes/MarqueeRoute.js";
 import userSearch from "./routes/userDetailsBySearchRoute.js";
+
+import versionRouter from "./routes/versionRoute.js";
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
 });
+app.use("/api/version", versionRouter);
 app.use("/api/auth", AuthRouter);
 app.use("/api/verify", userVerificationRoutes);
 app.use("/api/usercart", userVerificationCartRoutes);
@@ -51,7 +54,7 @@ app.use("/api/marquee", MarqueeRouter);
 app.use("/api/detailsBySearch", userSearch);
 
 // Start server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 1001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
