@@ -1604,6 +1604,16 @@ export const verifyOtpAadhar = async (req, res) => {
       { headers }
     );
 
+    if (!response.data.status_code == 200) {
+      return res
+        .status(500)
+        .json({
+          success: false,
+          error: response.data.message,
+          message: response.data.message,
+        });
+    }
+
     console.log("OTP Verification Response:", response.data);
 
     if (!response.data.success) {
