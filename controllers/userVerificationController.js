@@ -1613,6 +1613,14 @@ export const verifyOtpAadhar = async (req, res) => {
         .json({ success: false, message: response.data.message });
     }
 
+    if (!response.data.success) {
+      return res.status(400).json({
+        success: false,
+        message: response.data.message || "OTP verification failed",
+        data: response.data,
+      });
+    }
+
     // If OTP is successfully verified, update the document in UserVerification collection
     const updatedDoc = await UserVerification.findByIdAndUpdate(
       newId, // Document ID to update
