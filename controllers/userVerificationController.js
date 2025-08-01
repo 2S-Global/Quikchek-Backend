@@ -1604,17 +1604,14 @@ export const verifyOtpAadhar = async (req, res) => {
       { headers }
     );
 
-    if (!response.data.status_code == 200) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error: response.data.message,
-          message: response.data.message,
-        });
-    }
-
     console.log("OTP Verification Response:", response.data);
+    console.log("code", response.data.status_code);
+
+    if (response.data.status_code !== 200) {
+      return res
+        .status(200)
+        .json({ success: false, message: response.data.message });
+    }
 
     // If OTP is successfully verified, update the document in UserVerification collection
     const updatedDoc = await UserVerification.findByIdAndUpdate(
