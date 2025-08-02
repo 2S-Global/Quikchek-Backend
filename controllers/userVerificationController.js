@@ -2281,6 +2281,7 @@ export const resendAadharOTPFree = async (req, res) => {
     );
 
     return res.status(200).json({
+      success: true,
       message: "OTP resent successfully",
       aadhar_response: response.data,
       newId: newId
