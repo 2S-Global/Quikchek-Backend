@@ -2235,3 +2235,59 @@ export const paynowFree = async (req, res) => {
     });
   }
 };
+
+export const resendAadharOTPFree = async (req, res) => {
+  try {
+    const employer_id = req.userId;
+
+    if (!employer_id) {
+      return res.status(400).json({ error: "User ID is missing." });
+    }
+
+    // Get the last archived verification by employer
+    const archivedUser = await UserVerification.findOne({
+      employer_id,
+      is_del: false, // ensure only active (not deleted) records are used
+    })
+      .sort({ createdAt: -1 }) // get the latest one
+      .lean();
+
+    if (!archivedUser) {
+      return res.status(404).json({ message: "No verification data found to resend OTP." });
+    }
+
+    const aadhaarNumber = archivedUser.aadhar_number;
+    const nameToMatch = archivedUser.aadhar_name;
+
+    if (!aadhaarNumber || !nameToMatch) {
+      return res.status(400).json({ message: "Missing Aadhaar details for resend." });
+    }
+
+    // Prepare payload for OTP resend
+    const payload = {
+      key: "0196b58f-2f35-4c99-b219-aa8339013476",
+      id_number: aadhaarNumber,
+    };
+
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    const response = await axios.post(
+      "https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp",
+      payload,
+      { headers }
+    );
+
+    return res.status(200).json({
+      message: "OTP resent successfully",
+      aadhar_response: response.data,
+    });
+  } catch (error) {
+    console.error("Resend OTP Error:", error);
+    return res.status(500).json({
+      message: "Error resending OTP",
+      error: error.message,
+    });
+  }
+};
