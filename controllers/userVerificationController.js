@@ -736,6 +736,8 @@ export const paynowAadharOTP = async (req, res) => {
 
 export const paynowAadharOTPFree = async (req, res) => {
   try {
+
+    console.log("I am inside paynowAadharOTPFree API");
     const employer_id = req.userId;
 
     if (!employer_id) {
@@ -1604,15 +1606,15 @@ export const verifyOtpAadhar = async (req, res) => {
       { headers }
     );
 
-    if (!response.data.status_code == 200) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error: response.data.message,
-          message: response.data.message,
-        });
-    }
+    // if (!response.data.status_code == 200) {
+    //   return res
+    //     .status(500)
+    //     .json({
+    //       success: false,
+    //       error: response.data.message,
+    //       message: response.data.message,
+    //     });
+    // }
 
     console.log("OTP Verification Response:", response.data);
 

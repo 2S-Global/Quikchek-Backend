@@ -21,6 +21,8 @@ import {
   listCompaniesAll,
   verifyEmail,
   validtoken,
+  sendEmailToUserById,
+  toggleUserDeletionStatus
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -113,5 +115,9 @@ AuthRouter.post(
   toggleCompanyStatus
 );
 AuthRouter.get("/verify-email/:token", verifyEmail);
+
+AuthRouter.post("/send_user_mail", upload.none(), sendEmailToUserById);
+
+AuthRouter.post("/toggle_user_deletion_status", upload.none(), toggleUserDeletionStatus);
 
 export default AuthRouter;

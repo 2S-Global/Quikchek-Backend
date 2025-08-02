@@ -231,6 +231,8 @@ export const registerUser = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error creating user", error: error.message });
+
+
   }
 };
 
@@ -1280,6 +1282,112 @@ export const toggleCompanyStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error updating company status",
+      error: error.message,
+    });
+  }
+};
+
+export const sendEmailToUserById = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    // Fetch user from DB
+    const user = await User.findById(userId);
+
+    if (!user || user.is_del) {
+      return res.status(404).json({ success: false, message: "User not found or deleted" });
+    }
+
+    // Generate a short expiry token if needed
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "3d",
+    });
+
+    // Set up nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Verify your Email for QuikChek",
+      html: `
+        <p>Hi <strong>${user.name}</strong>,</p>
+        <p>Please verify your email by clicking the link below:</p>
+        <p><a href="${process.env.CLIENT_BASE_URL}/api/auth/verify-email/${token}">Verify Email</a></p>
+        <p>If you didn't request this, you can ignore this email.</p>
+        <br>
+        <p>Regards,<br>Geisil Team</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error sending email",
+      error: error.message,
+    });
+  }
+};
+
+
+// Path - /api/auth/toggle_user_deletion_status?userId=680223234ce03cb66650236c
+export const toggleUserDeletionStatus = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Toggle isDel: true ⇄ false
+    user.is_del = !user.is_del;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `User deletion status toggled to ${user.is_del}`,
+      user: {
+        _id: user._id,
+        email: user.email,
+        is_del: user.is_del,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error toggling user deletion status",
       error: error.message,
     });
   }
