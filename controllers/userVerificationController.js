@@ -2258,6 +2258,7 @@ export const resendAadharOTPFree = async (req, res) => {
 
     const aadhaarNumber = archivedUser.aadhar_number;
     const nameToMatch = archivedUser.aadhar_name;
+    const newId = archivedUser._id; // Extract newId from existing document
 
     if (!aadhaarNumber || !nameToMatch) {
       return res.status(400).json({ message: "Missing Aadhaar details for resend." });
@@ -2282,6 +2283,7 @@ export const resendAadharOTPFree = async (req, res) => {
     return res.status(200).json({
       message: "OTP resent successfully",
       aadhar_response: response.data,
+      newId: newId
     });
   } catch (error) {
     console.error("Resend OTP Error:", error);
