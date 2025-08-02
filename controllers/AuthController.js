@@ -1273,9 +1273,8 @@ export const toggleCompanyStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Company has been ${
-        status ? "activated" : "deactivated"
-      } successfully`,
+      message: `Company has been ${status ? "activated" : "deactivated"
+        } successfully`,
       data: updatedCompany,
     });
   } catch (error) {
@@ -1350,7 +1349,7 @@ export const sendEmailToUserById = async (req, res) => {
 
 
 // Path - /api/auth/toggle_user_deletion_status?userId=680223234ce03cb66650236c
-export const toggleUserDeletionStatus = async (req, res) => {
+export const toggleUserVerificationStatus = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -1363,7 +1362,7 @@ export const toggleUserDeletionStatus = async (req, res) => {
 
     const user = await User.findById(userId);
 
-    if (!user) {
+    if (!user || user.is_del) {
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -1371,16 +1370,16 @@ export const toggleUserDeletionStatus = async (req, res) => {
     }
 
     // Toggle isDel: true ⇄ false
-    user.is_del = !user.is_del;
+    user.isVerified = !user.isVerified;
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: `User deletion status toggled to ${user.is_del}`,
+      message: `User Verification status toggled to ${user.isVerified}`,
       user: {
         _id: user._id,
         email: user.email,
-        is_del: user.is_del,
+        isVerified: user.isVerified,
       },
     });
 

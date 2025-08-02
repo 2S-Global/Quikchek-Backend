@@ -22,7 +22,7 @@ import {
   verifyEmail,
   validtoken,
   sendEmailToUserById,
-  toggleUserDeletionStatus
+  toggleUserVerificationStatus
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -116,8 +116,8 @@ AuthRouter.post(
 );
 AuthRouter.get("/verify-email/:token", verifyEmail);
 
-AuthRouter.post("/send_user_mail", upload.none(), sendEmailToUserById);
+AuthRouter.post("/send_user_mail", upload.none(), userAuth, adminMiddleware, sendEmailToUserById);
 
-AuthRouter.post("/toggle_user_deletion_status", upload.none(), toggleUserDeletionStatus);
+AuthRouter.post("/toggle_user_deletion_status", upload.none(), userAuth, adminMiddleware, toggleUserVerificationStatus);
 
 export default AuthRouter;
