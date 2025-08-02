@@ -736,6 +736,8 @@ export const paynowAadharOTP = async (req, res) => {
 
 export const paynowAadharOTPFree = async (req, res) => {
   try {
+
+    console.log("I am inside paynowAadharOTPFree API");
     const employer_id = req.userId;
 
     if (!employer_id) {
