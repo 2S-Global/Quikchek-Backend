@@ -739,6 +739,7 @@ export const paynowAadharOTPFree = async (req, res) => {
 
     console.log("I am inside paynowAadharOTPFree API");
     const employer_id = req.userId;
+    console.log("My employer id ----  employer_id: ", employer_id);
 
     if (!employer_id) {
       return res.status(400).json({ error: "User ID is missing." });
@@ -767,6 +768,8 @@ export const paynowAadharOTPFree = async (req, res) => {
       { employer_id: employer_id },
       { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date() } }
     );
+
+    console.log("updatedUsers Value: ", updatedUsers);
 
     if (updatedUsers.modifiedCount === 0) {
       return res

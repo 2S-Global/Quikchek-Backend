@@ -29,6 +29,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import email_router from "./routes/emailRoute.js";
 import MarqueeRouter from "./routes/MarqueeRoute.js";
 import userSearch from "./routes/userDetailsBySearchRoute.js";
+import ownerRouter from "./routes/ownerRoutes.js";
 
 import versionRouter from "./routes/versionRoute.js";
 // Routes
@@ -52,6 +53,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/email", email_router);
 app.use("/api/marquee", MarqueeRouter);
 app.use("/api/detailsBySearch", userSearch);
+app.use("/api/ownerRoute", ownerRouter);
 
 // Start server
 const PORT = process.env.PORT || 1001;

@@ -85,6 +85,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: 1,
     },
+    check_role: {
+      type: Boolean,
+      default: false,
+    },
+    switchedRole: {
+      type: Number,
+      default: null,
+    },
     isVerified: { type: Boolean, default: false },
   },
   {
