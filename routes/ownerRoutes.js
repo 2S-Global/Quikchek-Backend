@@ -38,7 +38,8 @@ const upload = multer({ storage: storage });
 // userRouter.post('/walletBalance', userAuth, Companymid, walletBalance);
 
 ownerRouter.get('/getData',upload.none(),userAuth,Companymid,testController);
-ownerRouter.post('/register_owner', upload.none(), userAuth, adminMiddleware, registerOwnerUser);
+// ownerRouter.post('/register_owner', upload.none(), userAuth, adminMiddleware, registerOwnerUser);
+ownerRouter.post('/register_owner', upload.none(), userAuth, registerOwnerUser);
 
 
 export default ownerRouter;

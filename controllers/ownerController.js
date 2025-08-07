@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import ownerdetails from "../models/ownerDetailsModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -24,8 +25,23 @@ export const testController = async (req, res) => {
 
 // Register a new owner user
 export const registerOwnerUser = async (req, res) => {
-    let entityName = "Association";
+    let entityName = "Owner";
     try {
+
+        // Role = 5 for Association
+        const loggedInUserId = req.userId;
+
+        if (!loggedInUserId) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found." });
+        }
+
+        // Check if the user exists
+        const loggedInUser = await User.findOne({ _id: loggedInUserId, is_del: false, is_active: true }).lean();
+
+        if (!loggedInUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
         const {
             name,
             email,
@@ -52,8 +68,8 @@ export const registerOwnerUser = async (req, res) => {
             return res.status(400).json({ message: "Name, email, password" });
         }
 
-        if (role === 2) {
-            entityName = "Association";
+        if (role === 6) {
+            entityName = "Owner";
         } else if (role === 1) {
             entityName = "Company";
         }
@@ -62,7 +78,7 @@ export const registerOwnerUser = async (req, res) => {
         // }
 
         // Check if user already exists
-        const existingUser = await User.findOne({
+        const existingUser = await ownerdetails.findOne({
             email,
             is_del: false,
             is_active: true,
@@ -76,8 +92,9 @@ export const registerOwnerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create a new user with hashed password
-        const newUser = new User({
+        const newUser = new ownerdetails({
             name,
+            complex_id: loggedInUserId,
             email,
             password: hashedPassword,
             role,
@@ -174,7 +191,7 @@ export const registerOwnerUser = async (req, res) => {
       `,
         };
 
-        await transporter.sendMail(mailOptions);
+        // await transporter.sendMail(mailOptions);
 
         res.status(201).json({
             success: true,
