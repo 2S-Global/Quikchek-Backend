@@ -93,8 +93,8 @@ export const registerOwnerUser = async (req, res) => {
 
         // Create a new user with hashed password
         const newUser = new ownerdetails({
-            name,
             complex_id: loggedInUserId,
+            name,
             email,
             password: hashedPassword,
             role,

@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const ownerSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
     complex_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    name: {
+      type: String,
       required: true,
     },
     password: {
