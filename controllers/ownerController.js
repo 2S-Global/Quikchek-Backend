@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import ownerdetails from "../models/ownerDetailsModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
@@ -24,8 +25,23 @@ export const testController = async (req, res) => {
 
 // Register a new owner user
 export const registerOwnerUser = async (req, res) => {
-    let entityName = "Association";
+    let entityName = "Owner";
     try {
+
+        // Role = 5 for Association
+        const loggedInUserId = req.userId;
+
+        if (!loggedInUserId) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found." });
+        }
+
+        // Check if the user exists
+        const loggedInUser = await User.findOne({ _id: loggedInUserId, is_del: false, is_active: true }).lean();
+
+        if (!loggedInUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
         const {
             name,
             email,
@@ -52,8 +68,8 @@ export const registerOwnerUser = async (req, res) => {
             return res.status(400).json({ message: "Name, email, password" });
         }
 
-        if (role === 2) {
-            entityName = "Association";
+        if (role === 6) {
+            entityName = "Owner";
         } else if (role === 1) {
             entityName = "Company";
         }
@@ -62,7 +78,7 @@ export const registerOwnerUser = async (req, res) => {
         // }
 
         // Check if user already exists
-        const existingUser = await User.findOne({
+        const existingUser = await ownerdetails.findOne({
             email,
             is_del: false,
             is_active: true,
@@ -76,7 +92,8 @@ export const registerOwnerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create a new user with hashed password
-        const newUser = new User({
+        const newUser = new ownerdetails({
+            complex_id: loggedInUserId,
             name,
             email,
             password: hashedPassword,
@@ -174,7 +191,7 @@ export const registerOwnerUser = async (req, res) => {
       `,
         };
 
-        await transporter.sendMail(mailOptions);
+        // await transporter.sendMail(mailOptions);
 
         res.status(201).json({
             success: true,
@@ -185,5 +202,73 @@ export const registerOwnerUser = async (req, res) => {
         res
             .status(500)
             .json({ message: `Error creating ${entityName}`, error: error.message });
+    }
+};
+
+
+// List Owner Users
+export const listOwners = async (req, res) => {
+    try {
+        // Get all companies (role: 1 and is_del: false)
+
+        const loggedInUserId = req.userId;
+
+        if (!loggedInUserId) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found." });
+        }
+
+        const { role } = req.body;
+
+        let entityName = "Owner";
+        if (role === 6) {
+            entityName = "Owner";
+        } else if (role === 1) {
+            entityName = "Company";
+        } else if (role === 5) {
+            entityName = "Association";
+        }
+
+        const flatOwners = await ownerdetails.find({
+            complex_id: loggedInUserId,
+            is_del: false,
+            role: role,
+            self_registered: { $ne: 1 },
+        }).select("-password");
+
+        if (!flatOwners.length) {
+            return res.status(404).json({ message: `No ${entityName} found` });
+        }
+
+        // Get order counts grouped by employer_id
+        /* const orderCounts = await UserVerification.aggregate([
+          { $match: { is_del: false } },
+          { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+        ]); */
+
+        // Convert orderCounts to a map for quick lookup
+        const orderMap = {};
+        /*orderCounts.forEach(({ _id, orderCount }) => {
+          orderMap[_id.toString()] = orderCount;
+        }); */
+
+        // Attach order count to each company
+        const flatOwnersWithOrderCount = flatOwners.map((owners) => {
+            const ownerId = owners._id.toString();
+            return {
+                ...owners.toObject(),
+                orderCount: orderMap[ownerId] || 0,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `${entityName} retrieved successfully`,
+            data: flatOwnersWithOrderCount,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error retrieving companies",
+            error: error.message,
+        });
     }
 };
