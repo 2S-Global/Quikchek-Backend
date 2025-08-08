@@ -40,7 +40,7 @@ const upload = multer({ storage: storage });
 ownerRouter.get('/getData',upload.none(),userAuth,Companymid,testController);
 // ownerRouter.post('/register_owner', upload.none(), userAuth, adminMiddleware, registerOwnerUser);
 ownerRouter.post('/register_owner', upload.none(), userAuth, registerOwnerUser);
-ownerRouter.get('/list_owner',upload.none(),userAuth, listOwners);
+ownerRouter.post('/list_owner',upload.none(),userAuth, listOwners);
 
 
 export default ownerRouter;
