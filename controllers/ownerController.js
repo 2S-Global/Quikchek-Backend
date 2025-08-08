@@ -204,3 +204,71 @@ export const registerOwnerUser = async (req, res) => {
             .json({ message: `Error creating ${entityName}`, error: error.message });
     }
 };
+
+
+// List Owner Users
+export const listOwners = async (req, res) => {
+    try {
+        // Get all companies (role: 1 and is_del: false)
+
+        const loggedInUserId = req.userId;
+
+        if (!loggedInUserId) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found." });
+        }
+
+        const { role } = req.body;
+
+        let entityName = "Owner";
+        if (role === 6) {
+            entityName = "Owner";
+        } else if (role === 1) {
+            entityName = "Company";
+        } else if (role === 5) {
+            entityName = "Association";
+        }
+
+        const flatOwners = await ownerdetails.find({
+            complex_id: loggedInUserId,
+            is_del: false,
+            role: role,
+            self_registered: { $ne: 1 },
+        }).select("-password");
+
+        if (!flatOwners.length) {
+            return res.status(404).json({ message: `No ${entityName} found` });
+        }
+
+        // Get order counts grouped by employer_id
+        /* const orderCounts = await UserVerification.aggregate([
+          { $match: { is_del: false } },
+          { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+        ]); */
+
+        // Convert orderCounts to a map for quick lookup
+        const orderMap = {};
+        /*orderCounts.forEach(({ _id, orderCount }) => {
+          orderMap[_id.toString()] = orderCount;
+        }); */
+
+        // Attach order count to each company
+        const flatOwnersWithOrderCount = flatOwners.map((owners) => {
+            const ownerId = owners._id.toString();
+            return {
+                ...owners.toObject(),
+                orderCount: orderMap[ownerId] || 0,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `${entityName} retrieved successfully`,
+            data: flatOwnersWithOrderCount,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error retrieving companies",
+            error: error.message,
+        });
+    }
+};

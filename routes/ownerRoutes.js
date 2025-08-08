@@ -7,7 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 //     addTransaction,getUserTransactions,walletBalance 
 // } from '../controllers/walletController.js';
 
-import { testController, registerOwnerUser } from '../controllers/ownerController.js';
+import { testController, registerOwnerUser, listOwners } from '../controllers/ownerController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -40,6 +40,7 @@ const upload = multer({ storage: storage });
 ownerRouter.get('/getData',upload.none(),userAuth,Companymid,testController);
 // ownerRouter.post('/register_owner', upload.none(), userAuth, adminMiddleware, registerOwnerUser);
 ownerRouter.post('/register_owner', upload.none(), userAuth, registerOwnerUser);
+ownerRouter.get('/list_owner',upload.none(),userAuth, listOwners);
 
 
 export default ownerRouter;

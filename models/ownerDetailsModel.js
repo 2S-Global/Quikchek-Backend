@@ -88,7 +88,7 @@ const ownerSchema = new mongoose.Schema(
       /* 0 for admin ,1 for candidate ,2 for company  */
       type: Number,
       required: true,
-      default: 1,
+      default: 6,
     },
     check_role: {
       type: Boolean,
