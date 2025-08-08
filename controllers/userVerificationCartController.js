@@ -282,6 +282,11 @@ export const addUserToCartAadharOTP = async (req, res) => {
       });
     }
 
+    // ✅ Clean owner_id before destructuring
+    if (req.body.owner_id === "null" || req.body.owner_id === "") {
+      delete req.body.owner_id;
+    }
+
     const {
       name,
       email,
@@ -292,10 +297,8 @@ export const addUserToCartAadharOTP = async (req, res) => {
       aadhar_name,
       aadhar_number,
       aadhaardoc,
-      owner_id,
+      owner_id, // this will be undefined if deleted above
     } = req.body;
-
-    // Upload documents to Cloudinary
 
     const aadharImageUrl = req.files?.aadhaardoc
       ? await uploadToCloudinary(
@@ -316,7 +319,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       aadhar_name: aadhar_name,
       aadhar_number: aadhar_number,
       aadhar_image: aadharImageUrl,
-      owner_id: owner_id,
+      ...(owner_id && { owner_id }), // ✅ only include if exists
     });
 
     await newUserCart.save();
@@ -1522,7 +1525,7 @@ export const listAllTransactionByCompany = async (req, res) => {
         employer_name: orderObj.employer_id?.name || "N/A",
         order_number: orderObj.order_number,
         invoice_number: orderObj.invoice_number,
-        date: new Date(orderObj.createdAt).toLocaleDateString(),
+        date: orderObj.createdAt,
         subtotal: orderObj.subtotal ?? "N/A",
         cgst: hasValidCgst
           ? `${orderObj.cgst} (${orderObj.cgst_percent}%)`
