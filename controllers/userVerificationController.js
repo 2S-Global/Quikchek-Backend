@@ -612,7 +612,13 @@ export const paynowAadharOTP = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    if (payment_method === "online") {
+    if (payment_method === "Wallet") {
+      if (!user.wallet_amount || user.wallet_amount < amount) {
+        return res.status(400).json({ error: "Insufficient wallet balance." });
+      }
+      user.wallet_amount -= amount;
+      await user.save();
+    } else if (payment_method === "online") {
       if (!razorpay_response?.razorpay_payment_id) {
         return res
           .status(400)
@@ -662,7 +668,7 @@ export const paynowAadharOTP = async (req, res) => {
     // Save transaction after userIds is ready
     const transaction = new Transaction({
       employer_id: employer_id,
-      transactionId: razorpay_response.razorpay_payment_id,
+      transactionId: razorpay_response?.razorpay_payment_id,
       amount: parsedAmount,
       paymentids: paymentIds || null,
       order_ids: userId,
@@ -736,7 +742,6 @@ export const paynowAadharOTP = async (req, res) => {
 
 export const paynowAadharOTPFree = async (req, res) => {
   try {
-
     console.log("I am inside paynowAadharOTPFree API");
     const employer_id = req.userId;
     console.log("My employer id ----  employer_id: ", employer_id);
@@ -2256,7 +2261,9 @@ export const resendAadharOTPFree = async (req, res) => {
       .lean();
 
     if (!archivedUser) {
-      return res.status(404).json({ message: "No verification data found to resend OTP." });
+      return res
+        .status(404)
+        .json({ message: "No verification data found to resend OTP." });
     }
 
     const aadhaarNumber = archivedUser.aadhar_number;
@@ -2264,7 +2271,9 @@ export const resendAadharOTPFree = async (req, res) => {
     const newId = archivedUser._id; // Extract newId from existing document
 
     if (!aadhaarNumber || !nameToMatch) {
-      return res.status(400).json({ message: "Missing Aadhaar details for resend." });
+      return res
+        .status(400)
+        .json({ message: "Missing Aadhaar details for resend." });
     }
 
     // Prepare payload for OTP resend
@@ -2287,7 +2296,7 @@ export const resendAadharOTPFree = async (req, res) => {
       success: true,
       message: "OTP resent successfully",
       aadhar_response: response.data,
-      newId: newId
+      newId: newId,
     });
   } catch (error) {
     console.error("Resend OTP Error:", error);
