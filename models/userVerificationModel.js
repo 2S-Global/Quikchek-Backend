@@ -18,6 +18,10 @@ const userVerificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Package",
     },
+    owner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ownerdetails",
+    },
     amount: {
       type: String,
     },

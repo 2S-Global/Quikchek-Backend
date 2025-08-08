@@ -292,6 +292,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       aadhar_name,
       aadhar_number,
       aadhaardoc,
+      owner_id,
     } = req.body;
 
     // Upload documents to Cloudinary
@@ -315,6 +316,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       aadhar_name: aadhar_name,
       aadhar_number: aadhar_number,
       aadhar_image: aadharImageUrl,
+      owner_id: owner_id,
     });
 
     await newUserCart.save();
@@ -338,7 +340,6 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
     const employer_id = req.userId;
     const employer = await User.findOne({
       _id: employer_id,
-      role: 1,
       is_del: false,
     });
     if (!employer) {
@@ -393,7 +394,7 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
       data: userData, // Updated user list with pay_for field
       billing: {
         total_verifications: totalVerifications,
-        wallet_amount: "0.00",
+        wallet_amount: employer.wallet_amount || "0.00",
         fund_status: "NA",
         subtotal: subtotal.toFixed(2),
         discount: "0.00",

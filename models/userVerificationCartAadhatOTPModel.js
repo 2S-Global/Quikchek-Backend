@@ -7,6 +7,10 @@ const userVerificationCartAadharOTPSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    owner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ownerdetails",
+    },
     candidate_name: {
       type: String,
       required: true,
