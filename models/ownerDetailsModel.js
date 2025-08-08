@@ -13,14 +13,14 @@ const ownerSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      // required: true,
     },
     profilePicture: {
       type: String,
     },
     user_type: {
       type: String,
-      default: 'company',
+      default: 'owner',
     },
     required_services: {
       type: String,

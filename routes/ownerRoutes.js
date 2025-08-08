@@ -7,7 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 //     addTransaction,getUserTransactions,walletBalance 
 // } from '../controllers/walletController.js';
 
-import { testController, registerOwnerUser, listOwners } from '../controllers/ownerController.js';
+import { testController, registerOwnerUser, listOwners, editOwners, deleteOwners, importOwnerCsv } from '../controllers/ownerController.js';
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -30,8 +30,16 @@ const ownerRouter = express.Router();
 
 // Setup multer with memory storage for handling file uploads
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
+
+// Multer storage config
+const storage = multer.diskStorage({
+  destination: "./uploads",
+  filename: (_, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+});
+const upload = multer({ storage });
+
 
 // userRouter.post('/addTransaction', upload.none(), userAuth, Companymid, addTransaction);
 // userRouter.get('/getUserTransactions',upload.none(),userAuth,Companymid,getUserTransactions);
@@ -41,6 +49,8 @@ ownerRouter.get('/getData',upload.none(),userAuth,Companymid,testController);
 // ownerRouter.post('/register_owner', upload.none(), userAuth, adminMiddleware, registerOwnerUser);
 ownerRouter.post('/register_owner', upload.none(), userAuth, registerOwnerUser);
 ownerRouter.post('/list_owner',upload.none(),userAuth, listOwners);
-
+ownerRouter.post('/edit_owner',upload.none(),userAuth, editOwners);
+ownerRouter.post('/delete_owner',upload.none(),userAuth, deleteOwners);
+ownerRouter.post('/import_owner_csv',upload.single("file"),userAuth, importOwnerCsv);
 
 export default ownerRouter;
