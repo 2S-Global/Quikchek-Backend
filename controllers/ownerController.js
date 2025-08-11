@@ -520,6 +520,7 @@ export const importOwnerCsv = async (req, res) => {
         const emails = users.map((u) => u.email);
         await mongoose.connection.asPromise();
         const existingUsers = await ownerdetails.find({
+            complex_id: loggedInUserId,
             email: { $in: emails },
             is_del: false,
         });
