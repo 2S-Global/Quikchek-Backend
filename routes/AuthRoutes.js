@@ -22,7 +22,9 @@ import {
   verifyEmail,
   validtoken,
   sendEmailToUserById,
-  toggleUserVerificationStatus
+  toggleUserVerificationStatus,
+  listComplex,
+  registercomplex,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -58,6 +60,15 @@ AuthRouter.post(
   upload.none(),
   registerUser
 );
+
+AuthRouter.post(
+  "/register-complex",
+  userAuth,
+  adminMiddleware,
+  upload.none(),
+  registercomplex
+);
+
 AuthRouter.post(
   "/edit_user",
   userAuth,
@@ -94,6 +105,7 @@ AuthRouter.post(
   registerCompany
 );
 AuthRouter.post("/list-companies", userAuth, adminMiddleware, listCompanies);
+AuthRouter.post("/list-complex", userAuth, adminMiddleware, listComplex);
 AuthRouter.post(
   "/list-companies_all",
   userAuth,
@@ -116,8 +128,20 @@ AuthRouter.post(
 );
 AuthRouter.get("/verify-email/:token", verifyEmail);
 
-AuthRouter.post("/send_user_mail", upload.none(), userAuth, adminMiddleware, sendEmailToUserById);
+AuthRouter.post(
+  "/send_user_mail",
+  upload.none(),
+  userAuth,
+  adminMiddleware,
+  sendEmailToUserById
+);
 
-AuthRouter.post("/toggle_user_deletion_status", upload.none(), userAuth, adminMiddleware, toggleUserVerificationStatus);
+AuthRouter.post(
+  "/toggle_user_deletion_status",
+  upload.none(),
+  userAuth,
+  adminMiddleware,
+  toggleUserVerificationStatus
+);
 
 export default AuthRouter;

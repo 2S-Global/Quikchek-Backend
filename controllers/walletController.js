@@ -1,7 +1,6 @@
 import Transaction from "../models/transactionModel.js";
 import User from "../models/userModel.js";
 
-
 export const addTransaction = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -54,37 +53,34 @@ export const addTransaction = async (req, res) => {
   }
 };
 
-  export const getUserTransactions = async (req, res) => {
-    try {
-      const employer_id = req.userId;
+export const getUserTransactions = async (req, res) => {
+  try {
+    const employer_id = req.userId;
 
-  
-      const transactions = await Transaction.find({ 
-        employer_id,
-   
-      }).sort({ created_at: -1 });
-  
-      if (!transactions || transactions.length === 0) {
-        return res.status(200).json({
-          success: true,
-          data: [],
-          message: "No wallet transactions found"
-        });
-      }
-  
-      res.status(200).json({ 
-        success: true, 
-        data: transactions 
-      });
-    } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: "Failed to fetch transactions", 
-        error: error.message 
+    const transactions = await Transaction.find({
+      employer_id,
+    }).sort({ created_at: -1 });
+
+    if (!transactions || transactions.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No wallet transactions found",
       });
     }
-  };
 
+    res.status(200).json({
+      success: true,
+      data: transactions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch transactions",
+      error: error.message,
+    });
+  }
+};
 
 export const walletBalance = async (req, res) => {
   try {
@@ -95,24 +91,66 @@ export const walletBalance = async (req, res) => {
     if (!user) {
       return res.status(200).json({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
     res.status(200).json({
       success: true,
       data: {
-        wallet_amount: user.wallet_amount // or whatever field you're using
-      }
+        wallet_amount: user.wallet_amount, // or whatever field you're using
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Failed to fetch wallet balance",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-  
-  
+export const addWalletAmount = async (req, res) => {
+  try {
+    const { amount, companyId } = req.body;
+
+    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid amount",
+      });
+    }
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "Company ID is required",
+      });
+    }
+
+    const user = await User.findById(companyId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.wallet_amount = (user.wallet_amount || 0) + Number(amount);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Wallet amount added successfully",
+      updated_wallet: user.wallet_amount,
+    });
+  } catch (error) {
+    console.error("Error adding wallet amount:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
