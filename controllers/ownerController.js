@@ -531,6 +531,12 @@ export const importOwnerCsv = async (req, res) => {
     } catch (error) {
         console.error("Import error:", error);
         await fsp.unlink(filePath).catch(() => { });
+
+        // Header validation error → 400 Bad Request
+        if (error.message.startsWith("Invalid CSV headers")) {
+            return res.status(400).json({ message: error.message });
+        }
+
         res.status(500).json({ message: "Import failed", error: error.message });
     }
 }
