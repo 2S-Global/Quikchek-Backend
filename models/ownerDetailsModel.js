@@ -7,24 +7,17 @@ const ownerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    flat_no: {
+      type: Number,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
     },
-    password: {
-      type: String,
-      // required: true,
-    },
-    profilePicture: {
-      type: String,
-    },
     user_type: {
       type: String,
       default: 'owner',
-    },
-    required_services: {
-      type: String,
-    //  default: 'company',
     },
     email: {
       type: String,
@@ -32,30 +25,6 @@ const ownerSchema = new mongoose.Schema(
       // unique: true,
     },
     phone_number: {
-      type: String,
-    },
-    address: {
-      type: String,
-    },
-    gst_no: {
-      type: String,
-    },
-    package_id: {
-      type: String,
-    },
-    allowed_verifications: {
-      type: String,
-    },
-    discount_percent: {
-      type: String,
-    },
-    gender: {
-      type: String,
-    },
-    transaction_fee: {
-      type: String,
-    },
-    transaction_gst: {
       type: String,
     },
     createdAt: {
@@ -74,31 +43,12 @@ const ownerSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    wallet_amount: {
-      type: Number,
-      default: 0,
-    },
-    self_registered : {
-      /* 0 for admin ,1 for By own  */
-      type: Number,
-      required: true,
-      default: 0,
-    },    
     role: {
       /* 0 for admin ,1 for candidate ,2 for company  */
       type: Number,
       required: true,
       default: 6,
     },
-    check_role: {
-      type: Boolean,
-      default: false,
-    },
-    switchedRole: {
-      type: Number,
-      default: null,
-    },
-    isVerified: { type: Boolean, default: false },
   },
   {
     timestamps: true,
