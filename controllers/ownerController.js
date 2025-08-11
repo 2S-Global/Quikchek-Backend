@@ -55,7 +55,7 @@ export const registerOwnerUser = async (req, res) => {
         } = req.body;
 
         // Validate required fields
-        if (!name || !email ) {
+        if (!name || !email) {
             return res.status(400).json({ message: "Name, email" });
         }
 
@@ -385,10 +385,22 @@ export const importOwnerCsv = async (req, res) => {
 
     try {
         // 1. Parse CSV
+        const expectedHeaders = ["flat_no", "name", "email", "phone_no"];
         await new Promise((resolve, reject) => {
             const results = [];
             fs.createReadStream(filePath)
                 .pipe(csv())
+                .on("headers", (headers) => {
+                    // Compare expected headers with what was found
+                    const missing = expectedHeaders.filter(h => !headers.includes(h));
+                    const extra = headers.filter(h => !expectedHeaders.includes(h));
+
+                    if (missing.length > 0 || extra.length > 0) {
+                        reject(new Error(
+                            `Invalid CSV headers. Missing: ${missing.join(", ")} | Unexpected: ${extra.join(", ")}`
+                        ));
+                    }
+                })
                 .on("data", (row) => {
                     if (row.email) {
                         results.push({
