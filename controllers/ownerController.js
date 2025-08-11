@@ -240,7 +240,7 @@ export const listOwners = async (req, res) => {
         }).select("-password");
 
         if (!flatOwners.length) {
-            return res.status(404).json({ message: `No ${entityName} found` });
+            return res.status(200).json({ success: true, message: `No ${entityName} found` });
         }
 
         // Get order counts grouped by employer_id
