@@ -8,7 +8,7 @@ const ownerSchema = new mongoose.Schema(
       required: true,
     },
     flat_no: {
-      type: Number,
+      type: String,
       required: true,
     },
     name: {
