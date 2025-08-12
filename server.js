@@ -30,7 +30,7 @@ import email_router from "./routes/emailRoute.js";
 import MarqueeRouter from "./routes/MarqueeRoute.js";
 import userSearch from "./routes/userDetailsBySearchRoute.js";
 import ownerRouter from "./routes/ownerRoutes.js";
-
+import ComplexRouter from "./routes/complexRoute.js";
 import versionRouter from "./routes/versionRoute.js";
 // Routes
 app.get("/", (req, res) => {
@@ -54,6 +54,7 @@ app.use("/api/email", email_router);
 app.use("/api/marquee", MarqueeRouter);
 app.use("/api/detailsBySearch", userSearch);
 app.use("/api/ownerRoute", ownerRouter);
+app.use("/api/complex", ComplexRouter);
 
 // Start server
 const PORT = process.env.PORT || 1001;
