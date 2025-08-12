@@ -1,6 +1,9 @@
 import express from "express";
 
-import { getallownerforcompany } from "../controllers/complexController.js";
+import {
+  getallownerforcompany,
+  getreports,
+} from "../controllers/complexController.js";
 //Middleware
 import userAuth from "../middleware/authMiddleware.js";
 import Companymid from "../middleware/companyMiddleware.js";
@@ -15,5 +18,7 @@ ComplexRouter.get(
   Companymid,
   getallownerforcompany
 );
+
+ComplexRouter.get("/getreports", userAuth, Companymid, getreports);
 
 export default ComplexRouter;

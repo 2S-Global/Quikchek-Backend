@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import Email from "../models/emailModel.js";
 import UserVerification from "../models/userVerificationModel.js";
-import allOrdersData from "../models/allOrders.js";
+
 import SendEmail from "../controllers/email_Helper/emailhelper.js";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";

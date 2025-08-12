@@ -6,10 +6,10 @@ import Package from "../models/packageModel.js";
 import CompanyPackage from "../models/companyPackageModel.js";
 import allOrdersData from "../models/allOrders.js";
 import mongoose from "mongoose";
-import multer from "multer";
+
 import { v2 as cloudinary } from "cloudinary";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+
 // Register a new user
 
 cloudinary.config({
@@ -1117,7 +1117,6 @@ export const deleteUser = async (req, res) => {
     // Ensure employer is valid
     const employer = await User.findOne({
       _id: employer_id,
-      role: 1,
       is_del: false,
     });
 
