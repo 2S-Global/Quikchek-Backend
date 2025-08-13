@@ -599,7 +599,7 @@ export const paynowAadharOTP = async (req, res) => {
       return res.status(400).json({ error: "User ID is missing." });
     }
 
-    const { razorpay_response, amount, paymentIds, payment_method } = req.body;
+    const { razorpay_response, amount, paymentIds, payment_method, overall_billing } = req.body;
 
     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
@@ -628,10 +628,35 @@ export const paynowAadharOTP = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
+
+    //   Added By Chandra on 13th Aug 2025  start---
+    const orderNumber = `ORD-${Date.now()}`;
+
+    // Generate invoice number
+    const invoiceNumber = await generateInvoiceNo();
+
+    const newUserCart = new allOrdersData({
+      employer_id: employer_id,
+      order_number: orderNumber,
+      invoice_number: invoiceNumber,
+      subtotal: overall_billing.subtotal,
+      cgst: overall_billing.cgst,
+      cgst_percent: overall_billing.cgst_percent,
+      sgst: overall_billing.sgst,
+      sgst_percent: overall_billing.sgst_percent,
+      total_amount: overall_billing.total,
+      discount_percent: overall_billing.discount_percent,
+      discount_amount: overall_billing.discount,
+      total_numbers_users: overall_billing.total_verifications,
+    });
+
+    const savedCart = await newUserCart.save();
+    const insertedId = savedCart._id;
+
     // Update is_paid field
     const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
       { employer_id: employer_id },
-      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date() } }
+      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date(), order_ref_id: insertedId } }
     );
 
     if (updatedUsers.modifiedCount === 0) {
@@ -639,6 +664,18 @@ export const paynowAadharOTP = async (req, res) => {
         .status(404)
         .json({ message: "No users found for this employer" });
     }
+
+    // Fetch all cart items for this order
+
+    // const cartItems = await UserCartVerificationAadhatOTP.find({
+    //   employer_id,
+    //   order_ref_id: insertedId,
+    // });
+
+    //added By Chandra on 13th Aug 2025 end-----
+
+
+
 
     // Get users to archive
     const usersToArchive = await UserCartVerificationAadhatOTP.find({
@@ -663,12 +700,28 @@ export const paynowAadharOTP = async (req, res) => {
       return obj;
     });
 
+
+    // This Line added by Chandra on 13th Aug 2025
+    await UserVerification.insertMany(usersWithOrderId);
+
     const userId = usersToArchive[0]?._id;
+
+    // await UserCartVerificationAadhatOTP.deleteMany({
+    //   employer_id: employer_id,
+    //   is_paid: 1,
+    // });
+
+
     // amount: parsedAmount,
     // Save transaction after userIds is ready
     const transaction = new Transaction({
       employer_id: employer_id,
-      transactionId: razorpay_response?.razorpay_payment_id,
+      order_ref_id: insertedId,
+      // transactionId: razorpay_response?.razorpay_payment_id,
+      transactionId:
+        payment_method === "online"
+          ? razorpay_response.razorpay_payment_id
+          : `wallet_${Date.now()}`,
       amount: parsedAmount,
       paymentids: paymentIds || null,
       order_ids: userId,

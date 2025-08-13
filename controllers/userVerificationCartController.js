@@ -395,7 +395,7 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
     res.status(200).json({
       success: true,
       data: userData, // Updated user list with pay_for field
-      billing: {
+      overall_billing: {
         total_verifications: totalVerifications,
         wallet_amount: employer.wallet_amount || "0.00",
         fund_status: "NA",
