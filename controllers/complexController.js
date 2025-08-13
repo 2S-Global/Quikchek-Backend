@@ -154,6 +154,7 @@ export const reportPDF = async (req, res) => {
         Page <span class="pageNumber"></span> of <span class="totalPages"></span>
       </div>
     `;
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
