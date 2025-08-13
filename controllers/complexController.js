@@ -26,11 +26,17 @@ export const getreports = async (req, res) => {
     const userId = req.userId;
 
     const reports = await UserVerification.find({ employer_id: userId })
-      .select("candidate_name owner_id aadhat_otp createdAt") // select top-level fields
-      .populate({
-        path: "owner_id",
-        select: "name flat_no", // select only name & flat_no from ownerdetails
-      })
+      .select("candidate_name owner_id aadhat_otp createdAt")
+      .populate([
+        {
+          path: "owner_id",
+          select: "name flat_no",
+        },
+        {
+          path: "order_ref_id",
+          select: "total_amount",
+        },
+      ])
       .lean();
 
     if (!reports || reports.length === 0) {
@@ -42,9 +48,11 @@ export const getreports = async (req, res) => {
     res.status(200).json({
       success: true,
       data: reports,
+
       message: "Reports fetched successfully",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.error(error);
   }
 };
