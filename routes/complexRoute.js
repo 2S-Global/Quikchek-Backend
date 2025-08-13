@@ -3,6 +3,7 @@ import express from "express";
 import {
   getallownerforcompany,
   getreports,
+  reportPDF,
 } from "../controllers/complexController.js";
 //Middleware
 import userAuth from "../middleware/authMiddleware.js";
@@ -20,5 +21,7 @@ ComplexRouter.get(
 );
 
 ComplexRouter.get("/getreports", userAuth, Companymid, getreports);
+
+ComplexRouter.post("/reportPDF", userAuth, Companymid, reportPDF);
 
 export default ComplexRouter;
