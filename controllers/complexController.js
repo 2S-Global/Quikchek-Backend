@@ -4,6 +4,7 @@ import chromium from "@sparticuz/chromium";
 import User from "../models/userModel.js";
 import ownerdetails from "../models/ownerDetailsModel.js";
 import UserVerification from "../models/userVerificationModel.js";
+import Doclist from "./Helpers/verifiedDetails.js";
 import complexReportHelper from "./Helpers/complexReporthelper.js";
 export const getallownerforcompany = async (req, res) => {
   try {
@@ -47,6 +48,12 @@ export const getreports = async (req, res) => {
         .status(404)
         .json({ message: "No reports found for this company" });
     }
+
+    await Promise.all(
+      reports.map(async (report) => {
+        report.document = await Doclist(report._id);
+      })
+    );
 
     res.status(200).json({
       success: true,
@@ -105,6 +112,12 @@ export const reportPDF = async (req, res) => {
         message: "No reports found for this company in the given date range",
       });
     }
+
+    await Promise.all(
+      reports.map(async (report) => {
+        report.document = await Doclist(report._id);
+      })
+    );
 
     //pdf part
     const fileName = `Report_${user.name}.pdf`;

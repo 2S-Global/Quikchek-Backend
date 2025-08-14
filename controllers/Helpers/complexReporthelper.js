@@ -82,6 +82,7 @@ const complexReportHelper = ({ data, startDate, endDate }) => {
           <th>Date</th>
           <th>Name</th>
           <th>Owner Details</th>
+          <th>Documents</th>
           <th>Amount</th>                 
         </tr>
       </thead>
@@ -102,6 +103,7 @@ const complexReportHelper = ({ data, startDate, endDate }) => {
                       })`
                     : "N/A"
                 }</td>
+                <td>${payment.document || "N/A"}</td>
                 <td>₹ ${payment.order_ref_id?.total_amount || "0"}</td>
               </tr>
             `;
