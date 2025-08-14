@@ -737,7 +737,7 @@ export const paynowAadharOTP = async (req, res) => {
     const newId = insertedDoc._id;
     // Optional: Remove from cart after archiving
     // await UserCartVerificationAadhatOTP.deleteMany({ employer_id: employer_id, is_paid: 1 })
-    
+
     await UserCartVerificationAadhatOTP.deleteOne({
       employer_id: employer_id,
       is_paid: 1,
@@ -822,10 +822,42 @@ export const paynowAadharOTPFree = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
+
+    //   Added By Chandra on 14th Aug 2025  start---
+
+
+    const orderNumber = `ORD-${Date.now()}`;
+
+    // Generate invoice number
+    const invoiceNumber = await generateInvoiceNo();
+
+    const newUserCart = new allOrdersData({
+      employer_id: employer_id,
+      order_number: orderNumber,
+      invoice_number: invoiceNumber,
+      subtotal: 0,
+      cgst: 0,
+      cgst_percent: 9.00,
+      sgst: 0,
+      sgst_percent: 9.00,
+      total_amount: 0,
+      discount_percent: 0,
+      discount_amount: 0,
+      total_numbers_users: 1,
+    });
+
+    const savedCart = await newUserCart.save();
+    const insertedId = savedCart._id;
+
+
+
+    // Added By Chandra on 14th Aug 2025 end-----
+
+
     // Update is_paid field
     const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
       { employer_id: employer_id },
-      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date() } }
+      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date(), order_ref_id: insertedId } }
     );
 
     console.log("updatedUsers Value: ", updatedUsers);
