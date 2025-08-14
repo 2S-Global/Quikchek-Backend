@@ -7,6 +7,8 @@ const userVerifiedDetails = async (userId) => {
             throw new Error("User not found");
         }
 
+        console.log("User Data:", user);
+
         // Map of: name_field + number_field → label
         const docMap = [
             { nameField: "pan_name", numberField: "pan_number", label: "Pan" },
@@ -20,16 +22,21 @@ const userVerifiedDetails = async (userId) => {
 
         const verifiedDocs = [];
 
-        for (const { nameField, numberField, label } of docMap) {
+        docMap.forEach(({ nameField, numberField, label }) => {
             const nameVal = user[nameField];
             const numberVal = user[numberField];
 
-            if (nameVal && numberVal && nameVal.trim() !== "" && numberVal.trim() !== "") {
+            if (
+                typeof nameVal === "string" &&
+                typeof numberVal === "string" &&
+                nameVal.trim() &&
+                numberVal.trim()
+            ) {
                 verifiedDocs.push(label);
             }
-        }
+        });
 
-        return verifiedDocs;
+        return verifiedDocs.join(", ");
 
     } catch (error) {
         console.error("Error in getVerifiedDocuments:", error.message);
