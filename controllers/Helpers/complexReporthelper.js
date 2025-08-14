@@ -115,6 +115,31 @@ const complexReportHelper = ({ data, startDate, endDate }) => {
             return row + pageBreak;
           })
           .join("")}
+
+          <tr>
+           <td colSpan="4" style={{ textAlign: "center" }}>
+                      
+                      </td>
+                      <td colSpan="1" style={{ textAlign: "center" }}>
+                        Total
+                      </td>
+                      <td colSpan="1" style={{ textAlign: "center" }}>
+                        ₹ ${" "}
+                        ${data
+                          .reduce(
+                            (total, payment) =>
+                              total +
+                              (parseFloat(payment.order_ref_id?.total_amount) ||
+                                0),
+                            0
+                          )
+                          .toFixed(2)}
+                      </td>
+                    </tr>
+
+
+
+
       </tbody>
     </table>
   </div>
