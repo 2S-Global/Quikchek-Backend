@@ -702,7 +702,7 @@ export const paynowAadharOTP = async (req, res) => {
 
 
     // This Line added by Chandra on 13th Aug 2025
-    await UserVerification.insertMany(usersWithOrderId);
+    // await UserVerification.insertMany(usersWithOrderId);
 
     const userId = usersToArchive[0]?._id;
 
