@@ -7,8 +7,6 @@ const userVerifiedDetails = async (userId) => {
             throw new Error("User not found");
         }
 
-        console.log("User Data:", user);
-
         // Map of: name_field + number_field → label
         const docMap = [
             { nameField: "pan_name", numberField: "pan_number", label: "Pan" },
