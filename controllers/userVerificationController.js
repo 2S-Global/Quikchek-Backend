@@ -736,7 +736,8 @@ export const paynowAadharOTP = async (req, res) => {
     const insertedDoc = await UserVerification.create(usersWithOrderId[0]);
     const newId = insertedDoc._id;
     // Optional: Remove from cart after archiving
-    // await UserCartVerificationAadhatOTP.deleteMany({ employer_id: employer_id, is_paid: 1 });
+    // await UserCartVerificationAadhatOTP.deleteMany({ employer_id: employer_id, is_paid: 1 })
+    
     await UserCartVerificationAadhatOTP.deleteOne({
       employer_id: employer_id,
       is_paid: 1,
