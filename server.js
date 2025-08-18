@@ -32,10 +32,13 @@ import userSearch from "./routes/userDetailsBySearchRoute.js";
 import ownerRouter from "./routes/ownerRoutes.js";
 import ComplexRouter from "./routes/complexRoute.js";
 import versionRouter from "./routes/versionRoute.js";
+import contactRouter from "./routes/contactRoutes.js";
 // Routes
 app.get("/", (req, res) => {
   res.send("Welcome to the back end of the Quikchek ");
 });
+
+app.use("/api/contacts", contactRouter);
 app.use("/api/version", versionRouter);
 app.use("/api/auth", AuthRouter);
 app.use("/api/verify", userVerificationRoutes);
