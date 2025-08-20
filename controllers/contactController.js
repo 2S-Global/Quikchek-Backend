@@ -121,7 +121,7 @@ export const addContact = async (req, res) => {
     await transporter.sendMail({
       from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
       to: "kp.sunit@gmail.com",
-      cc: ["d.dey1988@gmail.com", "avik@2sglobal.co", "abhishek@2sglobal.co"],
+      cc: ["d.dey1988@gmail.com", "avik@2sglobal.co", "abhishek@2sglobal.us"],
       subject: dispute
         ? `⚠️ New Dispute Form Submission: ${subject}`
         : `📩 New Contact Form Submission: ${subject}`,
