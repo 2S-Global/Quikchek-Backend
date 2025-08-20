@@ -172,7 +172,7 @@ export const reportPDF = async (req, res) => {
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      landscape: true,
+      landscape: false,
       displayHeaderFooter: true,
       headerTemplate,
       footerTemplate,
