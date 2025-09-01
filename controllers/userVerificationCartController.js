@@ -70,6 +70,12 @@ export const addUserToCart = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+    // 🔹 Fetch user from DB first
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     const {
       plan,
       name,
@@ -147,50 +153,50 @@ export const addUserToCart = async (req, res) => {
     // Upload documents to Cloudinary
     const panImageUrl = req.files?.pandoc
       ? await uploadToCloudinary(
-          req.files.pandoc[0].buffer,
-          req.files.pandoc[0].originalname,
-          req.files.pandoc[0].mimetype
-        )
+        req.files.pandoc[0].buffer,
+        req.files.pandoc[0].originalname,
+        req.files.pandoc[0].mimetype
+      )
       : null;
 
     const aadharImageUrl = req.files?.aadhaardoc
       ? await uploadToCloudinary(
-          req.files.aadhaardoc[0].buffer,
-          req.files.aadhaardoc[0].originalname,
-          req.files.aadhaardoc[0].mimetype
-        )
+        req.files.aadhaardoc[0].buffer,
+        req.files.aadhaardoc[0].originalname,
+        req.files.aadhaardoc[0].mimetype
+      )
       : null;
 
     const dlImageUrl = req.files?.licensedoc
       ? await uploadToCloudinary(
-          req.files.licensedoc[0].buffer,
-          req.files.licensedoc[0].originalname,
-          req.files.licensedoc[0].mimetype
-        )
+        req.files.licensedoc[0].buffer,
+        req.files.licensedoc[0].originalname,
+        req.files.licensedoc[0].mimetype
+      )
       : null;
 
     const passportImageUrl = req.files?.doc
       ? await uploadToCloudinary(
-          req.files.doc[0].buffer,
-          req.files.doc[0].originalname,
-          req.files.doc[0].mimetype
-        )
+        req.files.doc[0].buffer,
+        req.files.doc[0].originalname,
+        req.files.doc[0].mimetype
+      )
       : null;
 
     const epicImageUrl = req.files?.voterdoc
       ? await uploadToCloudinary(
-          req.files.voterdoc[0].buffer,
-          req.files.voterdoc[0].originalname,
-          req.files.voterdoc[0].mimetype
-        )
+        req.files.voterdoc[0].buffer,
+        req.files.voterdoc[0].originalname,
+        req.files.voterdoc[0].mimetype
+      )
       : null;
 
     const uanImageUrl = req.files?.uandoc
       ? await uploadToCloudinary(
-          req.files.uandoc[0].buffer,
-          req.files.uandoc[0].originalname,
-          req.files.uandoc[0].mimetype
-        )
+        req.files.uandoc[0].buffer,
+        req.files.uandoc[0].originalname,
+        req.files.uandoc[0].mimetype
+      )
       : null;
 
     const packagedetails = await Package.findById(plan);
@@ -200,6 +206,22 @@ export const addUserToCart = async (req, res) => {
         .json({ success: false, message: "Package Not Found.." });
     }
     const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
+
+    // 🔹 Special case for Demo User (role 3)
+    if (user.role === 3) {
+      if (user.freeVerificationUsed) {
+        // ❌ Already used free trial
+        return res.status(403).json({
+          success: false,
+          message:
+            "Your free trial verification has already been used. Please purchase to continue.",
+        });
+      } else {
+        // ✅ First time free verification
+        user.freeVerificationUsed = true;
+        await user.save();
+      }
+    }
 
     const newUserCart = new UserCartVerification({
       employer_id: user_id,
@@ -302,11 +324,27 @@ export const addUserToCartAadharOTP = async (req, res) => {
 
     const aadharImageUrl = req.files?.aadhaardoc
       ? await uploadToCloudinary(
-          req.files.aadhaardoc[0].buffer,
-          req.files.aadhaardoc[0].originalname,
-          req.files.aadhaardoc[0].mimetype
-        )
+        req.files.aadhaardoc[0].buffer,
+        req.files.aadhaardoc[0].originalname,
+        req.files.aadhaardoc[0].mimetype
+      )
       : null;
+
+    // 🔹 Special case for Demo User (role 3)
+    if (user.role === 3) {
+      if (user.freeVerificationUsed) {
+        // ❌ Already used free trial
+        return res.status(403).json({
+          success: false,
+          message:
+            "Your free trial verification has already been used. Please purchase to continue.",
+        });
+      } else {
+        // ✅ First time free verification
+        user.freeVerificationUsed = true;
+        await user.save();
+      }
+    }
 
     const newUserCart = new UserCartVerificationAadhatOTP({
       employer_id: user_id,
@@ -321,6 +359,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       aadhar_image: aadharImageUrl,
       ...(owner_id && { owner_id }), // ✅ only include if exists
     });
+
 
     await newUserCart.save();
     res.status(201).json({
