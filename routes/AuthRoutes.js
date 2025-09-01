@@ -25,6 +25,7 @@ import {
   toggleUserVerificationStatus,
   listComplex,
   registercomplex,
+  RegisterDemoUser
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -51,6 +52,8 @@ AuthRouter.post("/change-password", upload.none(), userAuth, changePassword);
 AuthRouter.get("/validtoken", userAuth, validtoken);
 // Register user candidate
 AuthRouter.post("/register-frontend", upload.none(), RegisterFrontEnd);
+// Register demo user candidate one time free verify
+AuthRouter.post("/register-demo-user", upload.none(), RegisterDemoUser);
 
 // Register user candidate
 AuthRouter.post(
