@@ -666,7 +666,6 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
     // Ensure employer is valid
     const employer = await User.findOne({
       _id: employer_id,
-
       is_del: false,
     });
 
@@ -707,6 +706,29 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
     let overallSubtotal = 0;
     let gstPercent = 18 / 100;
 
+    //from here you need to add
+
+    let discountPercent = 0;
+    if (employer.role !== 3) {
+      const discountPercentData = await CompanyPackage.findOne({
+        companyId: employer_id,
+      });
+
+      if (!discountPercentData) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Discount Percent not found" });
+      }
+      discountPercent =
+        parseFloat(discountPercentData.discount_percent || 0) / 100;
+    }
+
+
+
+
+    // my code end here
+
+    /*
     const discountPercentData = await CompanyPackage.findOne({
       companyId: employer_id,
     });
@@ -719,10 +741,37 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
     console.log("Discount ==>>", discountPercentData.discount_percent);
     const discountPercent =
       parseFloat(discountPercentData.discount_percent || 0) / 100;
+    
+    */
+
+
+    // it will end here
 
     const formattedData = await Promise.all(
       userCarts.map(async (cart) => {
         console.log("Plan ID ==>>", cart.plan);
+
+        // it starts from here
+
+        let verificationCharge = 0;
+
+        if (employer.role !== 3) {
+          // 🔹 Normal package-based calculation
+          const packagedetails = await Package.findById(cart.plan);
+
+          if (!packagedetails) {
+            throw new Error("Package not found");
+          }
+
+          verificationCharge = parseFloat(packagedetails.transaction_fee || 0);
+        } else {
+          // 🔹 For role 3 → always free
+          verificationCharge = 0;
+        }
+
+        // my code ends here
+
+        /*
 
         const packagedetails = await Package.findById(cart.plan);
 
@@ -736,6 +785,10 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
           packagedetails.transaction_fee || 0
         );
         console.log(verificationCharge);
+        */
+
+
+        // it will end here
 
         const payForArray = [];
         if (cart.pan_number) payForArray.push("PAN");
@@ -761,6 +814,27 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
         };
       })
     );
+
+    // 🔹 Role 3 → return free billing (no discount/GST)
+    if (employer.role === 3) {
+      return res.status(200).json({
+        success: true,
+        data: formattedData,
+        overall_billing: {
+          total_verifications: overallTotalVerifications,
+          wallet_amount: employer.wallet_amount || "0.00",
+          fund_status: "NA",
+          subtotal: "0.00",
+          discount: "0.00",
+          discount_percent: "0.00",
+          cgst: "0.00",
+          cgst_percent: "0.00",
+          sgst: "0.00",
+          sgst_percent: "0.00",
+          total: "0.00",
+        },
+      });
+    }
 
     const discountAmount = overallSubtotal * discountPercent;
     const discountedSubtotal = overallSubtotal - discountAmount;
