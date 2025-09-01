@@ -110,7 +110,7 @@ const complexReportHelper = ({ data, startDate, endDate }) => {
 
             // Insert page break after every 3 rows
             const pageBreak =
-              (index + 1) % 7 === 0 ? `<tr class="page-break"></tr>` : "";
+              (index + 1) % 10 === 0 ? `<tr class="page-break"></tr>` : "";
 
             return row + pageBreak;
           })
