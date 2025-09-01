@@ -392,7 +392,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
     if (user.role === 3) {
       if (user.freeVerificationUsed) {
         // ❌ Already used free trial
-        return res.status(403).json({
+        return res.status(404).json({
           success: false,
           message:
             "Your free trial verification has already been used. Please purchase to continue.",
