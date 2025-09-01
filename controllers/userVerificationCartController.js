@@ -309,6 +309,23 @@ export const addUserToCartAadharOTP = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+
+    // 🔥 Skip package check for role 3
+    if (user.role !== 3) {
+      const companyPackage = await CompanyPackage.findOne({
+        companyId: user_id,
+        is_del: false,
+      });
+
+      if (!companyPackage || companyPackage.aadhar_otp !== "enable") {
+        return res.status(200).json({
+          success: false,
+          message: "Aadhar OTP verification is not enabled for this company.",
+        });
+      }
+    }
+
+    /*
     const companyPackage = await CompanyPackage.findOne({
       companyId: user_id,
       is_del: false,
@@ -320,6 +337,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
         message: "Aadhar OTP verification is not enabled for this company.",
       });
     }
+      */
 
     // ✅ Check for existing unpaid cart
     const existingCart = await UserCartVerificationAadhatOTP.findOne({
