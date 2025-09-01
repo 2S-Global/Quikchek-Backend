@@ -1270,6 +1270,16 @@ export const deleteUser = async (req, res) => {
         .json({ success: false, message: "Employer not found" });
     }
 
+    /**
+     * Special Handling for Role 3
+     * If employer has role = 3 → reset freeVerificationUsed = false
+     */
+    if (employer.role === 3) {
+      await User.findByIdAndUpdate(employer._id, {
+        $set: { freeVerificationUsed: false },
+      });
+    }
+
     const userCarts = await UserCartVerification.find({
       employer_id,
       is_del: false,
