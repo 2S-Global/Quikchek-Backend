@@ -199,6 +199,30 @@ export const addUserToCart = async (req, res) => {
       )
       : null;
 
+
+
+    if (user.role !== 3) {
+      // 🔹 For all users except demo role (3) → Package is required
+      packagedetails = await Package.findById(plan);
+      if (!packagedetails) {
+        return res.status(200).json({ success: false, message: "Package Not Found.." });
+      }
+      const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
+    } else {
+      // 🔹 Role 3 → Ignore package/plan, allow free verification
+      if (user.freeVerificationUsed) {
+        return res.status(403).json({
+          success: false,
+          message: "Your free trial verification has already been used. Please purchase to continue.",
+        });
+      } else {
+        user.freeVerificationUsed = true;
+        await user.save();
+      }
+    }
+
+
+    /*
     const packagedetails = await Package.findById(plan);
     if (!packagedetails) {
       return res
@@ -207,7 +231,10 @@ export const addUserToCart = async (req, res) => {
     }
     const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
 
+    */
+
     // 🔹 Special case for Demo User (role 3)
+    /*
     if (user.role === 3) {
       if (user.freeVerificationUsed) {
         // ❌ Already used free trial
@@ -222,6 +249,7 @@ export const addUserToCart = async (req, res) => {
         await user.save();
       }
     }
+      */
 
     const newUserCart = new UserCartVerification({
       employer_id: user_id,
