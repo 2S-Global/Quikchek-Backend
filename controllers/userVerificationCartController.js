@@ -218,6 +218,7 @@ export const addUserToCart = async (req, res) => {
       } else {
         user.freeVerificationUsed = true;
         await user.save();
+        verificationamount = 0; // free for role 3
       }
     }
 
