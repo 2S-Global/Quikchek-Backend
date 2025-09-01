@@ -425,6 +425,27 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
       is_del: false,
     });
 
+    // starts from here
+
+    let verificationCharge = 0;
+
+    if (employer.role === 3) {
+      // Skip CompanyPackage if role = 3
+      verificationCharge = 0; // or 50 (set default price if needed)
+    } else {
+      // Use company package for all other roles
+      const discountPercentData = await CompanyPackage.findOne({
+        companyId: employer_id,
+      });
+
+      verificationCharge = parseFloat(
+        discountPercentData?.aadhar_price || 0
+      );
+    }
+
+    // my code ends here
+
+    /*
     const discountPercentData = await CompanyPackage.findOne({
       companyId: employer_id,
     });
@@ -432,6 +453,12 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
     const verificationCharge = parseFloat(
       discountPercentData.aadhar_price || 0
     );
+    */
+
+
+    // it will end here
+
+
     const gstPercent = 18 / 100;
 
     let totalVerifications = 0;
@@ -491,6 +518,7 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
 export const deleteUserAadharOTP = async (req, res) => {
   try {
     const { id } = req.body;
+    const user_id = req.userId;
 
     // Validate ID
     if (!id) {
@@ -508,6 +536,14 @@ export const deleteUserAadharOTP = async (req, res) => {
 
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Added: Check if employer/user exists before updating
+    const user = await User.findOne({ _id: user_id, is_del: false });
+    if (user) {
+      await User.findByIdAndUpdate(user._id, {
+        $set: { freeVerificationUsed: false },
+      });
     }
 
     return res.status(200).json({

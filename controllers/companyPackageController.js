@@ -30,8 +30,8 @@ export const createCompanyPackage = async (req, res) => {
       typeof selected_plan === "string"
         ? selected_plan.split(",").map((id) => id.trim())
         : Array.isArray(selected_plan)
-        ? selected_plan
-        : [];
+          ? selected_plan
+          : [];
 
     const updatedOrCreated = await CompanyPackage.findOneAndUpdate(
       { companyId },
@@ -111,10 +111,9 @@ export const createCompanyPackage = async (req, res) => {
           <p>Based on your industry segment and requirements, the following package is now active for your account:</p>
 
           ${planDetailsHtml}
-        ${
-          finalDiscount > 0
-            ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>`
-            : ""
+        ${finalDiscount > 0
+          ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>`
+          : ""
         }
           <p>With this activated package, you can now begin utilizing QuikChek's fast and accurate KYC verification services.</p>
 
@@ -230,11 +229,10 @@ export const resendCompanyPackageEmail = async (req, res) => {
 
           <p>Your active service package details:</p>
           ${planDetailsHtml}
-          ${
-            discount_percent > 0
-              ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>`
-              : ""
-          }
+          ${discount_percent > 0
+          ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>`
+          : ""
+        }
 
           <p>Start using your services at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
 
@@ -341,6 +339,26 @@ export const sidebarAadharOtp = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User ID is missing",
+      });
+    }
+
+    const user = await User.findById(companyId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // 🔹 If user role is 3, always enable Aadhar OTP
+    if (user.role === 3) {
+      return res.status(200).json({
+        success: true,
+        aadhar_otp: "enable",
+        hoteltatus: "disable",
+        housingStatus: "disable",
+        message: "Demo user: Aadhar OTP enabled by default",
       });
     }
 
