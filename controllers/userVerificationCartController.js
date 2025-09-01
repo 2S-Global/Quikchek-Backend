@@ -200,6 +200,8 @@ export const addUserToCart = async (req, res) => {
       : null;
 
 
+    let verificationamount;
+    let packagedetails;
 
     if (user.role !== 3) {
       // 🔹 For all users except demo role (3) → Package is required
@@ -207,7 +209,7 @@ export const addUserToCart = async (req, res) => {
       if (!packagedetails) {
         return res.status(200).json({ success: false, message: "Package Not Found.." });
       }
-      const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
+      verificationamount = parseFloat(packagedetails.transaction_fee || 0);
     } else {
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (user.freeVerificationUsed) {
