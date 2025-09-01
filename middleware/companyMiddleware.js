@@ -4,11 +4,9 @@ const Companymid = async (req, res, next) => {
   try {
     // Ensure that the user is authenticated
     if (!req.user || !req.userId) {
-      return res
-        .status(401)
-        .json({
-          message: "Unauthorized: Please log in to access this resource.",
-        });
+      return res.status(401).json({
+        message: "Unauthorized: Please log in to access this resource.",
+      });
     }
     // Fetch the user by userId
     const user = await User.findById(req.userId);
@@ -21,7 +19,7 @@ const Companymid = async (req, res, next) => {
     console.log("Id:", user._id);
     console.log("User role_id:", user.role);
     // Check if the user's role_id is 3 (buyer role)
-    if (user.role !== 1 && user.role !== 2) {
+    if (user.role !== 1 && user.role !== 2 && user.role !== 3) {
       return res
         .status(403)
         .json({ message: "You are not authorized to access this resource." });
@@ -29,12 +27,10 @@ const Companymid = async (req, res, next) => {
     next();
   } catch (error) {
     // Handle any unexpected errors
-    return res
-      .status(500)
-      .json({
-        message: "An error occurred while verifying your role.",
-        error: error.message,
-      });
+    return res.status(500).json({
+      message: "An error occurred while verifying your role.",
+      error: error.message,
+    });
   }
 };
 
