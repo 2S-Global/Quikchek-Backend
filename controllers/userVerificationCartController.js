@@ -309,6 +309,15 @@ export const addUserToCartAadharOTP = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+    const user = await User.findOne({
+      _id: user_id,
+      is_del: false,
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "User Not Found" });
+    }
+
 
     // 🔥 Skip package check for role 3
     if (user.role !== 3) {
