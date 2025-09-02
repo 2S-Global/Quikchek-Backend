@@ -444,6 +444,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       docFile = req.body.aadhaardoc;
     }
     const FREE_VERIFICATION_LIMIT = 1;
+    let amount_for_demo_user = 0 ;
     if (user.role === 3) {
 
       const usedFree = await freeVerificationDetail.countDocuments({ user_id, free: true });
@@ -462,6 +463,8 @@ export const addUserToCartAadharOTP = async (req, res) => {
           free: true,
           status: "success"
         });
+      } else {
+        amount_for_demo_user = parseFloat(user.demoUserAmount || 0);
       }
     }
 
@@ -476,6 +479,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
         aadhar_name: aadhar_name,
         aadhar_number: aadhar_number,
         aadhar_image: aadharImageUrl,
+        amount_for_demo_user: amount_for_demo_user ,
         ...(owner_id && { owner_id }), // ✅ only include if exists
       });
 
@@ -519,7 +523,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
 
       if (employer.role === 3) {
         // Skip CompanyPackage if role = 3
-        verificationCharge = 0; // or 50 (set default price if needed)
+        verificationCharge =  parseFloat(userCarts[0]?.amount_for_demo_user) || 0; // or 50 (set default price if needed)
       } else {
         // Use company package for all other roles
         const discountPercentData = await CompanyPackage.findOne({

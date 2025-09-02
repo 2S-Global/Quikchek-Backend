@@ -69,6 +69,10 @@ const userVerificationCartAadharOTPSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    amount_for_demo_user: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
