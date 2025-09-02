@@ -98,6 +98,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    demoUserAmount:{
+      type: Number,
+      default: 0
+    },
   },
   {
     timestamps: true,
