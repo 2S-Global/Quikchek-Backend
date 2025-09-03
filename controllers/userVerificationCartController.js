@@ -487,7 +487,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
     let amount_for_demo_user = 0;
     if (user.role === 3) {
 
-      const usedFree = await freeVerificationDetail.countDocuments({ user_id, free: true });
+      const usedFree = await freeVerificationDetail.countDocuments({ userId:user_id, free: true });
 
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
