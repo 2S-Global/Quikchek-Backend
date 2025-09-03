@@ -235,6 +235,8 @@ export const addUserToCart = async (req, res) => {
     let packagedetails;
     const FREE_VERIFICATION_LIMIT = 1;
 
+    console.log("add_user_cart is running::: User role is -----> ", user.role);
+
     if (user.role !== 3) {
       // 🔹 For all users except demo role (3) → Package is required
       packagedetails = await Package.findById(plan);
@@ -244,7 +246,9 @@ export const addUserToCart = async (req, res) => {
       verificationamount = parseFloat(packagedetails.transaction_fee || 0);
     } else {
 
-      const usedFree = await freeVerificationDetail.countDocuments({ user_id, free: true });
+      const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
+
+      console.log("Used free verifications count for new user ---------: ", usedFree);
 
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
@@ -252,6 +256,8 @@ export const addUserToCart = async (req, res) => {
         //   success: false,
         //   message: "Your free trial verification has already been used. Please purchase to continue.",
         // });
+
+        console.log("Condition is satisfied for creating free verification entry  -----");
 
         await freeVerificationDetail.create({
           userId: user_id,
