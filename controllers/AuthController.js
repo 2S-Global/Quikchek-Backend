@@ -576,6 +576,7 @@ export const RegisterDemoUser = async (req, res) => {
       gst_no,
       required_services,
       self_registered,
+      demoUserAmount: 500,
     });
     await newUser.save();
     /* const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
