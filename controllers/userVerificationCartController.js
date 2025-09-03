@@ -510,8 +510,12 @@ export const addUserToCartAadharOTP = async (req, res) => {
         const verificationCartDetailsAadhar = await UserCartVerificationAadhatOTP.findOne(
           { employer_id: user_id, is_del: false });
 
+        console.log("While addind aadhar otp details:::  verificationCartDetailsAadhar", verificationCartDetailsAadhar);  //null
+
         const verificationCartDetails = await UserCartVerification.findOne(
-          { employer_id: user_id, is_del: false });
+          { employer_id: user_id, is_del: false });  // has value amount is 0 
+
+        console.log("While addind normal add to cart details:::  verificationCartDetails", verificationCartDetails);
 
         if ((verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0) || (verificationCartDetails && verificationCartDetails.is_paid === 0)) {
 
@@ -520,9 +524,9 @@ export const addUserToCartAadharOTP = async (req, res) => {
               amount_for_demo_user, 10)
             : null;
 
-          const cartAmount = verificationCartDetailsAadhar
-            ? parseInt(verificationCartDetailsAadhar.
-              amount_for_demo_user, 10)
+          const cartAmount = verificationCartDetails
+            ? parseInt(verificationCartDetails.
+              amount, 10)
             : null;
 
           if (cartAmountAadhar === 0 || cartAmount === 0) {
