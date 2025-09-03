@@ -507,17 +507,17 @@ export const addUserToCartAadharOTP = async (req, res) => {
         const verificationCartDetails = await UserCartVerification.findOne(
           { employer_id: user_id, is_del: false });
 
-        if (verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0 || verificationCartDetails && verificationCartDetails.is_paid === 0) {
+        if ((verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0) || (verificationCartDetails && verificationCartDetails.is_paid === 0)) {
 
           const cartAmountAadhar = verificationCartDetailsAadhar
             ? parseInt(verificationCartDetailsAadhar.
               amount_for_demo_user, 10)
-            : 0;
+            : null;
 
           const cartAmount = verificationCartDetailsAadhar
             ? parseInt(verificationCartDetailsAadhar.
               amount_for_demo_user, 10)
-            : 0;
+            : null;
 
           if (cartAmountAadhar === 0 || cartAmount === 0) {
             console.log("I am inside return 404 error message");
