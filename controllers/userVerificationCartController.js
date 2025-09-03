@@ -404,8 +404,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       return res.status(400).json({ message: "User Not Found" });
     }
 
-
-    // 🔥 Skip package check for role 3
+    // Skip package check for role 3
     if (user.role !== 3) {
       const companyPackage = await CompanyPackage.findOne({
         companyId: user_id,
@@ -420,21 +419,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       }
     }
 
-    /*
-    const companyPackage = await CompanyPackage.findOne({
-      companyId: user_id,
-      is_del: false,
-    });
-
-    if (!companyPackage || companyPackage.aadhar_otp !== "enable") {
-      return res.status(200).json({
-        success: false,
-        message: "Aadhar OTP verification is not enabled for this company.",
-      });
-    }
-      */
-
-    // ✅ Check for existing unpaid cart
+    // Check for existing unpaid cart
     const existingCart = await UserCartVerificationAadhatOTP.findOne({
       employer_id: user_id,
       is_paid: 0,
@@ -448,7 +433,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       });
     }
 
-    // ✅ Clean owner_id before destructuring
+    // Clean owner_id before destructuring
     if (req.body.owner_id === "null" || req.body.owner_id === "") {
       delete req.body.owner_id;
     }
@@ -474,7 +459,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       )
       : null;
 
-    // 🔹 Special case for Demo User (role 3)
+    // Special case for Demo User (role 3)
     let docType = "";
     let docNumber = "";
     let docFile = null;
@@ -489,12 +474,8 @@ export const addUserToCartAadharOTP = async (req, res) => {
 
       const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
 
-      // 🔹 Role 3 → Ignore package/plan, allow free verification
+      // Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
-        // return res.status(403).json({
-        //   success: false,
-        //   message: "Your free trial verification has already been used. Please purchase to continue.",
-        // });
 
         await freeVerificationDetail.create({
           userId: user_id,
@@ -505,17 +486,11 @@ export const addUserToCartAadharOTP = async (req, res) => {
         });
       } else {
 
-        // starts here
-
         const verificationCartDetailsAadhar = await UserCartVerificationAadhatOTP.findOne(
           { employer_id: user_id, is_del: false });
 
-        console.log("While addind aadhar otp details:::  verificationCartDetailsAadhar", verificationCartDetailsAadhar);  //null
-
         const verificationCartDetails = await UserCartVerification.findOne(
-          { employer_id: user_id, is_del: false });  // has value amount is 0 
-
-        console.log("While addind normal add to cart details:::  verificationCartDetails", verificationCartDetails);
+          { employer_id: user_id, is_del: false });
 
         if ((verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0) || (verificationCartDetails && verificationCartDetails.is_paid === 0)) {
 
@@ -530,7 +505,6 @@ export const addUserToCartAadharOTP = async (req, res) => {
             : null;
 
           if (cartAmountAadhar === 0 || cartAmount === 0) {
-            console.log("I am inside return 404 error message");
             return res.status(200).json({
               success: false,
               message:
@@ -538,9 +512,6 @@ export const addUserToCartAadharOTP = async (req, res) => {
             });
           }
         }
-
-        // Ends here
-
         amount_for_demo_user = parseFloat(user.demoUserAmount || 0);
       }
     }
@@ -559,7 +530,6 @@ export const addUserToCartAadharOTP = async (req, res) => {
       amount_for_demo_user: amount_for_demo_user,
       ...(owner_id && { owner_id }), // ✅ only include if exists
     });
-
 
     await newUserCart.save();
     res.status(201).json({
@@ -940,8 +910,6 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
     let overallSubtotal = 0;
     let gstPercent = 18 / 100;
 
-    //from here you need to add
-
     let discountPercent = 0;
     if (employer.role !== 3) {
       const discountPercentData = await CompanyPackage.findOne({
@@ -957,80 +925,25 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
         parseFloat(discountPercentData.discount_percent || 0) / 100;
     }
 
-
-
-
-    // my code end here
-
-    /*
-    const discountPercentData = await CompanyPackage.findOne({
-      companyId: employer_id,
-    });
- 
-    if (!discountPercentData) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Discount Percent not found" });
-    }
-    console.log("Discount ==>>", discountPercentData.discount_percent);
-    const discountPercent =
-      parseFloat(discountPercentData.discount_percent || 0) / 100;
-    
-    */
-
-
-    // it will end here
-
     const formattedData = await Promise.all(
       userCarts.map(async (cart) => {
         // console.log("Plan ID ==>>", cart.plan);
-
-        // it starts from here
-
         let verificationCharge = 0;
 
         const FREE_VERIFICATION_LIMIT = 1;
         const usedFree = await freeVerificationDetail.countDocuments({ userId: employer_id, free: true });
 
-        console.log("Used Free verifications count VALUE by chandra  ==>", usedFree);
-
         if (employer.role !== 3) {
-          // 🔹 Normal package-based calculation
+          // Normal package-based calculation
           const packagedetails = await Package.findById(cart.plan);
 
           if (!packagedetails) {
             throw new Error("Package not found");
           }
-
           verificationCharge = parseFloat(packagedetails.transaction_fee || 0);
         } else {
-          // 🔹 For role 3 → always free
-          // verificationCharge = 0;
-          // verificationCharge = cart.amount || 0;
           verificationCharge = parseFloat(cart.amount) || 0;
-          // verificationCharge = 0;
         }
-
-        // my code ends here
-
-        /*
- 
-        const packagedetails = await Package.findById(cart.plan);
- 
-        if (!packagedetails) {
-          throw new Error("Package not found"); // or handle differently
-        }
- 
-        console.log("Plan Price ==>>", packagedetails.transaction_fee);
- 
-        const verificationCharge = parseFloat(
-          packagedetails.transaction_fee || 0
-        );
-        console.log(verificationCharge);
-        */
-
-
-        // it will end here
 
         const payForArray = [];
         if (cart.pan_number) payForArray.push("PAN");
@@ -2103,11 +2016,7 @@ export const checkFreeTrialDemouser = async (req, res) => {
       free: true,
     });
 
-    console.log("Free Trial Document:", freeTrialDoc);
-
-    const trialVerificationUsed = !!freeTrialDoc; // true if found, false otherwise
-
-    console.log("Value in the form of true or false: ", trialVerificationUsed);
+    const trialVerificationUsed = !!freeTrialDoc;
 
     return res.status(200).json({
       success: true,
