@@ -487,7 +487,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
     let amount_for_demo_user = 0;
     if (user.role === 3) {
 
-      const usedFree = await freeVerificationDetail.countDocuments({ userId:user_id, free: true });
+      const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
 
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
@@ -2081,6 +2081,46 @@ export const listAllTransactionByCompanyAdmin = async (req, res) => {
       message: "Server error",
       error: error.message,
       data: [],
+    });
+  }
+};
+
+// Check free trial for one time verification is used or not API
+export const checkFreeTrialDemouser = async (req, res) => {
+  try {
+    const user_id = req.userId;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    // Check if user has any free trial record
+    const freeTrialDoc = await freeVerificationDetail.findOne({
+      userId: user_id,
+      free: true,
+    });
+
+    console.log("Free Trial Document:", freeTrialDoc);
+
+    const trialVerificationUsed = !!freeTrialDoc; // true if found, false otherwise
+
+    console.log("Value in the form of true or false: ", trialVerificationUsed);
+
+    return res.status(200).json({
+      success: true,
+      message: "Free trial check completed successfully",
+      trialVerificationUsed,
+    });
+  } catch (error) {
+    console.error("Error checking free trial:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+      trialVerificationUsed: false,
     });
   }
 };
