@@ -28,6 +28,8 @@ import {
   RegisterDemoUser,
   listDemoUser,
   changeDemoUserAmount,
+  changeAllDemoUserAmount,
+  listDemoUserNameId,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -152,7 +154,13 @@ AuthRouter.post(
 // List Demo User API
 AuthRouter.post("/list-demo-user", userAuth, adminMiddleware, listDemoUser);
 
+// List Demo User API only _id and name
+AuthRouter.post("/list-demo-user-name-id", userAuth, adminMiddleware, listDemoUserNameId);
+
 // Change amount of demo user
 AuthRouter.post("/change-demo-user-amount", upload.none(), userAuth, adminMiddleware, changeDemoUserAmount);
+
+// Change amount for multiple demo user
+AuthRouter.post("/change-all-demo-user-amount", upload.none(), userAuth, adminMiddleware, changeAllDemoUserAmount);
 
 export default AuthRouter;

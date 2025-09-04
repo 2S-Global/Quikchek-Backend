@@ -1789,8 +1789,74 @@ export const listDemoUser = async (req, res) => {
   }
 };
 
+// List Demo User return only _id and Name
+export const listDemoUserNameId = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find(
+      {is_del: false, role: 3},
+      { _id: 1, name: 1 }
+    );
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No Demo User found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Demo users retrieved successfully",
+      data: companies,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
 // Change amount for Demo User
 export const changeDemoUserAmount = async (req, res) => {
+  try {
+
+    const { _id, demoUserAmount } = req.body;
+
+    if (!_id || demoUserAmount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "_id and demoUserAmount are required",
+      });
+    }
+
+    // Find and update user
+    const updatedUser = await User.findOneAndUpdate(
+      { _id, is_del: false },
+      { $set: { demoUserAmount } },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "demoUserAmount updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+// Change amount for All Demo User
+export const changeAllDemoUserAmount = async (req, res) => {
   try {
 
     const { _id, demoUserAmount } = req.body;
