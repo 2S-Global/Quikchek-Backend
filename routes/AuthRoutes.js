@@ -25,7 +25,8 @@ import {
   toggleUserVerificationStatus,
   listComplex,
   registercomplex,
-  RegisterDemoUser
+  RegisterDemoUser,
+  listDemoUser,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -146,5 +147,8 @@ AuthRouter.post(
   adminMiddleware,
   toggleUserVerificationStatus
 );
+
+// List Demo User API
+AuthRouter.post("/list-demo-user", userAuth, adminMiddleware, listDemoUser);
 
 export default AuthRouter;

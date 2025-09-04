@@ -1218,8 +1218,12 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Hello ! I am inside login API ! ");
+
     // Find user by email
     const user = await User.findOne({ email, is_del: false });
+
+    console.log("User Details in Login API : ", user);
 
     if (!user) {
       return res.status(401).json({ message: "User not found." });
@@ -1247,6 +1251,8 @@ export const loginUser = async (req, res) => {
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("Password Match Status : ", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
@@ -1731,6 +1737,54 @@ export const toggleUserVerificationStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error toggling user deletion status",
+      error: error.message,
+    });
+  }
+};
+
+
+// List Demo User
+export const listDemoUser = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find({
+      is_del: false,
+      role: 3
+    }).select("-password");
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No Demo User found" });
+    }
+
+    // Get order counts grouped by employer_id
+    const orderCounts = await UserVerification.aggregate([
+      { $match: { is_del: false } },
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+    ]);
+
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      orderMap[_id.toString()] = orderCount;
+    });
+
+    // Attach order count to each company
+    const companiesWithOrderCount = companies.map((company) => {
+      const companyId = company._id.toString();
+      return {
+        ...company.toObject(),
+        orderCount: orderMap[companyId] || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Companies retrieved successfully",
+      data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
       error: error.message,
     });
   }
