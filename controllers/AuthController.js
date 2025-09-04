@@ -3,6 +3,7 @@ import UserVerification from "../models/userVerificationModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import UserRole from "../models/userRoleModel.js";
 
 import nodemailer from "nodemailer";
 
@@ -1899,6 +1900,145 @@ export const changeAllDemoUserAmount = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error updating demo user amounts",
+      error: error.message,
+    });
+  }
+};
+
+// List all users except Admin
+
+export const listAllUsersExceptAdmin = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const companies = await User.find(
+      { is_del: false, is_active: true, role: { $ne: 0 } },
+      {
+        user_type: 0,
+        self_registered: 0,
+        check_role: 0,
+        switchedRole: 0,
+        freeVerificationUsed: 0,
+        demoUserAmount: 0,
+        address: 0,
+        gst_no: 0,
+        package_id: 0,
+        allowed_verifications: 0,
+        discount_percent: 0,
+        transaction_fee: 0,
+        transaction_gst: 0,
+        wallet_amount: 0,
+        password: 0
+      }
+    );
+
+    if (!companies.length) {
+      return res.status(404).json({ message: "No User found" });
+    }
+
+    // Get order counts grouped by employer_id
+    const orderCounts = await UserVerification.aggregate([
+      { $match: { is_del: false } },
+      { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+    ]);
+
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    orderCounts.forEach(({ _id, orderCount }) => {
+      orderMap[_id.toString()] = orderCount;
+    });
+
+    // 4. Get roles from UserRoles collection
+    const roles = await UserRole.find({}, { role: 1, role_name: 1 });
+    const roleMap = {};
+    roles.forEach((r) => {
+      roleMap[r.role] = r.role_name;
+    });
+
+    // Attach order count to each company
+    const companiesWithOrderCount = companies.map((company) => {
+      const companyId = company._id.toString();
+      return {
+        ...company.toObject(),
+        orderCount: orderMap[companyId] || 0,
+        role_name: roleMap[company.role] || "Unknown"
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "All Users retrieved successfully",
+      data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+// Role change for a particular user based on provided _id
+
+export const userRoleChange = async (req, res) => {
+  try {
+
+    const { _id, role } = req.body;
+
+    if (!_id || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "_id and role are required",
+      });
+    }
+
+    // Find and update user
+    const updatedUser = await User.findOneAndUpdate(
+      { _id, is_del: false },
+      { $set: { role } },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Role updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+// List all user roles
+export const allUserRoles = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
+    const userRoles = await UserRole.find(
+      { is_del: false, is_active: true, role: { $ne: 0 } },
+      { role: 1, role_name: 1 }
+    );
+
+    if (!userRoles.length) {
+      return res.status(404).json({ message: "No User Role found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "All quikchek user role retrieved successfully",
+      data: userRoles,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
       error: error.message,
     });
   }

@@ -30,6 +30,9 @@ import {
   changeDemoUserAmount,
   changeAllDemoUserAmount,
   listDemoUserNameId,
+  listAllUsersExceptAdmin,
+  userRoleChange,
+  allUserRoles
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -162,5 +165,14 @@ AuthRouter.post("/change-demo-user-amount", upload.none(), userAuth, adminMiddle
 
 // Change amount for multiple demo user
 AuthRouter.post("/change-all-demo-user-amount", upload.none(), userAuth, adminMiddleware, changeAllDemoUserAmount);
+
+// List all users except admin
+AuthRouter.post("/list-all-users", upload.none(), userAuth, adminMiddleware, listAllUsersExceptAdmin);
+
+// change role for users
+AuthRouter.post("/user-role-change", upload.none(), userAuth, adminMiddleware, userRoleChange);
+
+// List all user roles
+AuthRouter.get("/all-user-roles", userAuth, adminMiddleware, allUserRoles);
 
 export default AuthRouter;
