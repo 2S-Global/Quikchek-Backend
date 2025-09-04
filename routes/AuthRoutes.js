@@ -27,6 +27,7 @@ import {
   registercomplex,
   RegisterDemoUser,
   listDemoUser,
+  changeDemoUserAmount,
 } from "../controllers/AuthController.js"; // Adjust the path according to your project structure
 // Initialize dotenv to load environment variables
 
@@ -150,5 +151,8 @@ AuthRouter.post(
 
 // List Demo User API
 AuthRouter.post("/list-demo-user", userAuth, adminMiddleware, listDemoUser);
+
+// Change amount of demo user
+AuthRouter.post("/change-demo-user-amount", upload.none(), userAuth, adminMiddleware, changeDemoUserAmount);
 
 export default AuthRouter;

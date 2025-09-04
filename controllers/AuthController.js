@@ -1621,9 +1621,8 @@ export const toggleCompanyStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Company has been ${
-        status ? "activated" : "deactivated"
-      } successfully`,
+      message: `Company has been ${status ? "activated" : "deactivated"
+        } successfully`,
       data: updatedCompany,
     });
   } catch (error) {
@@ -1781,6 +1780,46 @@ export const listDemoUser = async (req, res) => {
       success: true,
       message: "Companies retrieved successfully",
       data: companiesWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+// Change amount for Demo User
+export const changeDemoUserAmount = async (req, res) => {
+  try {
+
+    const { _id, demoUserAmount } = req.body;
+
+    if (!_id || demoUserAmount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "_id and demoUserAmount are required",
+      });
+    }
+
+    // Find and update user
+    const updatedUser = await User.findOneAndUpdate(
+      { _id, is_del: false },
+      { $set: { demoUserAmount } },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "demoUserAmount updated successfully",
+      data: updatedUser,
     });
   } catch (error) {
     res.status(500).json({
