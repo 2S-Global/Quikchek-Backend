@@ -1218,12 +1218,8 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("Hello ! I am inside login API ! ");
-
     // Find user by email
     const user = await User.findOne({ email, is_del: false });
-
-    console.log("User Details in Login API : ", user);
 
     if (!user) {
       return res.status(401).json({ message: "User not found." });
@@ -1251,8 +1247,6 @@ export const loginUser = async (req, res) => {
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
-
-    console.log("Password Match Status : ", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
@@ -1608,7 +1602,7 @@ export const toggleCompanyStatus = async (req, res) => {
     const objectId = new mongoose.Types.ObjectId(companyId);
 
     const updatedCompany = await User.findOneAndUpdate(
-      { _id: objectId, role: 1, is_del: false }, // 👈 FIXED HERE
+      { _id: objectId, is_del: false }, // 👈 FIXED HERE
       { is_active: status, updatedAt: new Date() },
       { new: true }
     );
@@ -1794,7 +1788,7 @@ export const listDemoUserNameId = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
     const companies = await User.find(
-      {is_del: false, role: 3},
+      { is_del: false, role: 3 },
       { _id: 1, name: 1 }
     );
 
@@ -1858,38 +1852,53 @@ export const changeDemoUserAmount = async (req, res) => {
 // Change amount for All Demo User
 export const changeAllDemoUserAmount = async (req, res) => {
   try {
+    let { all, list, fees } = req.body;
 
-    const { _id, demoUserAmount } = req.body;
-
-    if (!_id || demoUserAmount === undefined) {
+    if (fees === undefined) {
       return res.status(400).json({
         success: false,
-        message: "_id and demoUserAmount are required",
+        message: "fees is required",
       });
     }
 
-    // Find and update user
-    const updatedUser = await User.findOneAndUpdate(
-      { _id, is_del: false },
-      { $set: { demoUserAmount } },
-      { new: true }
-    ).select("-password");
+    all = all === "true" || all === true;
+    fees = Number(fees);
 
-    if (!updatedUser) {
-      return res.status(404).json({
+    if (isNaN(fees)) {
+      return res.status(400).json({
         success: false,
-        message: "User not found",
+        message: "fees must be a valid number",
       });
     }
+
+    let filter = { is_del: false, role: 3 };
+
+    if (all === false) {
+      // update only selected users
+      if (!Array.isArray(list) || list.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "list of user IDs is required when all is false",
+        });
+      }
+      filter._id = { $in: list };
+    }
+
+    const result = await User.updateMany(
+      filter,
+      { $set: { demoUserAmount: fees } }
+    );
 
     res.status(200).json({
       success: true,
       message: "demoUserAmount updated successfully",
-      data: updatedUser,
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Error retrieving companies",
+      success: false,
+      message: "Error updating demo user amounts",
       error: error.message,
     });
   }
