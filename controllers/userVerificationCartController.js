@@ -228,14 +228,9 @@ export const addUserToCart = async (req, res) => {
       docFile = req.body.voterdoc;
     }
 
-    console.log("Which doctype is this: ", docType, docNumber);
-
-
     let verificationamount;
     let packagedetails;
     const FREE_VERIFICATION_LIMIT = 1;
-
-    console.log("add_user_cart is running::: User role is -----> ", user.role);
 
     if (user.role !== 3) {
       // 🔹 For all users except demo role (3) → Package is required
@@ -245,20 +240,10 @@ export const addUserToCart = async (req, res) => {
       }
       verificationamount = parseFloat(packagedetails.transaction_fee || 0);
     } else {
-
       const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
-
-      console.log("Used free verifications count for new user ---------: ", usedFree);
 
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
-        // return res.status(403).json({
-        //   success: false,
-        //   message: "Your free trial verification has already been used. Please purchase to continue.",
-        // });
-
-        console.log("Condition is satisfied for creating free verification entry  -----");
-
         await freeVerificationDetail.create({
           userId: user_id,
           docType,
@@ -266,19 +251,13 @@ export const addUserToCart = async (req, res) => {
           free: true,
           status: "success"
         });
-
         verificationamount = 0;
-
       } else {
-        // user.freeVerificationUsed = true;
-        // await user.save();
-        // verificationamount = 0; // free for role 3
-
         const verificationCartDetailsAadhar = await UserCartVerificationAadhatOTP.findOne(
-          { employer_id: user_id, is_del: false });  //Present
+          { employer_id: user_id, is_del: false });
 
         const verificationCartDetails = await UserCartVerification.findOne(
-          { employer_id: user_id });   // Not Present
+          { employer_id: user_id });
 
         if (
           (verificationCartDetails && verificationCartDetails.is_paid === 0) ||
@@ -289,14 +268,10 @@ export const addUserToCart = async (req, res) => {
             ? parseInt(verificationCartDetails.amount, 10)
             : null;
 
-          console.log("Normal card amount: ", cartAmount);
-
           const cartAmountAadhar = verificationCartDetailsAadhar
             ? parseInt(verificationCartDetailsAadhar.
               amount_for_demo_user, 10)
             : null;
-
-          console.log("Card amount for Aadhar: ", cartAmountAadhar);
 
           if (cartAmount === 0 || cartAmountAadhar === 0) {
             return res.status(200).json({
@@ -310,7 +285,6 @@ export const addUserToCart = async (req, res) => {
       }
     }
 
-
     /*
     const packagedetails = await Package.findById(plan);
     if (!packagedetails) {
@@ -321,24 +295,6 @@ export const addUserToCart = async (req, res) => {
     const verificationamount = parseFloat(packagedetails.transaction_fee || 0);
 
     */
-
-    // 🔹 Special case for Demo User (role 3)
-    /*
-    if (user.role === 3) {
-      if (user.freeVerificationUsed) {
-        // ❌ Already used free trial
-        return res.status(403).json({
-          success: false,
-          message:
-            "Your free trial verification has already been used. Please purchase to continue.",
-        });
-      } else {
-        // ✅ First time free verification
-        user.freeVerificationUsed = true;
-        await user.save();
-      }
-    }
-      */
 
     const newUserCart = new UserCartVerification({
       employer_id: user_id,
