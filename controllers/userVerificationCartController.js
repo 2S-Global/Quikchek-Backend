@@ -230,7 +230,7 @@ export const addUserToCart = async (req, res) => {
 
     let verificationamount;
     let packagedetails;
-    const FREE_VERIFICATION_LIMIT = 1;
+    const FREE_VERIFICATION_LIMIT = 6;
 
     if (user.role !== 3) {
       // 🔹 For all users except demo role (3) → Package is required
@@ -424,7 +424,7 @@ export const addUserToCartAadharOTP = async (req, res) => {
       docNumber = req.body.aadhar_number;
       docFile = req.body.aadhaardoc;
     }
-    const FREE_VERIFICATION_LIMIT = 1;
+    const FREE_VERIFICATION_LIMIT = 6;
     let amount_for_demo_user = 0;
     if (user.role === 3) {
 
