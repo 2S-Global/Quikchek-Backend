@@ -529,7 +529,6 @@ export const RegisterFrontEnd = async (req, res) => {
   }
 };
 
-
 // Register for Demo User By Chandra Sarkar on 1st September 2025
 // RegisterDemoUser
 export const RegisterDemoUser = async (req, res) => {
@@ -674,8 +673,6 @@ export const RegisterDemoUser = async (req, res) => {
       .json({ message: "Error creating user", error: error.message });
   }
 };
-
-
 
 export const verifyEmail = async (req, res) => {
   const { token } = req.params;
@@ -1271,10 +1268,10 @@ export const loginUser = async (req, res) => {
       .json({ message: "Error logging in user", error: error.message });
   }
 };
-
+import { getPackageNamesByCompanyIds } from "./Helpers/packageUtils.js";
 export const listCompanies = async (req, res) => {
   try {
-    // Get all companies (role: 1 and is_del: false)
+    // 1️⃣ Get all companies (role: 1, not deleted, not self-registered)
     const companies = await User.find({
       is_del: false,
       role: 1,
@@ -1282,10 +1279,13 @@ export const listCompanies = async (req, res) => {
     }).select("-password");
 
     if (!companies.length) {
-      return res.status(404).json({ message: "No companies found" });
+      return res.status(404).json({
+        success: false,
+        message: "No companies found",
+      });
     }
 
-    // Get order counts grouped by employer_id
+    // 2️⃣ Get order counts grouped by employer_id
     const orderCounts = await UserVerification.aggregate([
       { $match: { is_del: false } },
       { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
@@ -1297,27 +1297,36 @@ export const listCompanies = async (req, res) => {
       orderMap[_id.toString()] = orderCount;
     });
 
-    // Attach order count to each company
-    const companiesWithOrderCount = companies.map((company) => {
+    // 3️⃣ Get package names for all companies in a single query
+    const companyIds = companies.map((c) => c._id.toString());
+    const packageMap = await getPackageNamesByCompanyIds(companyIds);
+
+    // 4️⃣ Build the final company list with orderCount and packages
+    const companiesWithDetails = companies.map((company) => {
       const companyId = company._id.toString();
       return {
         ...company.toObject(),
         orderCount: orderMap[companyId] || 0,
+        packages: packageMap[companyId] || "", // comma-separated string
       };
     });
 
+    // 5️⃣ Send response
     res.status(200).json({
       success: true,
       message: "Companies retrieved successfully",
-      data: companiesWithOrderCount,
+      data: companiesWithDetails,
     });
   } catch (error) {
+    console.error("Error retrieving companies:", error.message);
     res.status(500).json({
+      success: false,
       message: "Error retrieving companies",
       error: error.message,
     });
   }
 };
+
 export const listComplex = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
@@ -1328,7 +1337,10 @@ export const listComplex = async (req, res) => {
     }).select("-password");
 
     if (!companies.length) {
-      return res.status(404).json({ message: "No companies found" });
+      return res.status(404).json({
+        success: false,
+        message: "No companies found",
+      });
     }
 
     // Get order counts grouped by employer_id
@@ -1343,19 +1355,24 @@ export const listComplex = async (req, res) => {
       orderMap[_id.toString()] = orderCount;
     });
 
-    // Attach order count to each company
-    const companiesWithOrderCount = companies.map((company) => {
+    // 3️⃣ Get package names for all companies in a single query
+    const companyIds = companies.map((c) => c._id.toString());
+    const packageMap = await getPackageNamesByCompanyIds(companyIds);
+
+    // 4️⃣ Build the final company list with orderCount and packages
+    const companiesWithDetails = companies.map((company) => {
       const companyId = company._id.toString();
       return {
         ...company.toObject(),
         orderCount: orderMap[companyId] || 0,
+        packages: packageMap[companyId] || "", // comma-separated string
       };
     });
 
     res.status(200).json({
       success: true,
       message: "Companies retrieved successfully",
-      data: companiesWithOrderCount,
+      data: companiesWithDetails,
     });
   } catch (error) {
     res.status(500).json({
@@ -1435,19 +1452,24 @@ export const listSelfRegisteredCompanies = async (req, res) => {
       orderMap[_id.toString()] = orderCount;
     });
 
-    // Attach order count to each company
-    const companiesWithOrderCount = companies.map((company) => {
+    // 3️⃣ Get package names for all companies in a single query
+    const companyIds = companies.map((c) => c._id.toString());
+    const packageMap = await getPackageNamesByCompanyIds(companyIds);
+
+    // 4️⃣ Build the final company list with orderCount and packages
+    const companiesWithDetails = companies.map((company) => {
       const companyId = company._id.toString();
       return {
         ...company.toObject(),
         orderCount: orderMap[companyId] || 0,
+        packages: packageMap[companyId] || "", // comma-separated string
       };
     });
 
     res.status(200).json({
       success: true,
       message: "Companies retrieved successfully",
-      data: companiesWithOrderCount,
+      data: companiesWithDetails,
     });
   } catch (error) {
     res.status(500).json({
@@ -1616,8 +1638,9 @@ export const toggleCompanyStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Company has been ${status ? "activated" : "deactivated"
-        } successfully`,
+      message: `Company has been ${
+        status ? "activated" : "deactivated"
+      } successfully`,
       data: updatedCompany,
     });
   } catch (error) {
@@ -1736,14 +1759,13 @@ export const toggleUserVerificationStatus = async (req, res) => {
   }
 };
 
-
 // List Demo User
 export const listDemoUser = async (req, res) => {
   try {
     // Get all companies (role: 1 and is_del: false)
     const companies = await User.find({
       is_del: false,
-      role: 3
+      role: 3,
     }).select("-password");
 
     if (!companies.length) {
@@ -1813,7 +1835,6 @@ export const listDemoUserNameId = async (req, res) => {
 // Change amount for Demo User
 export const changeDemoUserAmount = async (req, res) => {
   try {
-
     const { _id, demoUserAmount } = req.body;
 
     if (!_id || demoUserAmount === undefined) {
@@ -1885,10 +1906,9 @@ export const changeAllDemoUserAmount = async (req, res) => {
       filter._id = { $in: list };
     }
 
-    const result = await User.updateMany(
-      filter,
-      { $set: { demoUserAmount: fees } }
-    );
+    const result = await User.updateMany(filter, {
+      $set: { demoUserAmount: fees },
+    });
 
     res.status(200).json({
       success: true,
@@ -1927,7 +1947,7 @@ export const listAllUsersExceptAdmin = async (req, res) => {
         transaction_fee: 0,
         transaction_gst: 0,
         wallet_amount: 0,
-        password: 0
+        password: 0,
       }
     );
 
@@ -1960,7 +1980,7 @@ export const listAllUsersExceptAdmin = async (req, res) => {
       return {
         ...company.toObject(),
         orderCount: orderMap[companyId] || 0,
-        role_name: roleMap[company.role] || "Unknown"
+        role_name: roleMap[company.role] || "Unknown",
       };
     });
 
@@ -1981,7 +2001,6 @@ export const listAllUsersExceptAdmin = async (req, res) => {
 
 export const userRoleChange = async (req, res) => {
   try {
-
     const { _id, role } = req.body;
 
     if (!_id || !role) {
