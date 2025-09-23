@@ -118,8 +118,9 @@ export const addContact = async (req, res) => {
       `;
 
     // Send email
+    /* email Checked */
     await transporter.sendMail({
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: "kp.sunit@gmail.com",
       cc: ["d.dey1988@gmail.com", "avik@2sglobal.co", "abhishek@2sglobal.us"],
       subject: dispute

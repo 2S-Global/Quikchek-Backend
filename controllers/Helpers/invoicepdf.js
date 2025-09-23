@@ -35,12 +35,13 @@ const InvoiceGenerate = ({ data }) => {
           <div class="company-name">
             GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED
           </div>
+          <div class="company-name">GST: 19AAVCS5999N1ZR</div>
           <div class="company-details">
             Unit-404, 4th Floor, Webel IT Park (Phase-II),Rajarhat,<br />
             DH Block (Newtown), Action Area 1D,<br />
             Newtown, West Bengal 700160.
           </div>
-          <div class="company-details">hello@geisil.com | 00348101495</div>
+          <div class="company-details">support@quikchek.in | 00348101495</div>
         </div>
       </div>
     </div>

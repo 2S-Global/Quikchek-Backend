@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 dotenv.config();
 
-const SendEmail = ({ table_data, month_name, email, year }) => {
+const SendEmail = async ({ table_data, month_name, email, year }) => {
   const email_address = email.employer_id.email;
   const company_name = email.employer_id.name;
 
@@ -73,7 +73,7 @@ Thank you for your continued support and collaboration.
 
     <p>Sincerely,<br/>
     The Team at <strong>Global Employability Information Services India Limited</strong><br/>
-   Email: hello@geisil.com , <br/>
+   Email: support@quikchek.in , <br/>
    Mobile: +91 9831823898
 <br/>
     <a href="https://geisil.com/" target="_blank">www.geisil.com</a></p>   

@@ -599,7 +599,13 @@ export const paynowAadharOTP = async (req, res) => {
       return res.status(400).json({ error: "User ID is missing." });
     }
 
-    const { razorpay_response, amount, paymentIds, payment_method, overall_billing } = req.body;
+    const {
+      razorpay_response,
+      amount,
+      paymentIds,
+      payment_method,
+      overall_billing,
+    } = req.body;
 
     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
@@ -628,7 +634,6 @@ export const paynowAadharOTP = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
-
     //   Added By Chandra on 13th Aug 2025  start---
     const orderNumber = `ORD-${Date.now()}`;
 
@@ -656,7 +661,14 @@ export const paynowAadharOTP = async (req, res) => {
     // Update is_paid field
     const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
       { employer_id: employer_id },
-      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date(), order_ref_id: insertedId } }
+      {
+        $set: {
+          is_paid: 1,
+          aadhat_otp: "yes",
+          createdAt: new Date(),
+          order_ref_id: insertedId,
+        },
+      }
     );
 
     if (updatedUsers.modifiedCount === 0) {
@@ -673,9 +685,6 @@ export const paynowAadharOTP = async (req, res) => {
     // });
 
     //added By Chandra on 13th Aug 2025 end-----
-
-
-
 
     // Get users to archive
     const usersToArchive = await UserCartVerificationAadhatOTP.find({
@@ -700,7 +709,6 @@ export const paynowAadharOTP = async (req, res) => {
       return obj;
     });
 
-
     // This Line added by Chandra on 13th Aug 2025
     // await UserVerification.insertMany(usersWithOrderId);
 
@@ -710,7 +718,6 @@ export const paynowAadharOTP = async (req, res) => {
     //   employer_id: employer_id,
     //   is_paid: 1,
     // });
-
 
     // amount: parsedAmount,
     // Save transaction after userIds is ready
@@ -822,9 +829,7 @@ export const paynowAadharOTPFree = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment method." });
     }
 
-
     //   Added By Chandra on 14th Aug 2025  start---
-
 
     const orderNumber = `ORD-${Date.now()}`;
 
@@ -835,29 +840,33 @@ export const paynowAadharOTPFree = async (req, res) => {
       employer_id: employer_id,
       order_number: orderNumber,
       invoice_number: invoiceNumber,
-      subtotal: 0.00,
-      cgst: 0.00,
-      cgst_percent: 9.00,
-      sgst: 0.00,
-      sgst_percent: 9.00,
-      total_amount: 0.00,
-      discount_percent: 0.00,
-      discount_amount: 0.00,
+      subtotal: 0.0,
+      cgst: 0.0,
+      cgst_percent: 9.0,
+      sgst: 0.0,
+      sgst_percent: 9.0,
+      total_amount: 0.0,
+      discount_percent: 0.0,
+      discount_amount: 0.0,
       total_numbers_users: 1,
     });
 
     const savedCart = await newUserCart.save();
     const insertedId = savedCart._id;
 
-
-
     // Added By Chandra on 14th Aug 2025 end-----
-
 
     // Update is_paid field
     const updatedUsers = await UserCartVerificationAadhatOTP.updateMany(
       { employer_id: employer_id },
-      { $set: { is_paid: 1, aadhat_otp: "yes", createdAt: new Date(), order_ref_id: insertedId } }
+      {
+        $set: {
+          is_paid: 1,
+          aadhat_otp: "yes",
+          createdAt: new Date(),
+          order_ref_id: insertedId,
+        },
+      }
     );
 
     console.log("updatedUsers Value: ", updatedUsers);
@@ -1925,7 +1934,7 @@ export const paynow = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Order Confirmation : QuikChek - Thank You for Your Purchase!",
       html: `
@@ -1947,18 +1956,22 @@ export const paynow = async (req, res) => {
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
         <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+      <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
+     </div>
       `,
     };
-
+    /* email Checked */
     await transporter.sendMail(mailOptions);
 
     const mailOptions2 = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Payment Received: QuikChek - Your Order is Confirmed!",
       html: `
@@ -1976,18 +1989,23 @@ export const paynow = async (req, res) => {
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+       <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>
+</p>
 
                 <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+       <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
       `,
     };
-
+    /* email Checked */
     await transporter.sendMail(mailOptions2);
 
     const mailOptions3 = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: "kp.sunit@gmail.com",
       subject:
         "Payment Received: QuikChek - " +
@@ -2018,10 +2036,14 @@ export const paynow = async (req, res) => {
     <br />
     <p>Sincerely,<br />
     The Admin Team<br />
-    <strong>Global Employability Information Services India Limited</strong></p>
+     <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
     <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+    <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
   `,
     };
@@ -2212,7 +2234,7 @@ export const paynowFree = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Order Confirmation : QuikChek - Thank You for Your Purchase!",
       html: `
@@ -2234,18 +2256,22 @@ export const paynowFree = async (req, res) => {
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
         <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+     <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
       `,
     };
-
+    /* Email Checked */
     await transporter.sendMail(mailOptions);
 
     const mailOptions2 = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Payment Received: QuikChek - Your Order is Confirmed!",
       html: `
@@ -2261,20 +2287,26 @@ export const paynowFree = async (req, res) => {
         <p>If you have any questions or need further assistance, feel free to reach out to our support team at support@quikchek.in or call us at 8697744701.</p>
         <p>Thank you for choosing QuikChek. We appreciate your trust in us and look forward to serving you again.</p>
         <br />
-        <p>Sincerely,<br />
-        The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <p>
+  Sincerely,<br />
+  The Admin Team<br />
+  <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>
+</p>
 
-                <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+<div style="text-align: center; margin-top: 30px">
+  <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
+</div>
       `,
     };
-
+    /* Email Checked */
     await transporter.sendMail(mailOptions2);
 
     const mailOptions3 = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: "kp.sunit@gmail.com",
       subject:
         "Payment Received: QuikChek - " +
@@ -2303,13 +2335,19 @@ export const paynowFree = async (req, res) => {
     <p>Thank you for being a part of the QuikChek team!</p>
 
     <br />
-    <p>Sincerely,<br />
-    The Admin Team<br />
-    <strong>Global Employability Information Services India Limited</strong></p>
+    <p>
+  Sincerely,<br />
+  The Admin Team<br />
+  <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>
+</p>
 
-    <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+<div style="text-align: center; margin-top: 30px">
+  <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
+</div>
   `,
     };
 

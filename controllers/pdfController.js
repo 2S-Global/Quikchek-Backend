@@ -48,7 +48,7 @@ export const generatePDF = async (req, res) => {
   Newtown, West Bengal 700160.
 </p>
 
-        <p style="margin: 0; font-size: 10px; line-height: 1.6;">hello@geisil.com | 00348101495</p>
+        <p style="margin: 0; font-size: 10px; line-height: 1.6;">support@quikchek.in | 00348101495</p>
       </div>
     `;
     const createdAt = new Date().toLocaleString("en-IN", {
@@ -141,7 +141,7 @@ export const otpgeneratePDF = async (req, res) => {
   Newtown, West Bengal 700160.
 </p>
 
-        <p style="margin: 0; font-size: 10px; line-height: 1.6;">hello@geisil.com | 00348101495</p>
+        <p style="margin: 0; font-size: 10px; line-height: 1.6;">support@quikchek.in | 00348101495</p>
       </div>
     `;
     const createdAt = new Date().toLocaleString("en-IN", {
@@ -332,7 +332,7 @@ export const ReportPDF = async (req, res) => {
   Newtown, West Bengal 700160.
 </p>
 
-        <p style="margin: 0; font-size: 10px; line-height: 1.6;">hello@geisil.com | 00348101495</p>
+        <p style="margin: 0; font-size: 10px; line-height: 1.6;">support@quikchek.in | 00348101495</p>
       </div>
     `;
     const createdAt = new Date().toLocaleString("en-IN", {

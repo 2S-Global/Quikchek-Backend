@@ -14,9 +14,19 @@ export const getallownerforcompany = async (req, res) => {
     if (owners.length === 0) {
       res.status(404).json({ message: "No owners found for this company" });
     } else {
+      //modified data
+      const modifiedOwners = owners.map((owner) => {
+        return {
+          _id: owner._id,
+          name: `${owner.name} (${owner.flat_no || ""})`,
+          flat_no: owner.flat_no,
+          owner_id: owner._id,
+        };
+      });
+
       res.status(200).json({
         success: true,
-        data: owners,
+        data: modifiedOwners,
         message: "Owners fetched successfully",
       });
     }

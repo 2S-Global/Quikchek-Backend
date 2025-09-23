@@ -30,8 +30,8 @@ export const createCompanyPackage = async (req, res) => {
       typeof selected_plan === "string"
         ? selected_plan.split(",").map((id) => id.trim())
         : Array.isArray(selected_plan)
-          ? selected_plan
-          : [];
+        ? selected_plan
+        : [];
 
     const updatedOrCreated = await CompanyPackage.findOneAndUpdate(
       { companyId },
@@ -93,7 +93,7 @@ export const createCompanyPackage = async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: company.email,
       subject: "QuikChek Account Activation and Package Details",
       html: `  
@@ -104,16 +104,17 @@ export const createCompanyPackage = async (req, res) => {
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <p>Dear ${company.name || "Valued Partner"},</p>
 
-          <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+          <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
 
           <p>Following the successful creation of your <strong>QuikChek</strong> account, we are pleased to inform you that your selected service package has been activated.</p>
 
           <p>Based on your industry segment and requirements, the following package is now active for your account:</p>
 
           ${planDetailsHtml}
-        ${finalDiscount > 0
-          ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>`
-          : ""
+        ${
+          finalDiscount > 0
+            ? `<p><strong>• Discount Applied:</strong> ${finalDiscount}%</p>`
+            : ""
         }
           <p>With this activated package, you can now begin utilizing QuikChek's fast and accurate KYC verification services.</p>
 
@@ -122,13 +123,13 @@ export const createCompanyPackage = async (req, res) => {
           <p>We are committed to providing you with a seamless and efficient KYC verification experience. If you have any questions about your activated package or require any assistance, please feel free to contact our support team:</p>
 
           <ul>
-            <li><strong>Email:</strong> hello@geisil.com</li>
+            <li><strong>Email:</strong> support@quikchek.in</li>
             <li><strong>Phone:</strong>9831823898</li>
           </ul>
 
-          <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+          <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
 
-          <p>Sincerely,<br/>The Admin Team<br/><strong>Global Employability Information Services India Limited</strong></p>
+          <p>Sincerely,<br/>The Admin Team<br/><strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
         </div>
       `,
     };
@@ -136,6 +137,7 @@ export const createCompanyPackage = async (req, res) => {
     // Send email
     if (transporter) {
       try {
+        /* Email checked */
         await transporter.sendMail(mailOptions);
         console.log("Email sent successfully");
       } catch (emailError) {
@@ -212,7 +214,7 @@ export const resendCompanyPackageEmail = async (req, res) => {
 
     // Email content
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: company.email,
       subject: "QuikChek Account Activation and Package Details - Resend",
       html: `
@@ -223,31 +225,33 @@ export const resendCompanyPackageEmail = async (req, res) => {
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <p>Dear ${company.name || "Valued Partner"},</p>
 
-          <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+          <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
 
           <p>This is a follow-up email to confirm your <strong>QuikChek</strong> service package.</p>
 
           <p>Your active service package details:</p>
           ${planDetailsHtml}
-          ${discount_percent > 0
-          ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>`
-          : ""
-        }
+          ${
+            discount_percent > 0
+              ? `<p><strong>• Discount Applied:</strong> ${discount_percent}%</p>`
+              : ""
+          }
 
           <p>Start using your services at: <a href="https://www.quikchek.in">www.quikchek.in</a></p>
 
           <p>Need help? Contact our support:</p>
           <ul>
-            <li><strong>Email:</strong> hello@geisil.com</li>
+            <li><strong>Email:</strong> support@quikchek.in</li>
             <li><strong>Phone:</strong> 9831823898</li>
           </ul>
 
-          <p>Sincerely,<br/>The Admin Team<br/><strong>Global Employability Information Services India Limited</strong></p>
+          <p>Sincerely,<br/>The Admin Team<br/><strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
         </div>
       `,
     };
 
     // Send the email
+    /* email Checked */
     await transporter.sendMail(mailOptions);
     console.log("Resend email sent successfully to", company.email);
 

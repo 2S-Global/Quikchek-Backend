@@ -158,7 +158,7 @@ export const registerUser = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
@@ -167,7 +167,7 @@ export const registerUser = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -207,20 +207,20 @@ export const registerUser = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
          <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg" alt="Footer" style="width:97px; height: 116px;" />
     </div>
       `,
     };
-
+    /* email checked */
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -309,7 +309,7 @@ export const registercomplex = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
@@ -318,7 +318,7 @@ export const registercomplex = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -358,20 +358,24 @@ export const registercomplex = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
          <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+       <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
       `,
     };
-
+    /* Email Checked */
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -454,7 +458,7 @@ export const RegisterFrontEnd = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
@@ -463,7 +467,7 @@ export const RegisterFrontEnd = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -501,20 +505,25 @@ export const RegisterFrontEnd = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
          <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+      <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
       `,
     };
 
+    /* email Checked */
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -599,7 +608,7 @@ export const RegisterDemoUser = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
@@ -608,7 +617,7 @@ export const RegisterDemoUser = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745565670/QuikChek%20images/New%20banner%20images/bx5dt5rz0zdmowryb0bz.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${name}</strong>,</p>
-        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -646,20 +655,24 @@ export const RegisterDemoUser = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
          <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+    <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  /> 
+         </div>
       `,
     };
-
+    /* email checked */
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -877,7 +890,7 @@ export const editUser = async (req, res) => {
       });
 
       const mailOptions = {
-        from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+        from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
         to: email,
         subject:
           "Your Email Address Has Been Updated QuikChek - Fast & Accurate KYC Verification Platform",
@@ -896,14 +909,18 @@ export const editUser = async (req, res) => {
           <br />
           <p>Sincerely,<br />
           The Admin Team<br />
-          <strong>Global Employability Information Services India Limited</strong></p>
+          <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
 
            <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+      <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
+      </div>
         `,
       };
-
+      /* email checked */
       await transporter.sendMail(mailOptions);
     }
 
@@ -970,7 +987,7 @@ export const sendAccessEmail = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Access Credentials for QuikChek - Fast & Accurate KYC Verification Platform",
@@ -979,7 +996,7 @@ export const sendAccessEmail = async (req, res) => {
     <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
   </div>
         <p>Dear <strong>${user.name}</strong>,</p>
-        <p>Greetings from <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Greetings from <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>
           We are pleased to provide you with access to our newly launched platform,
           <a href="https://www.quikchek.in" target="_blank">https://www.quikchek.in</a>,
@@ -1022,19 +1039,23 @@ export const sendAccessEmail = async (req, res) => {
           <li><strong>Phone:</strong> 9831823898</li>
         </ul>
       
-        <p>Thank you for choosing <strong>Global Employability Information Services India Limited</strong>.</p>
+        <p>Thank you for choosing <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong>.</p>
         <p>We look forward to supporting your KYC verification needs.</p>
       
         <br />
         <p>Sincerely,<br />
         The Admin Team<br />
-        <strong>Global Employability Information Services India Limited</strong></p>
+        <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong></p>
          <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
-    </div>
+       <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
+     </div>
       `,
     };
-
+    /* email Checked */
     await transporter.sendMail(mailOptions);
 
     res
@@ -1091,7 +1112,7 @@ export const forgotPassword = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Password Reset Successful - Action Required",
       html: `<div style="text-align: center; margin-bottom: 20px;">
@@ -1107,14 +1128,18 @@ export const forgotPassword = async (req, res) => {
               
               </p>
               <br/>
-              <p>Stay secure,<br/>Geisil Team</p>
+              <p>Stay secure,<br/>2S GLOBAL TECHNOLOGIES LIMITED Team</p>
 
                <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+      <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
           `,
     };
-
+    /* email Checked */
     await transporter.sendMail(mailOptions);
 
     res.status(200).json({ message: "New password sent to your email" });
@@ -1688,7 +1713,7 @@ export const sendEmailToUserById = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Verify your Email for QuikChek",
       html: `
@@ -1697,7 +1722,7 @@ export const sendEmailToUserById = async (req, res) => {
         <p><a href="${process.env.CLIENT_BASE_URL}/api/auth/verify-email/${token}">Verify Email</a></p>
         <p>If you didn't request this, you can ignore this email.</p>
         <br>
-        <p>Regards,<br>Geisil Team</p>
+        <p>Regards,<br>2S GLOBAL TECHNOLOGIES LIMITED Team</p>
       `,
     };
 

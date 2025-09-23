@@ -36,7 +36,7 @@ export const inviteController = async (req, res) => {
     
     <p>We understand that the primary deterrent to thorough KYC verification isn't necessarily the cost,
      but rather the complexity and hassle of dealing with multiple verification agencies and processes. 
-     Recognizing this critical need, <strong>Global Employability Information Services India Limited</strong> is proud to introduce <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a>, India's first comprehensive platform designed to streamline and simplify your KYC verification process.</p>
+     Recognizing this critical need, <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong> is proud to introduce <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a>, India's first comprehensive platform designed to streamline and simplify your KYC verification process.</p>
     
     <p><strong>Quikchek.in</strong> offers a single, unified platform to verify the authenticity of most standard KYC documents, including:</p>
     
@@ -65,14 +65,18 @@ export const inviteController = async (req, res) => {
     <p>We invite you to explore our platform at <a href="https://www.quikchek.in" target="_blank">www.quikchek.in</a> to understand how we can help you fortify your recruitment process and protect your organization. For further information or a personalized demonstration, please feel free to contact us.</p>
 
     <p>Sincerely,<br/>
-    The Team at <strong>Global Employability Information Services India Limited</strong><br/>
-   Email: hello@geisil.com , <br/>
+    The Team at <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong><br/>
+   Email: support@quikchek.in , <br/>
    Mobile: +91 9831823898
 <br/>
-    <a href="https://geisil.com/" target="_blank">www.geisil.com</a></p>   
+    <a href="https://quikchek.in/" target="_blank">https://quikchek.in/</a></p>   
     
      <div style="text-align: center; margin-top: 30px;">
-      <img src="https://res.cloudinary.com/da4unxero/image/upload/v1746776002/QuikChek%20images/ntvxq8yy2l9de25t1rmu.png" alt="Footer" style="width:97px; height: 116px;" />
+      <img
+    src="https://res.cloudinary.com/da4unxero/image/upload/v1757332207/e2score/profile_picture/p2e5bnd8v6waczzwjrbk.jpg"
+    alt="Footer"
+    style="width: 97px; height: 116px"
+  />
     </div>
     `;
 
@@ -87,13 +91,14 @@ export const inviteController = async (req, res) => {
     });
 
     const mailOptions = {
-      from: `"Geisil Team" <${process.env.EMAIL_USER}>`,
+      from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject:
         "Mitigate Recruitment Risks with Quikchek: Verify KYC Authenticity Seamlessly",
       html: emailContent,
     };
 
+    /* email Checked */
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
