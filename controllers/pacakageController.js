@@ -1,6 +1,4 @@
-import Package from "../models/packageModel.js"; 
-
-
+import Package from "../models/packageModel.js";
 
 export const addPackage = async (req, res) => {
   try {
@@ -11,11 +9,11 @@ export const addPackage = async (req, res) => {
       transaction_gst,
       allowed_verifications,
       expiryDate,
+      is_tenant,
     } = req.body;
- 
 
-   if (
-       !name ||
+    if (
+      !name ||
       transaction_fee == null ||
       transaction_gst == null ||
       !allowed_verifications
@@ -26,9 +24,6 @@ export const addPackage = async (req, res) => {
           "All fields are required:  name, transaction_fee, transaction_gst, allowed_verifications",
       });
     }
-
-
-
 
     const parsedVerifications =
       typeof allowed_verifications === "string"
@@ -43,24 +38,26 @@ export const addPackage = async (req, res) => {
       description,
       transaction_gst: transaction_gst || 18,
       allowed_verifications: parsedVerifications,
-      expiryDate: expiryDate,  
+      expiryDate: expiryDate,
+      is_tenant: is_tenant || false,
     });
 
     const savedPackage = await newPackage.save();
-    res.status(201).json({ message: "Package added successfully", data: savedPackage });
+    res
+      .status(201)
+      .json({ message: "Package added successfully", data: savedPackage });
   } catch (error) {
-    res.status(500).json({ message: "Error adding package", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error adding package", error: error.message });
   }
 };
-
-
-
 
 export const getAllPackages = async (req, res) => {
   try {
     const packages = await Package.find({ is_del: false });
 
-    const transformedPackages = packages.map(pkg => {
+    const transformedPackages = packages.map((pkg) => {
       const pkgObj = pkg.toObject();
       pkgObj.allowed_verifications = pkg.allowed_verifications.join(", ");
       return pkgObj;
@@ -80,7 +77,7 @@ export const getAllPackages = async (req, res) => {
 
 export const deletePackage = async (req, res) => {
   try {
-  const { id } = req.body; 
+    const { id } = req.body;
 
     const deleted = await Package.findByIdAndUpdate(
       id,
@@ -92,12 +89,14 @@ export const deletePackage = async (req, res) => {
       return res.status(404).json({ message: "Package not found" });
     }
 
-  res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Package deleted successfully",
     });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting package", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting package", error: error.message });
   }
 };
 
@@ -111,6 +110,7 @@ export const updatePackage = async (req, res) => {
       transaction_gst,
       allowed_verifications,
       expiryDate,
+      is_tenant,
     } = req.body;
 
     // ✅ Validate required fields
@@ -155,6 +155,7 @@ export const updatePackage = async (req, res) => {
         transaction_gst,
         allowed_verifications: parsedVerifications, // 🔥 Replace with new list
         expiryDate,
+        is_tenant,
       },
       { new: true }
     );
@@ -198,7 +199,7 @@ export const toggleStatusPackage = async (req, res) => {
     res.status(200).json({
       success: true,
       data: updated,
-       message: `Package Status Changed Successfully.`,
+      message: `Package Status Changed Successfully.`,
     });
   } catch (error) {
     res.status(500).json({
@@ -211,9 +212,9 @@ export const toggleStatusPackage = async (req, res) => {
 
 export const getPackages = async (req, res) => {
   try {
-    const packages = await Package.find({ is_del: false,is_active:true });
+    const packages = await Package.find({ is_del: false, is_active: true });
 
-    const transformedPackages = packages.map(pkg => {
+    const transformedPackages = packages.map((pkg) => {
       const pkgObj = pkg.toObject();
       pkgObj.allowed_verifications = pkg.allowed_verifications.join(", ");
       return pkgObj;
@@ -230,6 +231,3 @@ export const getPackages = async (req, res) => {
     });
   }
 };
-  
-
-

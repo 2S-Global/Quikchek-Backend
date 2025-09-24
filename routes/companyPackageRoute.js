@@ -8,7 +8,8 @@ import {
   getCompanyPackagesByCompanyId,
   getPackageByCompany,
   resendCompanyPackageEmail,
-  sidebarAadharOtp
+  sidebarAadharOtp,
+  getPackageByCompanyTanent,
 } from "../controllers/companyPackageController.js";
 
 //Middleware
@@ -55,7 +56,20 @@ userRouter.post(
   getPackageByCompany
 );
 
-userRouter.post("/resendCompanyPackageEmail",upload.none(), userAuth, adminMiddleware, resendCompanyPackageEmail);
+userRouter.post(
+  "/getPackageByCompanyTanent",
+  userAuth,
+  Companymid,
+  getPackageByCompanyTanent
+);
+
+userRouter.post(
+  "/resendCompanyPackageEmail",
+  upload.none(),
+  userAuth,
+  adminMiddleware,
+  resendCompanyPackageEmail
+);
 userRouter.post("/sidebarAadharOtp", userAuth, Companymid, sidebarAadharOtp);
 
 export default userRouter;

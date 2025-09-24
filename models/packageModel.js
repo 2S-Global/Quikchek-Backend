@@ -9,7 +9,7 @@ const packageSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-
+  is_tenant: { type: Boolean, default: false },
   expiryDate: { type: String },
   is_active: { type: Boolean, default: true },
   is_del: { type: Boolean, default: false },
