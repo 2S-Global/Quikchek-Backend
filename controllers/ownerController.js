@@ -7,432 +7,545 @@ import nodemailer from "nodemailer";
 import fsp from "fs/promises";
 import path from "path";
 import csv from "csv-parser";
-import fs from "fs";
 
-export const testController = async (req, res) => {
-    try {
+import fs from "fs/promises"; // ✅ promises API
+import XLSX from "xlsx"; // ✅ default import so readFile works
 
-        return res.status(200).json({
-            message: "Test Controller Running Successfully.",
-            success: true,
-        });
-    } catch (error) {
-        console.error("Error changing password:", error);
-        return res.status(500).json({
-            message: "An error occurred while changing the password.",
-            success: false,
-        });
+export const importOwnerxlsx = async (req, res) => {
+  const loggedInUserId = req.userId;
+
+  if (!loggedInUserId) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: User ID not found." });
+  }
+
+  if (!req.file)
+    return res.status(400).json({ message: "XLSX file is required" });
+
+  const filePath = path.resolve(req.file.path);
+  const users = [];
+
+  try {
+    // 1. Parse XLSX
+    const expectedHeaders = ["flat_no", "name", "email", "phone_no", "block"];
+
+    // Read workbook
+    const workbook = XLSX.readFile(filePath); // ✅ works with default import
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Convert sheet to JSON
+    const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+    if (!rows.length) {
+      throw new Error("XLSX file is empty");
     }
+
+    // Validate headers
+    const headers = Object.keys(rows[0] || {});
+    const missing = expectedHeaders.filter((h) => !headers.includes(h));
+    const extra = headers.filter((h) => !expectedHeaders.includes(h));
+
+    if (missing.length > 0 || extra.length > 0) {
+      throw new Error(
+        `Invalid XLSX headers. Missing: ${missing.join(
+          ", "
+        )} | Unexpected: ${extra.join(", ")}`
+      );
+    }
+
+    // Collect users
+    rows.forEach((row) => {
+      if (row.email) {
+        users.push({
+          complex_id: loggedInUserId,
+          flat_no: row.flat_no,
+          block: row.block,
+          name: row.name,
+          email: row.email,
+          phone_number: row.phone_no,
+          role: 6,
+          is_del: false,
+        });
+      }
+    });
+
+    // 2. Check existing users
+    const emails = users.map((u) => u.email);
+    await mongoose.connection.asPromise();
+
+    const existingUsers = await ownerdetails.find({
+      complex_id: loggedInUserId,
+      email: { $in: emails },
+      is_del: false,
+    });
+    const existingEmails = new Set(existingUsers.map((u) => u.email));
+
+    // Filter only new users
+    const newUsers = users.filter((user) => !existingEmails.has(user.email));
+
+    const insertedUsers = await ownerdetails.insertMany(newUsers);
+
+    await fs.unlink(filePath);
+
+    res.json({
+      success: true,
+      inserted: insertedUsers.length,
+      skipped: existingEmails.size,
+      message: "Owner XLSX import completed successfully",
+    });
+  } catch (error) {
+    console.error("Import error:", error);
+    await fs.unlink(filePath).catch(() => {});
+
+    if (error.message.startsWith("Invalid XLSX headers")) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res.status(500).json({ message: "Import failed", error: error.message });
+  }
 };
 
-
+export const testController = async (req, res) => {
+  try {
+    return res.status(200).json({
+      message: "Test Controller Running Successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return res.status(500).json({
+      message: "An error occurred while changing the password.",
+      success: false,
+    });
+  }
+};
 
 // Register a new owner user
 export const registerOwnerUser = async (req, res) => {
-    let entityName = "Owner";
-    try {
+  let entityName = "Owner";
+  try {
+    // Role = 5 for Association
+    const loggedInUserId = req.userId;
 
-        // Role = 5 for Association
-        const loggedInUserId = req.userId;
-
-        if (!loggedInUserId) {
-            return res.status(401).json({ message: "Unauthorized: User ID not found." });
-        }
-
-        // Check if the user exists
-        const loggedInUser = await User.findOne({ _id: loggedInUserId, is_del: false, is_active: true }).lean();
-
-        if (!loggedInUser) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        const {
-            flat_number,
-            name,
-            email,
-            phone_number,
-            role
-        } = req.body;
-
-        // Validate required fields
-        if (!name || !email) {
-            return res.status(400).json({ message: "Name, email" });
-        }
-
-        if (role === 6) {
-            entityName = "Owner";
-        } else if (role === 1) {
-            entityName = "Company";
-        }
-        // else if (role === 1) {
-        //     entityName = "Candidate";
-        // }
-
-        // Check if user already exists
-        const existingUser = await ownerdetails.findOne({
-            email,
-            is_del: false,
-            is_active: true,
-        }).lean();
-        if (existingUser) {
-            return res.status(400).json({ message: `${entityName} already exists` });
-        }
-
-        // Create a new user with hashed password
-        const newUser = new ownerdetails({
-            complex_id: loggedInUserId,
-            flat_no: flat_number,
-            name,
-            email,
-            phone_number,
-            role
-        });
-        await newUser.save();
-
-        res.status(201).json({
-            success: true,
-            message: `${entityName} registered successfully!`,
-            /* token, */
-        });
-    } catch (error) {
-        res
-            .status(500)
-            .json({ message: `Error creating ${entityName}`, error: error.message });
+    if (!loggedInUserId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User ID not found." });
     }
-};
 
+    // Check if the user exists
+    const loggedInUser = await User.findOne({
+      _id: loggedInUserId,
+      is_del: false,
+      is_active: true,
+    }).lean();
+
+    if (!loggedInUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const { block, flat_number, name, email, phone_number, role } = req.body;
+
+    // Validate required fields
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name, email" });
+    }
+
+    if (role === 6) {
+      entityName = "Owner";
+    } else if (role === 1) {
+      entityName = "Company";
+    }
+    // else if (role === 1) {
+    //     entityName = "Candidate";
+    // }
+
+    // Check if user already exists
+    const existingUser = await ownerdetails
+      .findOne({
+        email,
+        is_del: false,
+        is_active: true,
+      })
+      .lean();
+    if (existingUser) {
+      return res.status(400).json({ message: `${entityName} already exists` });
+    }
+
+    // Create a new user with hashed password
+    const newUser = new ownerdetails({
+      complex_id: loggedInUserId,
+      block: block,
+      flat_no: flat_number,
+      name,
+      email,
+      phone_number,
+      role,
+    });
+    await newUser.save();
+
+    res.status(201).json({
+      success: true,
+      message: `${entityName} registered successfully!`,
+      /* token, */
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Error creating ${entityName}`, error: error.message });
+  }
+};
 
 // List Owner Users
 export const listOwners = async (req, res) => {
-    try {
-        // Get all companies (role: 1 and is_del: false)
-
-        const loggedInUserId = req.userId;
-
-        if (!loggedInUserId) {
-            return res.status(401).json({ message: "Unauthorized: User ID not found." });
-        }
-
-        const { role } = req.body;
-
-        let entityName = "Owner";
-        if (role === 6) {
-            entityName = "Owner";
-        } else if (role === 1) {
-            entityName = "Company";
-        } else if (role === 5) {
-            entityName = "Association";
-        }
-
-        const flatOwners = await ownerdetails.find({
-            complex_id: loggedInUserId,
-            is_del: false,
-            role: role,
-            self_registered: { $ne: 1 },
-        }).select("-password");
-
-        if (!flatOwners.length) {
-            return res.status(200).json({ success: true, message: `No ${entityName} found` });
-        }
-
-        // Get order counts grouped by employer_id
-        /* const orderCounts = await UserVerification.aggregate([
-          { $match: { is_del: false } },
-          { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
-        ]); */
-
-        // Convert orderCounts to a map for quick lookup
-        const orderMap = {};
-        /*orderCounts.forEach(({ _id, orderCount }) => {
-          orderMap[_id.toString()] = orderCount;
-        }); */
-
-        // Attach order count to each company
-        const flatOwnersWithOrderCount = flatOwners.map((owners) => {
-            const ownerId = owners._id.toString();
-            return {
-                ...owners.toObject(),
-                orderCount: orderMap[ownerId] || 0,
-            };
-        });
-
-        res.status(200).json({
-            success: true,
-            message: `${entityName} retrieved successfully`,
-            data: flatOwnersWithOrderCount,
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: "Error retrieving companies",
-            error: error.message,
-        });
-    }
-};
-
-
-// Edit Owner User
-export const editOwners = async (req, res) => {
-    const {
-        flat_number,
-        name,
-        email,
-        allowed_verifications,
-        transaction_fee,
-        transaction_gst,
-        id,
-        phone_number,
-        address,
-        gst_no,
-        package_id,
-        discount_percent,
-        role,
-        check_role,
-    } = req.body;
-
-    try {
-        const updatedFields = {};
-
-        let entityName = "Owner";
-        if (role === 6) {
-            entityName = "Owner";
-        } else if (role === 1) {
-            entityName = "Company";
-        }
-
-        // Check if user already exists
-        const existingUser = await ownerdetails.findOne({
-            email,
-            _id: { $ne: id },
-            is_del: false,
-            is_active: true,
-        });
-        if (existingUser) {
-            return res
-                .status(200)
-                .json({ success: true, message: "Email already exists" });
-        }
-
-        const getDetails = await ownerdetails.findOne({
-            _id: id,
-            is_del: false,
-        });
-
-        // const oldemail = getDetails.email;
-        // console.log(oldemail);
-
-        if (flat_number !== undefined) updatedFields.flat_no = flat_number;
-        if (name !== undefined) updatedFields.name = name;
-        if (allowed_verifications !== undefined)
-            updatedFields.allowed_verifications = allowed_verifications;
-        if (transaction_fee !== undefined)
-            updatedFields.transaction_fee = transaction_fee;
-        if (transaction_gst !== undefined)
-            updatedFields.transaction_gst = transaction_gst;
-
-        updatedFields.phone_number = phone_number;
-        updatedFields.email = email;
-        updatedFields.address = address;
-        updatedFields.gst_no = gst_no;
-        updatedFields.package_id = package_id;
-        updatedFields.discount_percent = discount_percent;
-
-        updatedFields.updatedAt = Date.now(); // ensure updatedAt is modified
-
-        if (check_role !== undefined) {
-            updatedFields.check_role = check_role;
-            updatedFields.switchedRole = check_role ? 2 : null;
-        }
-
-        const updatedUser = await ownerdetails.findByIdAndUpdate(
-            id,
-            { $set: updatedFields },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: `${entityName} not found` });
-        }
-
-        // if (oldemail != email) {
-        //   const transporter = nodemailer.createTransport({
-        //     host: "smtp.hostinger.com", // fixed typo
-        //     port: 465,
-        //     secure: true, // true for port 465
-        //     auth: {
-        //       user: process.env.EMAIL_USER,
-        //       pass: process.env.EMAIL_PASS,
-        //     },
-        //   });
-
-        //   const mailOptions = {
-        //     from: `"E2Score Team" <${process.env.EMAIL_USER}>`,
-        //     to: email,
-        //     subject:
-        //       "Your Email Address Has Been Updated QuikChek - Fast & Accurate KYC Verification Platform",
-        //     html: `
-        //     <div style="text-align: center; margin-bottom: 20px;">
-        //   <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
-        // </div>
-        //       <p>Dear <strong>${name}</strong>,</p>
-        //       <p>We wanted to let you know that the email address associated with your account was recently changed.</p>
-
-        //         <p><strong>New Email Address::</strong> ${email}</p>
-
-        //       <p>If you made this change, no further action is needed.</p>
-
-        //       <p>If you didn’t make this change or believe it was done in error, please contact our support team immediately so we can help secure your account.</p>
-        //       <br />
-        //       <p>Sincerely,<br />
-        //       The Admin Team<br />
-        //       <strong>E2Score India Limited</strong></p>
-        //     `,
-        //   };
-
-        //   await transporter.sendMail(mailOptions);
-        //}
-
-        res.status(200).json({
-            success: true,
-            message: `${entityName} updated successfully`,
-            user: updatedUser,
-        });
-    } catch (error) {
-        res
-            .status(500)
-            .json({ message: `Error updating ${entityName}`, error: error.message });
-    }
-};
-
-// Delete Owner User
-export const deleteOwners = async (req, res) => {
-    try {
-
-        // Role = 5 for Association
-        const loggedInUserId = req.userId;
-
-        if (!loggedInUserId) {
-            return res.status(401).json({ message: "Unauthorized: User ID not found." });
-        }
-
-        // Check if the user exists
-        const loggedInUser = await User.findOne({ _id: loggedInUserId, is_del: false, is_active: true }).lean();
-
-        if (!loggedInUser) {
-            return res.status(404).json({ message: "User not found." });
-        }
-
-        const { ownerId, role } = req.body;
-
-        let entityName = "Owner";
-        if (role === 6) {
-            entityName = "Owner";
-        } else if (role === 1) {
-            entityName = "Company";
-        }
-
-        // Validate and convert companyId to ObjectId
-        if (!mongoose.Types.ObjectId.isValid(ownerId)) {
-            return res
-                .status(400)
-                .json({ success: false, message: `Invalid ${entityName} ID` });
-        }
-
-        const objectId = new mongoose.Types.ObjectId(ownerId);
-
-        // Find and update the company
-        const deletedCompany = await ownerdetails.findOneAndUpdate(
-            { _id: objectId, complex_id: loggedInUserId, role: role, is_del: false },
-            { is_del: true, updatedAt: new Date() },
-            { new: true }
-        );
-
-        if (!deletedCompany) {
-            return res.status(404).json({
-                success: false,
-                message: `${entityName} not found or already deleted`,
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `${entityName} deleted successfully`,
-            data: deletedCompany,
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error deleting Owner",
-            error: error.message,
-        });
-    }
-};
-
-
-// Import CSV file
-export const importOwnerCsv = async (req, res) => {
+  try {
+    // Get all companies (role: 1 and is_del: false)
 
     const loggedInUserId = req.userId;
 
     if (!loggedInUserId) {
-        return res.status(401).json({ message: "Unauthorized: User ID not found." });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User ID not found." });
     }
 
-    if (!req.file)
-        return res.status(400).json({ message: "CSV file is required" });
+    const { role } = req.body;
 
-    const filePath = path.resolve(req.file.path);
-    const users = [];
+    let entityName = "Owner";
+    if (role === 6) {
+      entityName = "Owner";
+    } else if (role === 1) {
+      entityName = "Company";
+    } else if (role === 5) {
+      entityName = "Association";
+    }
 
-    try {
-        // 1. Parse CSV
-        const expectedHeaders = ["flat_no", "name", "email", "phone_no"];
-        await new Promise((resolve, reject) => {
-            const results = [];
-            fs.createReadStream(filePath)
-                .pipe(csv())
-                .on("headers", (headers) => {
-                    // Compare expected headers with what was found
-                    const missing = expectedHeaders.filter(h => !headers.includes(h));
-                    const extra = headers.filter(h => !expectedHeaders.includes(h));
+    const flatOwners = await ownerdetails
+      .find({
+        complex_id: loggedInUserId,
+        is_del: false,
+        role: role,
+        self_registered: { $ne: 1 },
+      })
+      .select("-password");
 
-                    if (missing.length > 0 || extra.length > 0) {
-                        reject(new Error(
-                            `Invalid CSV headers. Missing: ${missing.join(", ")} | Unexpected: ${extra.join(", ")}`
-                        ));
-                    }
-                })
-                .on("data", (row) => {
-                    if (row.email) {
-                        results.push({
-                            complex_id: loggedInUserId,
-                            flat_no: row.flat_no,
-                            name: row.name,
-                            email: row.email,
-                            phone_number: row.phone_no,
-                            role: 6,
-                            is_del: false
-                        });
-                    }
-                })
-                .on("end", () => {
-                    users.push(...results);
-                    resolve();
-                })
-                .on("error", reject);
-        });
+    if (!flatOwners.length) {
+      return res
+        .status(200)
+        .json({ success: true, message: `No ${entityName} found` });
+    }
 
-        // 2. Check existing users
-        const emails = users.map((u) => u.email);
-        await mongoose.connection.asPromise();
-        const existingUsers = await ownerdetails.find({
-            complex_id: loggedInUserId,
-            email: { $in: emails },
-            is_del: false,
-        });
-        const existingEmails = new Set(existingUsers.map((u) => u.email));
+    // Get order counts grouped by employer_id
+    /* const orderCounts = await UserVerification.aggregate([
+          { $match: { is_del: false } },
+          { $group: { _id: "$employer_id", orderCount: { $sum: 1 } } },
+        ]); */
 
-        // 3. Create new users
-        /*
+    // Convert orderCounts to a map for quick lookup
+    const orderMap = {};
+    /*orderCounts.forEach(({ _id, orderCount }) => {
+          orderMap[_id.toString()] = orderCount;
+        }); */
+
+    // Attach order count to each company
+    const flatOwnersWithOrderCount = flatOwners.map((owners) => {
+      const ownerId = owners._id.toString();
+      return {
+        ...owners.toObject(),
+        orderCount: orderMap[ownerId] || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `${entityName} retrieved successfully`,
+      data: flatOwnersWithOrderCount,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving companies",
+      error: error.message,
+    });
+  }
+};
+
+// Edit Owner User
+export const editOwners = async (req, res) => {
+  const {
+    flat_number,
+    name,
+    email,
+    allowed_verifications,
+    transaction_fee,
+    transaction_gst,
+    id,
+    phone_number,
+    address,
+    gst_no,
+    package_id,
+    discount_percent,
+    role,
+    check_role,
+    block,
+  } = req.body;
+
+  try {
+    const updatedFields = {};
+
+    let entityName = "Owner";
+    if (role === 6) {
+      entityName = "Owner";
+    } else if (role === 1) {
+      entityName = "Company";
+    }
+
+    // Check if user already exists
+    const existingUser = await ownerdetails.findOne({
+      email,
+      _id: { $ne: id },
+      is_del: false,
+      is_active: true,
+    });
+    if (existingUser) {
+      return res
+        .status(200)
+        .json({ success: true, message: "Email already exists" });
+    }
+
+    const getDetails = await ownerdetails.findOne({
+      _id: id,
+      is_del: false,
+    });
+
+    // const oldemail = getDetails.email;
+    // console.log(oldemail);
+    /* no condition applied */
+    updatedFields.block = block;
+
+    if (flat_number !== undefined) updatedFields.flat_no = flat_number;
+    if (name !== undefined) updatedFields.name = name;
+    if (allowed_verifications !== undefined)
+      updatedFields.allowed_verifications = allowed_verifications;
+    if (transaction_fee !== undefined)
+      updatedFields.transaction_fee = transaction_fee;
+    if (transaction_gst !== undefined)
+      updatedFields.transaction_gst = transaction_gst;
+
+    updatedFields.phone_number = phone_number;
+    updatedFields.email = email;
+    updatedFields.address = address;
+    updatedFields.gst_no = gst_no;
+    updatedFields.package_id = package_id;
+    updatedFields.discount_percent = discount_percent;
+
+    updatedFields.updatedAt = Date.now(); // ensure updatedAt is modified
+
+    if (check_role !== undefined) {
+      updatedFields.check_role = check_role;
+      updatedFields.switchedRole = check_role ? 2 : null;
+    }
+
+    const updatedUser = await ownerdetails.findByIdAndUpdate(
+      id,
+      { $set: updatedFields },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: `${entityName} not found` });
+    }
+
+    // if (oldemail != email) {
+    //   const transporter = nodemailer.createTransport({
+    //     host: "smtp.hostinger.com", // fixed typo
+    //     port: 465,
+    //     secure: true, // true for port 465
+    //     auth: {
+    //       user: process.env.EMAIL_USER,
+    //       pass: process.env.EMAIL_PASS,
+    //     },
+    //   });
+
+    //   const mailOptions = {
+    //     from: `"E2Score Team" <${process.env.EMAIL_USER}>`,
+    //     to: email,
+    //     subject:
+    //       "Your Email Address Has Been Updated QuikChek - Fast & Accurate KYC Verification Platform",
+    //     html: `
+    //     <div style="text-align: center; margin-bottom: 20px;">
+    //   <img src="https://res.cloudinary.com/da4unxero/image/upload/v1745316541/QuikChek%20images/nbnkdrtxbawjjh2zgs1y.jpg" alt="Banner" style="width: 100%; height: auto;" />
+    // </div>
+    //       <p>Dear <strong>${name}</strong>,</p>
+    //       <p>We wanted to let you know that the email address associated with your account was recently changed.</p>
+
+    //         <p><strong>New Email Address::</strong> ${email}</p>
+
+    //       <p>If you made this change, no further action is needed.</p>
+
+    //       <p>If you didn’t make this change or believe it was done in error, please contact our support team immediately so we can help secure your account.</p>
+    //       <br />
+    //       <p>Sincerely,<br />
+    //       The Admin Team<br />
+    //       <strong>E2Score India Limited</strong></p>
+    //     `,
+    //   };
+
+    //   await transporter.sendMail(mailOptions);
+    //}
+
+    res.status(200).json({
+      success: true,
+      message: `${entityName} updated successfully`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Error updating ${entityName}`, error: error.message });
+  }
+};
+
+// Delete Owner User
+export const deleteOwners = async (req, res) => {
+  try {
+    // Role = 5 for Association
+    const loggedInUserId = req.userId;
+
+    if (!loggedInUserId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User ID not found." });
+    }
+
+    // Check if the user exists
+    const loggedInUser = await User.findOne({
+      _id: loggedInUserId,
+      is_del: false,
+      is_active: true,
+    }).lean();
+
+    if (!loggedInUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const { ownerId, role } = req.body;
+
+    let entityName = "Owner";
+    if (role === 6) {
+      entityName = "Owner";
+    } else if (role === 1) {
+      entityName = "Company";
+    }
+
+    // Validate and convert companyId to ObjectId
+    if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: `Invalid ${entityName} ID` });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(ownerId);
+
+    // Find and update the company
+    const deletedCompany = await ownerdetails.findOneAndUpdate(
+      { _id: objectId, complex_id: loggedInUserId, role: role, is_del: false },
+      { is_del: true, updatedAt: new Date() },
+      { new: true }
+    );
+
+    if (!deletedCompany) {
+      return res.status(404).json({
+        success: false,
+        message: `${entityName} not found or already deleted`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `${entityName} deleted successfully`,
+      data: deletedCompany,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting Owner",
+      error: error.message,
+    });
+  }
+};
+
+// Import CSV file
+export const importOwnerCsv = async (req, res) => {
+  const loggedInUserId = req.userId;
+
+  if (!loggedInUserId) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: User ID not found." });
+  }
+
+  if (!req.file)
+    return res.status(400).json({ message: "CSV file is required" });
+
+  const filePath = path.resolve(req.file.path);
+  const users = [];
+
+  try {
+    // 1. Parse CSV
+    const expectedHeaders = ["flat_no", "name", "email", "phone_no"];
+    await new Promise((resolve, reject) => {
+      const results = [];
+      fs.createReadStream(filePath)
+        .pipe(csv())
+        .on("headers", (headers) => {
+          // Compare expected headers with what was found
+          const missing = expectedHeaders.filter((h) => !headers.includes(h));
+          const extra = headers.filter((h) => !expectedHeaders.includes(h));
+
+          if (missing.length > 0 || extra.length > 0) {
+            reject(
+              new Error(
+                `Invalid CSV headers. Missing: ${missing.join(
+                  ", "
+                )} | Unexpected: ${extra.join(", ")}`
+              )
+            );
+          }
+        })
+        .on("data", (row) => {
+          if (row.email) {
+            results.push({
+              complex_id: loggedInUserId,
+              flat_no: row.flat_no,
+              name: row.name,
+              email: row.email,
+              phone_number: row.phone_no,
+              role: 6,
+              is_del: false,
+            });
+          }
+        })
+        .on("end", () => {
+          users.push(...results);
+          resolve();
+        })
+        .on("error", reject);
+    });
+
+    // 2. Check existing users
+    const emails = users.map((u) => u.email);
+    await mongoose.connection.asPromise();
+    const existingUsers = await ownerdetails.find({
+      complex_id: loggedInUserId,
+      email: { $in: emails },
+      is_del: false,
+    });
+    const existingEmails = new Set(existingUsers.map((u) => u.email));
+
+    // 3. Create new users
+    /*
         const newUsersPromises = users
             .filter((user) => !existingEmails.has(user.email))
             .map(async (user) => {
@@ -513,30 +626,30 @@ export const importOwnerCsv = async (req, res) => {
             });
         */
 
-        //const newUsers = await Promise.all(newUsersPromises);
+    //const newUsers = await Promise.all(newUsersPromises);
 
-        // Filter only new users
-        const newUsers = users.filter((user) => !existingEmails.has(user.email));
+    // Filter only new users
+    const newUsers = users.filter((user) => !existingEmails.has(user.email));
 
-        const insertedUsers = await ownerdetails.insertMany(newUsers);
+    const insertedUsers = await ownerdetails.insertMany(newUsers);
 
-        await fsp.unlink(filePath);
+    await fsp.unlink(filePath);
 
-        res.json({
-            success: true,
-            inserted: insertedUsers.length,
-            skipped: existingEmails.size,
-            message: "Owner CSV import completed successfully",
-        });
-    } catch (error) {
-        console.error("Import error:", error);
-        await fsp.unlink(filePath).catch(() => { });
+    res.json({
+      success: true,
+      inserted: insertedUsers.length,
+      skipped: existingEmails.size,
+      message: "Owner CSV import completed successfully",
+    });
+  } catch (error) {
+    console.error("Import error:", error);
+    await fsp.unlink(filePath).catch(() => {});
 
-        // Header validation error → 400 Bad Request
-        if (error.message.startsWith("Invalid CSV headers")) {
-            return res.status(400).json({ message: error.message });
-        }
-
-        res.status(500).json({ message: "Import failed", error: error.message });
+    // Header validation error → 400 Bad Request
+    if (error.message.startsWith("Invalid CSV headers")) {
+      return res.status(400).json({ message: error.message });
     }
-}
+
+    res.status(500).json({ message: "Import failed", error: error.message });
+  }
+};

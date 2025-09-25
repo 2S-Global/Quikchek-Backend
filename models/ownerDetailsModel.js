@@ -7,6 +7,9 @@ const ownerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    block: {
+      type: String,
+    },
     flat_no: {
       type: String,
       required: true,
@@ -17,7 +20,7 @@ const ownerSchema = new mongoose.Schema(
     },
     user_type: {
       type: String,
-      default: 'owner',
+      default: "owner",
     },
     email: {
       type: String,
@@ -55,6 +58,10 @@ const ownerSchema = new mongoose.Schema(
   }
 );
 
-const ownerdetails = mongoose.model("ownerdetails", ownerSchema, "ownerdetails");
+const ownerdetails = mongoose.model(
+  "ownerdetails",
+  ownerSchema,
+  "ownerdetails"
+);
 
 export default ownerdetails;
