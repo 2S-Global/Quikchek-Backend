@@ -72,7 +72,7 @@ Thank you for your continued support and collaboration.
     
 
     <p>Sincerely,<br/>
-    The Team at <strong>Global Employability Information Services India Limited</strong><br/>
+    The Team at <strong>2S GLOBAL TECHNOLOGIES LIMITED</strong><br/>
    Email: support@quikchek.in , <br/>
    Mobile: +91 9831823898
 <br/>

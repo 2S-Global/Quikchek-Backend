@@ -1358,7 +1358,6 @@ export const listComplex = async (req, res) => {
     const companies = await User.find({
       is_del: false,
       role: 2,
-      self_registered: { $ne: 1 },
     }).select("-password");
 
     if (!companies.length) {

@@ -11,6 +11,7 @@ import allOrdersData from "../models/allOrders.js";
 import generateInvoiceNo from "../controllers/Helpers/generateInvoiceno.js";
 
 import nodemailer from "nodemailer";
+import getowneridhelper from "./Helpers/getowneridhelper.js";
 
 // Register a new user
 export const listUserVerifiedList = async (req, res) => {
@@ -619,11 +620,17 @@ export const paynowAadharOTP = async (req, res) => {
     }
 
     if (payment_method === "Wallet") {
-      if (!user.wallet_amount || user.wallet_amount < amount) {
+      const walletAmount = Number(user.wallet_amount || 0);
+      const paymentAmount = Number(amount);
+
+      if (walletAmount < paymentAmount) {
         return res.status(400).json({ error: "Insufficient wallet balance." });
       }
-      user.wallet_amount -= amount;
-      await user.save();
+
+      // Always a number
+      user.wallet_amount = Number(walletAmount - paymentAmount);
+
+      await user.save(); // make sure to save before returning
     } else if (payment_method === "online") {
       if (!razorpay_response?.razorpay_payment_id) {
         return res
@@ -639,9 +646,13 @@ export const paynowAadharOTP = async (req, res) => {
 
     // Generate invoice number
     const invoiceNumber = await generateInvoiceNo();
+    const owner_ids = await getowneridhelper(paymentIds);
 
     const newUserCart = new allOrdersData({
       employer_id: employer_id,
+      owner_ids: owner_ids,
+      payment_method: payment_method,
+      balance: user.wallet_amount,
       order_number: orderNumber,
       invoice_number: invoiceNumber,
       subtotal: overall_billing.subtotal,
@@ -835,9 +846,13 @@ export const paynowAadharOTPFree = async (req, res) => {
 
     // Generate invoice number
     const invoiceNumber = await generateInvoiceNo();
+    const owner_ids = await getowneridhelper(paymentIds);
 
     const newUserCart = new allOrdersData({
       employer_id: employer_id,
+      payment_method: payment_method,
+      owner_ids: owner_ids,
+      balance: user.wallet_amount,
       order_number: orderNumber,
       invoice_number: invoiceNumber,
       subtotal: 0.0,
@@ -1767,6 +1782,11 @@ export const paynow = async (req, res) => {
       overall_billing,
     } = req.body;
 
+    /* console.log("Overall Billing:", overall_billing);
+    console.log("Payment IDs:", paymentIds);
+
+    return res.status(200).json({ success: true }); */
+
     if (!amount || !payment_method) {
       return res.status(400).json({ error: "Payment details are incomplete." });
     }
@@ -1777,11 +1797,17 @@ export const paynow = async (req, res) => {
     }
 
     if (payment_method === "Wallet") {
-      if (!user.wallet_amount || user.wallet_amount < amount) {
+      const walletAmount = Number(user.wallet_amount || 0);
+      const paymentAmount = Number(amount);
+
+      if (walletAmount < paymentAmount) {
         return res.status(400).json({ error: "Insufficient wallet balance." });
       }
-      user.wallet_amount -= amount;
-      await user.save();
+
+      // Always a number
+      user.wallet_amount = Number(walletAmount - paymentAmount);
+
+      await user.save(); // make sure to save before returning
     } else if (payment_method === "online") {
       if (!razorpay_response?.razorpay_payment_id) {
         return res
@@ -1802,8 +1828,17 @@ export const paynow = async (req, res) => {
     // Generate invoice number
     const invoiceNumber = await generateInvoiceNo();
 
+    const owner_ids = await getowneridhelper(paymentIds);
+
+    /*  console.log("owner_ids", owner_ids);
+
+    return; */
+
     const newUserCart = new allOrdersData({
+      owner_ids: owner_ids,
+      payment_method: payment_method,
       employer_id: employer_id,
+      balance: user.wallet_amount,
       order_number: orderNumber,
       invoice_number: invoiceNumber,
       subtotal: overall_billing.subtotal,
@@ -2085,11 +2120,11 @@ export const paynowFree = async (req, res) => {
     }
 
     if (payment_method === "Wallet") {
-      if (!user.wallet_amount || user.wallet_amount < amount) {
+      /*  if (!user.wallet_amount || user.wallet_amount < amount) {
         return res.status(400).json({ error: "Insufficient wallet balance." });
-      }
-      user.wallet_amount -= amount;
-      await user.save();
+      } */
+      // user.wallet_amount -= amount;
+      //await user.save();
     } else if (payment_method === "Free") {
     } else {
       return res.status(400).json({ error: "Invalid payment method." });
@@ -2104,9 +2139,13 @@ export const paynowFree = async (req, res) => {
 
     // Generate invoice number
     const invoiceNumber = await generateInvoiceNo();
+    const owner_ids = await getowneridhelper(paymentIds);
 
     const newUserCart = new allOrdersData({
       employer_id: employer_id,
+      owner_ids: owner_ids,
+      payment_method: payment_method,
+      balance: user.wallet_amount,
       order_number: orderNumber,
       invoice_number: invoiceNumber,
       subtotal: overall_billing.subtotal,

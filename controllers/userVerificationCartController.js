@@ -74,7 +74,9 @@ export const addUserToCart = async (req, res) => {
     // 🔹 Fetch user from DB first
     const user = await User.findById(user_id);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     const {
@@ -154,50 +156,50 @@ export const addUserToCart = async (req, res) => {
     // Upload documents to Cloudinary
     const panImageUrl = req.files?.pandoc
       ? await uploadToCloudinary(
-        req.files.pandoc[0].buffer,
-        req.files.pandoc[0].originalname,
-        req.files.pandoc[0].mimetype
-      )
+          req.files.pandoc[0].buffer,
+          req.files.pandoc[0].originalname,
+          req.files.pandoc[0].mimetype
+        )
       : null;
 
     const aadharImageUrl = req.files?.aadhaardoc
       ? await uploadToCloudinary(
-        req.files.aadhaardoc[0].buffer,
-        req.files.aadhaardoc[0].originalname,
-        req.files.aadhaardoc[0].mimetype
-      )
+          req.files.aadhaardoc[0].buffer,
+          req.files.aadhaardoc[0].originalname,
+          req.files.aadhaardoc[0].mimetype
+        )
       : null;
 
     const dlImageUrl = req.files?.licensedoc
       ? await uploadToCloudinary(
-        req.files.licensedoc[0].buffer,
-        req.files.licensedoc[0].originalname,
-        req.files.licensedoc[0].mimetype
-      )
+          req.files.licensedoc[0].buffer,
+          req.files.licensedoc[0].originalname,
+          req.files.licensedoc[0].mimetype
+        )
       : null;
 
     const passportImageUrl = req.files?.doc
       ? await uploadToCloudinary(
-        req.files.doc[0].buffer,
-        req.files.doc[0].originalname,
-        req.files.doc[0].mimetype
-      )
+          req.files.doc[0].buffer,
+          req.files.doc[0].originalname,
+          req.files.doc[0].mimetype
+        )
       : null;
 
     const epicImageUrl = req.files?.voterdoc
       ? await uploadToCloudinary(
-        req.files.voterdoc[0].buffer,
-        req.files.voterdoc[0].originalname,
-        req.files.voterdoc[0].mimetype
-      )
+          req.files.voterdoc[0].buffer,
+          req.files.voterdoc[0].originalname,
+          req.files.voterdoc[0].mimetype
+        )
       : null;
 
     const uanImageUrl = req.files?.uandoc
       ? await uploadToCloudinary(
-        req.files.uandoc[0].buffer,
-        req.files.uandoc[0].originalname,
-        req.files.uandoc[0].mimetype
-      )
+          req.files.uandoc[0].buffer,
+          req.files.uandoc[0].originalname,
+          req.files.uandoc[0].mimetype
+        )
       : null;
 
     // Mapping all the data for role 3 users
@@ -236,11 +238,16 @@ export const addUserToCart = async (req, res) => {
       // 🔹 For all users except demo role (3) → Package is required
       packagedetails = await Package.findById(plan);
       if (!packagedetails) {
-        return res.status(200).json({ success: false, message: "Package Not Found.." });
+        return res
+          .status(200)
+          .json({ success: false, message: "Package Not Found.." });
       }
       verificationamount = parseFloat(packagedetails.transaction_fee || 0);
     } else {
-      const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
+      const usedFree = await freeVerificationDetail.countDocuments({
+        userId: user_id,
+        free: true,
+      });
 
       // 🔹 Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
@@ -249,28 +256,31 @@ export const addUserToCart = async (req, res) => {
           docType,
           docNumber,
           free: true,
-          status: "success"
+          status: "success",
         });
         verificationamount = 0;
       } else {
-        const verificationCartDetailsAadhar = await UserCartVerificationAadhatOTP.findOne(
-          { employer_id: user_id, is_del: false });
+        const verificationCartDetailsAadhar =
+          await UserCartVerificationAadhatOTP.findOne({
+            employer_id: user_id,
+            is_del: false,
+          });
 
-        const verificationCartDetails = await UserCartVerification.findOne(
-          { employer_id: user_id });
+        const verificationCartDetails = await UserCartVerification.findOne({
+          employer_id: user_id,
+        });
 
         if (
           (verificationCartDetails && verificationCartDetails.is_paid === 0) ||
-          (verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0)
+          (verificationCartDetailsAadhar &&
+            verificationCartDetailsAadhar.is_paid === 0)
         ) {
-
           const cartAmount = verificationCartDetails
             ? parseInt(verificationCartDetails.amount, 10)
             : null;
 
           const cartAmountAadhar = verificationCartDetailsAadhar
-            ? parseInt(verificationCartDetailsAadhar.
-              amount_for_demo_user, 10)
+            ? parseInt(verificationCartDetailsAadhar.amount_for_demo_user, 10)
             : null;
 
           if (cartAmount === 0 || cartAmountAadhar === 0) {
@@ -409,10 +419,10 @@ export const addUserToCartAadharOTP = async (req, res) => {
 
     const aadharImageUrl = req.files?.aadhaardoc
       ? await uploadToCloudinary(
-        req.files.aadhaardoc[0].buffer,
-        req.files.aadhaardoc[0].originalname,
-        req.files.aadhaardoc[0].mimetype
-      )
+          req.files.aadhaardoc[0].buffer,
+          req.files.aadhaardoc[0].originalname,
+          req.files.aadhaardoc[0].mimetype
+        )
       : null;
 
     // Special case for Demo User (role 3)
@@ -427,37 +437,43 @@ export const addUserToCartAadharOTP = async (req, res) => {
     const FREE_VERIFICATION_LIMIT = 1;
     let amount_for_demo_user = 0;
     if (user.role === 3) {
-
-      const usedFree = await freeVerificationDetail.countDocuments({ userId: user_id, free: true });
+      const usedFree = await freeVerificationDetail.countDocuments({
+        userId: user_id,
+        free: true,
+      });
 
       // Role 3 → Ignore package/plan, allow free verification
       if (usedFree < FREE_VERIFICATION_LIMIT) {
-
         await freeVerificationDetail.create({
           userId: user_id,
           docType,
           docNumber,
           free: true,
-          status: "success"
+          status: "success",
         });
       } else {
+        const verificationCartDetailsAadhar =
+          await UserCartVerificationAadhatOTP.findOne({
+            employer_id: user_id,
+            is_del: false,
+          });
 
-        const verificationCartDetailsAadhar = await UserCartVerificationAadhatOTP.findOne(
-          { employer_id: user_id, is_del: false });
+        const verificationCartDetails = await UserCartVerification.findOne({
+          employer_id: user_id,
+          is_del: false,
+        });
 
-        const verificationCartDetails = await UserCartVerification.findOne(
-          { employer_id: user_id, is_del: false });
-
-        if ((verificationCartDetailsAadhar && verificationCartDetailsAadhar.is_paid === 0) || (verificationCartDetails && verificationCartDetails.is_paid === 0)) {
-
+        if (
+          (verificationCartDetailsAadhar &&
+            verificationCartDetailsAadhar.is_paid === 0) ||
+          (verificationCartDetails && verificationCartDetails.is_paid === 0)
+        ) {
           const cartAmountAadhar = verificationCartDetailsAadhar
-            ? parseInt(verificationCartDetailsAadhar.
-              amount_for_demo_user, 10)
+            ? parseInt(verificationCartDetailsAadhar.amount_for_demo_user, 10)
             : null;
 
           const cartAmount = verificationCartDetails
-            ? parseInt(verificationCartDetails.
-              amount, 10)
+            ? parseInt(verificationCartDetails.amount, 10)
             : null;
 
           if (cartAmountAadhar === 0 || cartAmount === 0) {
@@ -533,9 +549,7 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
         companyId: employer_id,
       });
 
-      verificationCharge = parseFloat(
-        discountPercentData?.aadhar_price || 0
-      );
+      verificationCharge = parseFloat(discountPercentData?.aadhar_price || 0);
     }
 
     // my code ends here
@@ -550,9 +564,7 @@ export const getCartDetailsAadhatOTP = async (req, res) => {
     );
     */
 
-
     // it will end here
-
 
     const gstPercent = 18 / 100;
 
@@ -624,33 +636,35 @@ export const deleteUserAadharOTP = async (req, res) => {
       return res.status(400).json({ message: "Invalid ID format" });
     }
 
-
     // starts here
 
-    const verificationCartDetails = await UserCartVerificationAadhatOTP.findOne({
-      employer_id: user_id,
-      is_del: false,
-      is_paid: 0,
-    });
+    const verificationCartDetails = await UserCartVerificationAadhatOTP.findOne(
+      {
+        employer_id: user_id,
+        is_del: false,
+        is_paid: 0,
+      }
+    );
 
     if (verificationCartDetails && verificationCartDetails.is_paid === 0) {
-
       console.log("For deleting purpose I am inside if block: ");
       const cartAmount = verificationCartDetails
         ? parseInt(verificationCartDetails.amount_for_demo_user, 10)
         : 0;
 
-      console.log("For deleting purpose I am inside if block:   amoutn==> ", cartAmount);
+      console.log(
+        "For deleting purpose I am inside if block:   amoutn==> ",
+        cartAmount
+      );
 
       if (cartAmount === 0) {
         console.log("I am inside delete happen block");
-        const deletedFreeVerification = await freeVerificationDetail.findOneAndDelete({ userId: user_id });
+        const deletedFreeVerification =
+          await freeVerificationDetail.findOneAndDelete({ userId: user_id });
       }
     }
 
     // ends here
-
-
 
     // Delete user from database
     const deletedUser = await UserCartVerificationAadhatOTP.findByIdAndDelete(
@@ -887,7 +901,10 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
         let verificationCharge = 0;
 
         const FREE_VERIFICATION_LIMIT = 1;
-        const usedFree = await freeVerificationDetail.countDocuments({ userId: employer_id, free: true });
+        const usedFree = await freeVerificationDetail.countDocuments({
+          userId: employer_id,
+          free: true,
+        });
 
         if (employer.role !== 3) {
           // Normal package-based calculation
@@ -925,7 +942,6 @@ export const getUserVerificationCartByEmployer = async (req, res) => {
         };
       })
     );
-
 
     // 🔹 Role 3 → return free billing (no discount/GST)
     if (employer.role === 3 && overallSubtotal === 0) {
@@ -1371,17 +1387,22 @@ export const deleteUser = async (req, res) => {
     });
 
     if (verificationCartDetails && verificationCartDetails.is_paid === 0) {
-
       console.log("For deleting purpose I am inside if block: ");
       const cartAmount = verificationCartDetails
         ? parseInt(verificationCartDetails.amount, 10)
         : 0;
 
-      console.log("For deleting purpose I am inside if block:   amoutn==> ", cartAmount);
+      console.log(
+        "For deleting purpose I am inside if block:   amoutn==> ",
+        cartAmount
+      );
 
       if (cartAmount === 0) {
         console.log("I am inside delete happen block");
-        const deletedFreeVerification = await freeVerificationDetail.findOneAndDelete({ userId: employer_id });
+        const deletedFreeVerification =
+          await freeVerificationDetail.findOneAndDelete({
+            userId: employer_id,
+          });
       }
     }
 
@@ -1406,7 +1427,6 @@ export const deleteUser = async (req, res) => {
         .json({ success: false, message: "Employer not found" });
     }
 
-
     /**
      * Special Handling for Role 3
      * If employer has role = 3 → reset freeVerificationUsed = false
@@ -1422,7 +1442,6 @@ export const deleteUser = async (req, res) => {
       is_del: false,
       is_paid: 0,
     });
-
 
     if (!userCarts || userCarts.length === 0) {
       return res.status(200).json({
@@ -1452,7 +1471,6 @@ export const deleteUser = async (req, res) => {
     let discountPercent = 0;
 
     if (employer.role !== 3) {
-
       const discountPercentData = await CompanyPackage.findOne({
         companyId: employer_id,
       });
@@ -1465,14 +1483,12 @@ export const deleteUser = async (req, res) => {
       console.log("Discount ==>>", discountPercentData.discount_percent);
       const discountPercent =
         parseFloat(discountPercentData.discount_percent || 0) / 100;
-
     } else {
       discountPercent = 0;
     }
 
     const formattedData = await Promise.all(
       userCarts.map(async (cart) => {
-
         let verificationCharge = 0;
         if (employer.role !== 3) {
           console.log("Plan ID ==>>", cart.plan);
@@ -1489,7 +1505,6 @@ export const deleteUser = async (req, res) => {
             packagedetails.transaction_fee || 0
           );
           console.log(verificationCharge);
-
         } else {
           verificationCharge = parseFloat(cart.amoun) || 0;
         }
@@ -1809,6 +1824,7 @@ export const listAllTransactionByCompany = async (req, res) => {
     const allTransactions = await allOrdersData
       .find(filter)
       .populate("employer_id", "name") // only fetch employer name
+      .populate("owner_ids", "flat_no name")
       .sort({ createdAt: -1 });
 
     if (!allTransactions.length) {
@@ -1826,6 +1842,13 @@ export const listAllTransactionByCompany = async (req, res) => {
       const hasValidSgst = orderObj.sgst && orderObj.sgst_percent;
       const hasValidDiscount =
         orderObj.discount_amount && orderObj.discount_percent;
+
+      // make Name coma separated
+      if (orderObj.owner_ids && orderObj.owner_ids.length > 0) {
+        orderObj.owner_ids = orderObj.owner_ids
+          .map((owner) => owner.name + " (" + owner.flat_no + ")")
+          .join(", ");
+      }
 
       return {
         employer_name: orderObj.employer_id?.name || "N/A",
@@ -1845,6 +1868,10 @@ export const listAllTransactionByCompany = async (req, res) => {
         total_amount: orderObj.total_amount ?? "N/A",
         total_users: orderObj.total_numbers_users ?? "N/A",
         id: orderObj._id,
+        balance: orderObj.balance ?? "N/A",
+        type: orderObj.type ?? "N/A",
+        payment_method: orderObj.payment_method ?? "N/A",
+        owner_names: orderObj.owner_ids ?? "N/A",
       };
     });
 
@@ -1852,6 +1879,7 @@ export const listAllTransactionByCompany = async (req, res) => {
       success: true,
       message: "Company transactions fetched successfully",
       data: formattedTransactions,
+      raw: allTransactions,
     });
   } catch (error) {
     console.error("Error fetching transactions:", error);

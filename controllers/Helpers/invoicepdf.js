@@ -33,7 +33,7 @@ const InvoiceGenerate = ({ data }) => {
         <div class="text-end">
           <div class="invoice-title">INVOICE</div>
           <div class="company-name">
-            GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED
+            2S GLOBAL TECHNOLOGIES LIMITED
           </div>
           <div class="company-name">GST: 19AAVCS5999N1ZR</div>
           <div class="company-details">

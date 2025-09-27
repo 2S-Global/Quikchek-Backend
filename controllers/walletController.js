@@ -1,6 +1,6 @@
 import Transaction from "../models/transactionModel.js";
 import User from "../models/userModel.js";
-
+import allOrdersData from "../models/allOrders.js";
 export const addTransaction = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -113,7 +113,7 @@ export const walletBalance = async (req, res) => {
 export const addWalletAmount = async (req, res) => {
   try {
     const { amount, companyId } = req.body;
-
+    console.log("companyId", companyId);
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
       return res.status(400).json({
         success: false,
@@ -139,6 +139,18 @@ export const addWalletAmount = async (req, res) => {
 
     user.wallet_amount = (user.wallet_amount || 0) + Number(amount);
     await user.save();
+
+    const orderNumber = `CRD-${Date.now()}`;
+
+    //insert in allOrders table
+    const allOrders = new allOrdersData({
+      employer_id: companyId,
+      total_amount: amount,
+      balance: user.wallet_amount,
+      type: "Credit",
+      order_number: orderNumber,
+    });
+    await allOrders.save();
 
     return res.status(200).json({
       success: true,

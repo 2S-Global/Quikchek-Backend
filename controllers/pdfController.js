@@ -41,7 +41,7 @@ export const generatePDF = async (req, res) => {
 
     const headerTemplate = `
       <div style="width: 100%; text-align: center; font-size: 12px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-        <h2 style="margin: 0; color: #333;">GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED</h2>
+        <h2 style="margin: 0; color: #333;">2S GLOBAL TECHNOLOGIES LIMITED</h2>
 <p style="margin: 0; font-size: 10px; line-height: 1.6;">
   Unit-404, 4th Floor, Webel IT Park (Phase-II),<br />
   Rajarhat, DH Block (Newtown), Action Area 1D,<br />
@@ -134,7 +134,7 @@ export const otpgeneratePDF = async (req, res) => {
 
     const headerTemplate = `
       <div style="width: 100%; text-align: center; font-size: 12px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-        <h2 style="margin: 0; color: #333;">GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED</h2>
+        <h2 style="margin: 0; color: #333;">2S GLOBAL TECHNOLOGIES LIMITED</h2>
 <p style="margin: 0; font-size: 10px; line-height: 1.6;">
   Unit-404, 4th Floor, Webel IT Park (Phase-II),<br />
   Rajarhat, DH Block (Newtown), Action Area 1D,<br />
@@ -325,7 +325,7 @@ export const ReportPDF = async (req, res) => {
     const page = await browser.newPage();
     const headerTemplate = `
       <div style="width: 100%; text-align: center; font-size: 12px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-        <h2 style="margin: 0; color: #333;">GLOBAL EMPLOYABILITY INFORMATION SERVICES INDIA LIMITED</h2>
+        <h2 style="margin: 0; color: #333;">2S GLOBAL TECHNOLOGIES LIMITED</h2>
 <p style="margin: 0; font-size: 10px; line-height: 1.6;">
   Unit-404, 4th Floor, Webel IT Park (Phase-II),<br />
   Rajarhat, DH Block (Newtown), Action Area 1D,<br />
