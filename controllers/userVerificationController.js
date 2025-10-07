@@ -1968,6 +1968,15 @@ export const paynow = async (req, res) => {
       },
     });
 
+    const ucfirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+    const payments = `<p>Payment Method: ${ucfirst(payment_method)}</p>
+    ${
+      payment_method === "Wallet"
+        ? `<p>Credit Balance: ${user.wallet_amount}</p>`
+        : ""
+    }
+    `;
+
     const mailOptions = {
       from: `"QuikChek Team" <${process.env.EMAIL_USER}>`,
       to: user.email,
@@ -1980,8 +1989,8 @@ export const paynow = async (req, res) => {
         <p>Thank you for shopping with QuikChek. We have successfully received your order, and it's now being processed.</p>
         <p><strong>Order Details:</strong></p>
         <p>Order Number: #${orderNumber}</p>
-        <p>Payment Amount: #${overall_billing.total}</p>
-        <p>Payment Method: Online</p>
+        <p>Payment Amount:  ₹${overall_billing.total}</p>
+        ${payments}
 
         <p>Thank you for shopping with QuikChek. Here are your order details:</p>
         ${emailTable}
@@ -2285,7 +2294,7 @@ export const paynowFree = async (req, res) => {
         <p><strong>Order Details:</strong></p>
         <p>Order Number: #${orderNumber}</p>
         <p>Payment Amount: #${overall_billing.total}</p>
-        <p>Payment Method: Online</p>
+        <p>Payment Method: Free</p>
 
         <p>Thank you for shopping with QuikChek. Here are your order details:</p>
         ${emailTable}

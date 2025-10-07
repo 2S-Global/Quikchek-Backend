@@ -10,7 +10,11 @@ export const getallownerforcompany = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const owners = await ownerdetails.find({ complex_id: userId }).lean();
+    const owners = await ownerdetails
+      .find({ complex_id: userId })
+      .sort({ name: 1 }) // 1 = ascending, -1 = descending
+      .lean();
+
     if (owners.length === 0) {
       res.status(404).json({ message: "No owners found for this company" });
     } else {
