@@ -1569,9 +1569,9 @@ export const deleteCompany = async (req, res) => {
 
     // Find and update the company
     const deletedCompany = await User.findOneAndUpdate(
-      { _id: objectId, role: 1, is_del: false },
+      { _id: objectId, role: { $ne: 0 }, is_del: false },
       { is_del: true, updatedAt: new Date() },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!deletedCompany) {
@@ -1604,9 +1604,9 @@ export const deleteAccount = async (req, res) => {
 
     // Find and update the company
     const deletedCompany = await User.findOneAndUpdate(
-      { _id: companyId, role: 1, is_del: false },
+      { _id: objectId, role: { $ne: 0 }, is_del: false },
       { is_del: true, updatedAt: new Date() },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!deletedCompany) {
