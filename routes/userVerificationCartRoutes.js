@@ -4,19 +4,22 @@ import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 // import uploadmiddleware from '../middleware/upload';
 import {
-    addUserToCart,
-    getUserVerificationCartByEmployer,
-    getUserVerificationCartByEmployerAll,getPaidUserVerificationCartByEmployer,deleteUser,
-    getAllVerifiedCandidateAdmin,
-    getAllVerifiedCandidateByCompanyForAdmin,
-    getCartDetailsAadhatOTP,
-    deleteUserAadharOTP,
-    addUserToCartAadharOTP,
-    getUserVerificationCartByEmployerFromAdmin,
-    listAllTransactionByCompany,
-    listAllTransactionByCompanyAdmin,
-    checkFreeTrialDemouser
-} from '../controllers/userVerificationCartController.js'; // Adjust the path according to your project structure
+  addUserToCart,
+  getUserVerificationCartByEmployer,
+  getUserVerificationCartByEmployerAll,
+  getPaidUserVerificationCartByEmployer,
+  deleteUser,
+  getAllVerifiedCandidateAdmin,
+  getAllVerifiedCandidateByCompanyForAdmin,
+  getCartDetailsAadhatOTP,
+  deleteUserAadharOTP,
+  addUserToCartAadharOTP,
+  getUserVerificationCartByEmployerFromAdmin,
+  listAllTransactionByCompany,
+  listAllTransactionByCompanyAdmin,
+  checkFreeTrialDemouser,
+  getQrcodeDetails,
+} from "../controllers/userVerificationCartController.js"; // Adjust the path according to your project structure
 
 //Middleware
 import userAuth from '../middleware/authMiddleware.js';
@@ -65,6 +68,8 @@ userRouter.post('/list_user_cart_admin', upload.none(), userAuth, Adminmid, getU
 
 userRouter.get('/list_user_cart_all', upload.none(), userAuth, Companymid, getUserVerificationCartByEmployerAll);
 userRouter.post('/getPaidUserVerificationCartByEmployer', upload.none(), userAuth, Companymid, getPaidUserVerificationCartByEmployer);
+userRouter.get("/get-qrcode-details", getQrcodeDetails);
+
 userRouter.post('/getAllVerifiedCandidateAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateAdmin);
 userRouter.post('/getAllVerifiedCandidateByCompanyForAdmin', upload.none(), userAuth,Adminmid, getAllVerifiedCandidateByCompanyForAdmin);
 userRouter.post('/deleteUser', upload.none(), userAuth, Companymid, deleteUser);

@@ -1130,6 +1130,53 @@ export const getPaidUserVerificationCartByEmployer = async (req, res) => {
   }
 };
 
+export const getQrcodeDetails = async (req, res) => {
+  try {
+    const { candidate_id } = req.query;
+
+    // Validate candidate_id
+    if (!candidate_id || !mongoose.Types.ObjectId.isValid(candidate_id)) {
+      return res.status(400).json({
+        message: "Invalid candidate ID",
+        data: [],
+      });
+    }
+
+    // Fetch only verified records
+    const user = await UserVerification.findOne({
+      _id: candidate_id,
+      all_verified: 1,
+    });
+
+    if (!user) {
+      return res.status(200).json({
+        message: "No verified user found",
+        data: [],
+      });
+    }
+
+    // Add status field
+    const processedUser = {
+      ...user.toObject(),
+      status: "verified", // since all_verified = 1
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "QR code details fetched successfully",
+      data: processedUser,
+    });
+  } catch (error) {
+    console.error("Error fetching QR code details:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+      data: [],
+    });
+  }
+};
+
 export const getAllVerifiedCandidateAdmin_24042025 = async (req, res) => {
   try {
     const paidUsers = await UserVerification.find({
